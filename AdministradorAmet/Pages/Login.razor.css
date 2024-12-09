@@ -1,0 +1,178 @@
+﻿
+body{
+    margin:0;
+    padding:0;
+}
+#display-div{
+    display:flex;
+
+}
+
+/* Fondo verde (izquierda) */
+.rectangle-green {
+    background-color: #009C40;
+    height: 100vh;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+   
+
+}
+
+/* Estilo de la sección de login */
+.login-section {
+    font-family: 'Poppins', sans-serif;
+    width: 80%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    color: white;
+    margin: auto;
+    margin-top: 5%;
+}
+.header-login h1 {
+    font-size: 52px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: bold;
+    
+}
+.header-login p {
+    width:auto;
+    margin-bottom: 40px;
+   
+    font-size: 15px;
+}
+
+/* Estilo de inputs */
+.input-field {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    background-color: transparent;
+    font-size: 15px;
+    width: 100%; /* Se ajusta al contenedor */
+    box-sizing: border-box;
+}
+
+/* Contraseña con icono */
+.input-wrapper {
+    position: relative;
+}
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 20px;
+    filter: brightness(0) invert(1);
+}
+.usuario label,
+.password label {
+    font-size: 14px;
+  
+    font-style: normal;
+}
+
+
+/* Extras: Recordar y Olvidaste contraseña */
+.extras {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+    .extras label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: white;
+        font-size: 14px;
+    }
+ .extras input[type="checkbox"] {
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid white;
+        background-color: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        position: relative;
+}
+ .extras a{
+     color:black;
+     font-size:14px;
+ }
+
+/* Botones */
+.btn-primary, .btn-google {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    width: 100%; /* Ancho completo dentro del contenedor */
+    text-align: center;
+}
+.btn-primary {
+    background-color: white;
+    color: #009C40;
+    margin-top: 20px;
+    border-radius: 9px;
+    border: 1px solid #ddd;
+}
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #009C40;
+    color: white;
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    cursor: pointer;
+    margin-top: 0px;
+    margin-bottom: 4px;
+    flex-direction: row-reverse;
+}
+.btn-google img {
+        width: 20px;
+        height: 20px;
+    }
+
+/* Registro */
+.register-container {
+    text-align: center;
+    
+}
+.register a {
+    color: black;
+    text-decoration: underline;
+}
+
+/* Contenedor derecho (contenido) */
+.content {
+    background-color: white;
+    height: 100vh;
+    width: 50%;
+    margin: auto;
+   
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+/* Logo y nombre */
+.content h1 {
+    font-size: 70px;
+    color: black;
+    font-weight: bold;
+    margin-top:7px;
+}
+.content .logo {
+    max-width: 500px; /* Tamaño máximo del logo */
+    height: auto;
+}

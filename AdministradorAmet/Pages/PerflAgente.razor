@@ -1,0 +1,106 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<PageTitle>Administrador Digesett</PageTitle>
+@page "/perfilAgente"
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+
+<div class="container">
+
+    <!-- Primera columna -->
+    <div class="column left">
+        <div class="back-container">
+            <img @onclick="Atras" src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
+            <span class="back-text">Atrás</span>
+        </div>
+    </div>
+
+    <!-- Segunda columna (Centro) -->
+    <div class="column center">
+        <div class="main-box">
+            <div class="photo-info">
+                <!-- Foto -->
+                @* <div class="photo-box"> Foto </div> *@
+                <img crs="imagenes/foto-svg" alt="imagenperfil" class="photo-box" />
+             
+                <!-- Textos al lado de la foto -->
+
+                <div class="info-list">
+
+                    <p class="nombre"><strong>Jose Ferreira Rodriguez</strong></p>
+                    <p><strong>ID:</strong> <span class="info-value">12345</span></p>
+                    <p><strong>Estado:</strong> <span class="info-value active">Activo</span></p>
+                    <p><strong>Multas:</strong> <span class="info-value green">0</span></p>
+                </div>
+
+
+            </div>
+
+            <!-- Datos debajo de la foto -->
+            <div class="additional-info">
+                <p class="location"><strong>Santiago de los caballeros</strong></p>
+                <p><strong>Edad:</strong> <span>35 </span></p>
+               @*  <p><strong>Altura:</strong> <span>1.75 m</span></p> *@
+                <p><strong>Estado Civil:</strong> <span>Casado</span></p>
+                <p><strong>Fecha de Nacimiento:</strong> <span>1988-05-10</span></p>
+            </div>
+
+            <!-- Otros datos -->
+            <div class="other-data">
+                <h3>Otros Datos</h3>
+                <p>Información adicional sobre el agente.</p>
+            </div>
+
+            <!-- Iconos al final -->
+            <div class="icons">
+                <img src="imagenes/delete-icon.svg" alt="Icono 1" class="icon">
+                <img src="imagenes/edit-icon.svg" alt="Icono 2" class="icon">
+                <img src="imagenes/note-icon.svg" alt="Icono 3" class="icon">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tercera columna -->
+    <div class="column right">
+        <div class="score-box">
+            <h3>Puntuación</h3>
+
+            <div class="score-row">
+                <span>Excelente</span>
+                <div class="progress-bar excellent">
+                    <div class="progress" style="width: 80%;"></div>
+                </div>
+                <span>80%</span>
+            </div>
+
+            <div class="score-row">
+                <span>Regular</span>
+                <div class="progress-bar regular">
+                    <div class="progress" style="width: 50%;"></div>
+                </div>
+                <span>50%</span>
+            </div>
+
+            <div class="score-row">
+                <span>Malo</span>
+                <div class="progress-bar bad">
+                    <div class="progress" style="width: 20%;"></div>
+                </div>
+                <span>20%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    private void Atras(){
+        NavigationManager.NavigateTo("");
+
+    }
+}

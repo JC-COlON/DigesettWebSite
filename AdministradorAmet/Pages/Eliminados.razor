@@ -1,0 +1,77 @@
+﻿@* @layout ParaRecuperarPassword1 *@ 
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<PageTitle>Administrador Digesett</PageTitle>
+
+@page "/eliminados"
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+
+<div class="container">
+    <!-- Parte Superior -->
+    <div class="header">
+        <h1 class="title">Notificaciones</h1>
+        <div class="text-links">
+            <span class="text-link" @onclick="IraTodos" id="todos">Todos</span>
+            <span class="text-link" @onclick="Iraeditados" id="editados">Editados</span>
+            <span class="text-link" id="eliminados">Eliminados</span>
+        </div>
+    </div>
+
+    <!-- Cuadro big  -->
+    <div class="agents-section">
+
+        <h2 class="FechaNotificacion">10 Dic</h2>
+
+        <!-- Cuadro central -->
+        <div class="main-table">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>James Hulton</th>
+                        <th>ID:</th>
+                        <th>Status:</th>
+                        <th>Creado:</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td> o</td>
+                        <td>Solicitud de un cambio de mi contraseña</td>
+                        <td>12345</td>
+                        <td>Activo</td>
+                        <td>01/12/2024</td>
+                        <td>
+                            <img src="imagenes/revert.svg" alt="Editar" class="action-icon">
+                            
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+
+    </div>
+
+</div>
+
+@code {
+    private void IraTodos()
+    {
+        NavigationManager.NavigateTo("notificaciones");
+    }
+
+    private void Iraeditados()
+    {
+        NavigationManager.NavigateTo("editados");
+    }
+
+}

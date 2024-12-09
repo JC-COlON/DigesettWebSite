@@ -1,0 +1,103 @@
+﻿@layout EmtyLayout
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<PageTitle>Login Admimistrador</PageTitle>
+@page "/LoginAdmimistrador"
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+<body>
+
+    <section id="display-div">
+        <div class="rectangle-green">
+
+            <div class="login-section">
+
+                <div class="header-login">
+                    <h1>Login</h1>
+                    <p>Ingresa tus datos para poder entrar a la aplicación</p>
+                </div>
+
+                <div class="usuario">
+                    <label for="usuario">Usuario</label>
+                    <input type="text" id="usuario" class="input-field" />
+                </div>
+
+                <div class="password">
+                    <label for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" class="input-field" />
+                        <img src="imagenes/eyesee.png" alt="Mostrar contraseña" class="eye-icon" />
+                    </div>
+                </div>
+
+                <div class="extras">
+                    <label>
+                        <input type="checkbox" /> Recordar
+                    </label>
+                    <a @onclick="irAOlvideContrasenna" href="#">Olvidaste la contraseña?</a>
+                </div>
+
+                <button @onclick="EntrarApp" class="btn-primary">
+                    Entrar
+                </button>
+
+                <button class="btn-google">
+                    <img src="imagenes/logodegoogle.png" alt="Google" />
+                    Entrar con Google
+                </button>
+
+                <div class="register-container">
+                    <p class="register">¿No tienes una cuenta? <a href="#">Crea una</a></p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="content">
+
+            <h1>DIGESETT</h1>
+            <img src="imagenes/ametlogo.png" alt="Logo DIGESETT" class="logo" />
+
+        </div>
+
+    </section>
+
+</body>
+
+
+@code {
+   private void EntrarApp()
+    {
+        NavigationManager.NavigateTo("");
+    }
+    
+    private void irAOlvideContrasenna()
+    {
+        NavigationManager.NavigateTo("enviarAlCorreo");
+    }
+
+    // private LoginModel loginModel = new LoginModel();
+
+    // private void HandleLogin()
+    // {
+    //     // Lógica de autenticación (aquí solo es un ejemplo simple)
+    //     if (loginModel.Username == "admin" && loginModel.Password == "admin")
+    //     {
+    //         // Si el login es exitoso, redirige al Home
+    //         NavigationManager.NavigateTo("/home");
+    //     }
+    //     else
+    //     {
+    //         // Si las credenciales son incorrectas, muestra un mensaje o realiza otra acción
+    //         Console.WriteLine("Credenciales incorrectas");
+    //     }
+    // }
+
+    // public class LoginModel
+    // {
+    //     public string Username { get; set; }
+    //     public string Password { get; set; }
+    // }
+}
+

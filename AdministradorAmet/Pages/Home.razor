@@ -1,0 +1,133 @@
+﻿@inject NavigationManager NavigationManager
+@inherits LayoutComponentBase
+@page "/"
+<PageTitle>Administrador Digesett</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+
+<div class="container">
+    <!-- Parte Superior -->
+    <div class="header">
+        <h1 class="title">ANÁLISIS</h1>
+        <button @onclick="IrAcreateAgente" class="btn-create">
+            <span>CREAR USUARIO   + </span>
+           @*  <img src="icono-mas.png" alt="Icono +" class="icon-plus"> *@
+        </button>
+    </div>
+    
+    <!-- Cuadro transparente  -->
+    <div class="Cuadro-Grande">
+
+        <h2 class="section-title">AGENTES</h2>
+
+        <div class="top-row">
+
+            <!-- Cuadros de agentes -->
+            <div class="agent-box" >
+                <span class="number orange">150</span>
+                <span class="text1">Agentes</span>
+            </div>
+            <div class="agent-box">
+                <span class="number orange">130</span>
+                <span class="text1">Activos</span>
+            </div>
+            <div class="agent-box">
+                <span class="number orange">20</span>
+                <span class="text1">Inactivos</span>
+            </div>
+
+            
+
+            <div class="green-box1">
+                <span class="text">6</span>
+                <span class="fecha">Hoy</span>
+            </div>
+
+
+        </div>
+
+        <div class="wrapper">
+            <!-- Cuadro central abajo-->
+            <div class="main-table">
+
+                <!-- Tabla con scroll -->
+                <table>
+                    <thead>
+
+                        <tr>
+                            <th></th>
+                            <th>Provincias</th>
+                            <th>Hoy</th>
+                            <th>1 Semana</th>
+                            <th>2 Semana</th>
+                            <th>3 Semana</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td><input @onclick="IraVerAgente" type="checkbox" class="row-checkbox" /></td>
+                            <td>Santiago</td>
+                            <td>10</td>
+                            <td>19</td>
+                            <td>32</td>
+                            <td>120</td>
+                        </tr>
+
+
+                        <!-- Más filas -->
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Cuadros al lado derecho -->
+            <div class="side-boxes">
+             
+
+                <h3 class="second-box-title">Más Multas</h3> 
+
+                <div class="green-box">
+                    <span class="text">240</span>
+                    <span class="fecha">Santo Domingo</span>
+                </div>
+
+                <div class="green-box">
+                    <span class="text">129</span>
+                    <span class="fecha">Santiago</span>
+                </div>
+
+                <div class="green-box">
+                    <span class="text">112</span>
+                    <span class="fecha">La Vega</span>
+                </div>
+
+                <div class="green-box">
+                    <span class="text">102</span>
+                    <span class="fecha">San Pedro de Macorís</span>
+                </div>
+            </div>
+
+        </div>
+       
+
+
+    </div>
+
+</div>
+
+@code {
+    private void IrAcreateAgente()
+    {
+        NavigationManager.NavigateTo("createAgente");
+    }
+
+    private void IraVerAgente(){
+        NavigationManager.NavigateTo("provinciasAgentes");
+    }
+}

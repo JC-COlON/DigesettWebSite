@@ -1,0 +1,159 @@
+﻿/* General */
+/*body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+}*/
+
+/* Contenedor principal */
+/*.web-sen-codigo-1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}*/
+
+/* Header */
+.web-sen-codigo-1 {
+    display: flex;
+    flex-direction: column; /* Apila header y rectangle */
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Altura completa de la pantalla */
+    background-color: white; /* Fondo opcional */
+    position: relative;
+}
+
+.header {
+    position: absolute; /* Se mantiene fijo en la esquina superior izquierda */
+    top: 05px;
+    left: 20px;
+    display: flex;
+    align-items: center; /* Alinea logo y texto verticalmente */
+    gap: 10px; /* Espaciado entre logo y texto */
+}
+
+.ametlogo {
+    width: 80px;
+    height: 80px;
+    border-radius: 21px;
+}
+
+.digesett {
+    font-size: 30px;
+    font-family: var(--font-family-poppins);
+    font-weight: bold;
+    color: black;
+    margin: 0; /* Elimina márgenes predeterminados */
+}
+
+/* Rectángulo principal */
+.rectangle {
+    position: relative;
+    width: 480px;
+    height: 500px;
+    background-color: transparent;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: visible; /* Asegura que la sombra no se recorte */
+}
+
+
+/* Imagen y texto */
+.email {
+    width: 83px;
+    height: auto;
+    color: #FD8402;
+    margin-bottom: 20px;
+}
+
+.text-1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.text-2 {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de los cuadros */
+.SeisCuadros {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 17px;
+    margin: 20px 0;
+}
+
+/* Estilo de cada cuadro */
+.input-box {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    border: 1px solid #FD8402;
+    border-radius: 5px;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+}
+
+    .input-box:focus {
+        border-color: #ff6a00;
+    }
+
+/* Botón */
+.btn {
+    width: 280px;
+    height: 35px;
+    border: none;
+    border-radius: 7px;
+    background-color: #FD8402;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 20px;
+}
+
+
+/* Enviar código de nuevo */
+.EnviarCodigo-DeNuevo {
+    margin-top: 20px;
+}
+
+.register {
+    font-size: 14px;
+    color: #555;
+}
+
+    .register a {
+        color: #FD8402;
+        text-decoration: none;
+    }
+
+        .register a:hover {
+            text-decoration: underline;
+        }

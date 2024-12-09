@@ -1,0 +1,83 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<PageTitle>Administrador Digesett</PageTitle>
+@page "/provinciasAgentes"
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+<div class="container">
+    <!-- Fila 1 -->
+    <div class="header">
+        <div class="back-container">
+            <img src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
+            <span class="back-text">Atrás</span>
+        </div>
+        <h1 class="city-title">Santiago</h1>
+    </div>
+
+    <!-- Fila 2 -->
+    <div class="actions-row">
+
+        <div class="text-links">
+            <span class="text-link" id="todos">Todos</span>
+            <span class="text-link" id="editados">Activos</span>
+            <span class="text-link" id="eliminados">Inactivos</span>
+        </div>
+        <button class="btn-create">
+            <span>CREAR USUARIO +</span>
+        </button>
+    </div>
+
+    <!-- Fila 3 -->
+    <div class="big-frame">
+        <div class="main-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>ID Agente</th>
+                        <th>Nombre</th>
+                        <th>Multas</th>
+                        <th>Estado</th>
+                        <th>Editar</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            <img @onclick="gotoperfil" src="imagenes/user-circle.svg" alt="Editar" class="icon-action">
+                        </td>
+                        <td>44</td>
+                        <td>Jose</td>
+                        <td>23</td>
+                        <td><button class="status-btn ">Activo</button></td>
+
+                        <td>
+                            <img src="imagenes/edit-icon.svg" alt="Editar" class="icon-action">
+                        </td>
+
+                        <td>
+                            <img src="imagenes/more-icon.svg" alt="Eliminar" class="icon-action">
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+
+    private void gotoperfil()
+    {
+        NavigationManager.NavigateTo("perfilAgente");
+    }
+
+}

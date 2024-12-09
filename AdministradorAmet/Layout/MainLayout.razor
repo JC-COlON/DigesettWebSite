@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+   <div style="background-image:none;background-color:white;" class="sidebar">
+    <NavMenu />
+</div>
+
+    <main>
+
+        <div class="top-row px-4 d-flex align-items-center justify-content-center">
+           
+            <a href="#" class="icon-link mx-2">
+                <img src="imagenes/user-circle.svg" alt="Icon 1" class="icon" />
+            </a>
+
+            <a href="#" class="icon-link mx-2">
+                <img src="imagenes/notification.svg" alt="Icon 2" class="icon" />
+            </a>
+
+            <a href="#" class="icon-link mx-2">
+                <img src="imagenes/settingIcon.svg" alt="Icon 3" class="icon" />
+            </a>
+
+        </div>
+
+
+        <article class="content px-4">
+            @Body
+        </article>
+
+    </main>
+
+</div>

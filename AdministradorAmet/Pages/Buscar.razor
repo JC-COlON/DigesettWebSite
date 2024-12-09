@@ -1,0 +1,25 @@
+﻿@inject NavigationManager NavigationManager
+<PageTitle>Administrador Digesett</PageTitle>
+@page "/Buscar"
+
+
+
+<div class="search-container">
+    <h1 class="search-title">Buscar</h1>
+    <div class="search-box-container">
+        <div class="search-box">
+            <input type="text" class="form-control" placeholder="Escribe aqui...">
+        </div>
+        <button @onclick="IrALogin" class="search-button">Buscar</button>
+    </div>
+</div>
+
+
+
+@code {
+
+    private void IrALogin()
+    {        
+        NavigationManager.NavigateTo("LoginAdmimistrador");
+    }
+}

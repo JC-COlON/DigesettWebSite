@@ -1,0 +1,50 @@
+﻿@layout ParaRecuperarPassword1
+@inject NavigationManager NavigationManager
+@page "/ChangePaswaordPage"
+
+
+<div class="web-sen-codigo-1">
+
+    <div class="header">
+        <img src="imagenes/ametlogo.png" class="ametlogo" alt="Logo Amet" />
+        <p class="digesett">DIGESETT</p>
+    </div>
+
+
+    <div class="rectangle">
+
+        <img src="imagenes/securelogin.svg" class="undrawforgot" alt="undraw" />
+        <p class="text-1">or</p>
+
+
+        <div class="newPasword1">
+            <label for="inputLabel" class="label1">Nueva Contraseña</label>
+            <div class="input-container">
+                <input id="input" type="text" class="input1" />
+                <img src="imagenes/eyesee.png" alt="Mostrar contraseña" class="eyeicon1" />
+            </div>
+        </div>
+
+        <div class="newPasword2">
+            <label for="inputLabel" class="label2">Repite la contraseña</label>
+            <div class="input-container">
+                <input id="input" type="text" class="input2" />
+                <img src="imagenes/eyesee.png" alt="Mostrar contraseña" class="eyeicon2" />
+            </div>
+        </div>
+
+
+        <button @onclick="IrALoginn" class="btn">Cambiar contraseña</button>
+
+    </div>
+
+</div>
+
+
+@code {
+    // LoginAdmimistrador
+    private void IrALoginn()
+    {
+        NavigationManager.NavigateTo("LoginAdmimistrador");
+    }
+}

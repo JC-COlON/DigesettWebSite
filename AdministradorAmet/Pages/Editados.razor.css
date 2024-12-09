@@ -1,0 +1,162 @@
+﻿
+/* General */
+.container {
+    font-family: Poppins, Roboto;
+    padding: 0px;
+    margin-top: 10px;
+    text-align: left;
+    margin-left: 15px;
+}
+
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    max-width: 97%;
+}
+
+.title {
+    font-size: 22px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.text-links {
+    display: flex;
+    gap: 40px;
+}
+
+.text-link {
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+    position: relative;
+    padding-bottom: 4px; /* Espacio para la línea */
+}
+    .text-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: transparent; /* Línea invisible por defecto */
+        transition: background-color 0.3s ease;
+    }
+    .text-link:hover {
+        color: #FD8402; /* Color del texto al pasar el ratón */
+    }
+    .text-link.active {
+        color: #FD8402; /* Color del texto cuando está activo */
+    }
+        .text-link.active::after {
+            background-color: #FD8402; /* Línea activa de color FD8402 */
+        }
+
+.agents-section {
+    width: 97%;
+    height: 75vh;
+    border: 1px solid #009C40;
+    padding: 20px;
+    border-radius: 9px;
+    background-color: #F2F5FA;
+    overflow-y: auto;
+}
+.FechaNotificacion {
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: black;
+    margin-top: 0px;
+}
+
+
+/* Main Table */
+.main-table {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 510px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: white;
+    
+}
+table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border: none;
+    box-shadow: none;
+    
+}
+th, td {
+    padding: 7px;
+    font-size: 14px;
+    text-align: center;
+    word-wrap: break-word; /* Ajustar texto largo */
+    border: 1px dashed rgba(0, 0, 0, 0.2); /* Líneas guía */
+}
+th {
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 16px;
+    
+}
+
+    /* Ajustar anchos de columnas */
+    th:nth-child(1), td:nth-child(1) {
+        width: 5%;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 30%;
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 10%;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+        width: 10%;
+    }
+
+/* Estilo específico para el contenido de ID */
+td:nth-child(3) {
+    color: #009C40;
+}
+
+td:nth-child(4) {
+    color: #009C40;
+}
+
+/* Estilo para las demás columnas */
+th:nth-child(5), td:nth-child(5) {
+    width: 10%;
+}
+
+th:nth-child(6), td:nth-child(6) {
+    width: 10%;
+}
+
+.action-icon {
+    width: 23px;
+    height: 23px;
+    margin-right: 25px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+    .action-icon:last-of-type {
+        margin-right: 0;
+    }
+    .action-icon:hover {
+        transform: scale(1.1);
+    }

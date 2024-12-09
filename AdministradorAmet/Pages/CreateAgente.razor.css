@@ -1,0 +1,177 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    width: 80%;
+    margin-top: 10px;
+    background-color: white;
+    margin-left: 10px; 
+    padding: 0px;
+}
+.header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 30px;
+    padding: 0 10px; 
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    
+}
+
+.back-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+
+}
+.icon-back {
+    width:21px;
+    height:auto;margin-top:-70px;
+    cursor: pointer;
+}
+.back-text {
+    margin-top: -70px;
+    font-size: 14px;
+    color: black;
+}
+.header h1 {
+    margin-top: -70px;
+    flex: 1;
+    text-align: center;
+    margin: 0;
+    font-size: 20px;
+    color: #09c940;
+}
+
+
+.inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+    margin-bottom: 45px;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin-top: 20px;
+    background-color: white;
+    margin-left: 10px;
+    padding: 0px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 0px;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+}
+
+.back-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre texto y botón */
+}
+.icon-back {
+    width: 27px;
+    height: auto;
+    cursor: pointer;
+}
+.back-text {
+    font-size: 16px;
+    color: black;
+}
+
+.header h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 20px;
+    color: #09c940;
+}
+
+
+.inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+    margin-bottom: 30px;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+    .input-group input {
+        height: 40px;
+        width: 270px;
+        border: 1px solid #828282;
+        border-radius: 6px !important;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        appearance: none;
+    }
+    .input-group label {
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+.last-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    margin-bottom: 40px;
+    height: 100px; /* Si necesitas centrar verticalmente */
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 49px;
+    
+}
+.create-button {
+    background-color: #009C40;
+    color: white;
+    border: none;
+    width: 120px;
+    height: 40px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+    .create-button:hover {
+        background-color: #007A30;
+    }
+.cancel-button {
+    background-color: #ff0000;
+    width: 120px;
+    height: 40px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+    .cancel-button:hover {
+        background-color: #990101; 
+    }

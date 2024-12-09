@@ -1,0 +1,42 @@
+﻿ @layout EmtyLayout
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<PageTitle>Recuperar Contraseña</PageTitle>
+@page "/enviarAlCorreo"
+
+
+
+<div class="web-sen-codigo-1">
+    <div class="header">
+        <img src="imagenes/ametlogo.png" class="ametlogo" alt="Logo Amet" />
+        <p class="digesett">DIGESETT</p>
+    </div>
+
+    <div class="rectangle">
+        <img src="imagenes/email.svg" class="email" alt="undraw" />
+        <p class="text-1">Verifica tu email</p>
+        <p class="text-2">Ingresa los 6 dígitos</p>
+
+        <div class="SeisCuadros">
+            <input type="text" maxlength="1" class="input-box" />
+            <input type="text" maxlength="1" class="input-box" />
+            <input type="text" maxlength="1" class="input-box" />
+            <input type="text" maxlength="1" class="input-box" />
+            <input type="text" maxlength="1" class="input-box" />
+            <input type="text" maxlength="1" class="input-box" />
+        </div>
+
+        <button @onclick="IrAEnviarcode" class="btn">Verificar</button>
+
+        <div class="EnviarCodigo-DeNuevo">
+            <p class="register">¿No reciviste ningun codigo? <a href="#">Enviar</a></p>
+        </div>
+    </div>
+</div>
+
+@code{
+   private void IrAEnviarcode(){
+        NavigationManager.NavigateTo("ChangePaswaordPage");
+    }
+}
+
