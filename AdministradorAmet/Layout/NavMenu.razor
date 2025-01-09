@@ -2,56 +2,43 @@
 <PageTitle>Administrador Digesett</PageTitle>
 
 <div class="top-row ps-3 navbar navbar-dark">
-
-    <div class="container-fluid top-row">
-        <img src="imagenes/ametlogo.png" alt="Logo DIGESETT" class="logoarriba" /> 
+    <div class="container-fluid top-row" href="Home">
+        <img src="imagenes/ametlogo.png" alt="Logo DIGESETT" class="logoarriba" />
         <a class="title-Digesett" href="">DIGESETT</a>
     </div>
-
-    @* <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button> *@
-
-
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <img src="imagenes/home-2.svg" alt="Logo DIGESETT" class="home" />
+                <img src="imagenes/home-2.svg" alt="Logo DIGESETT" class="nav-icon" />
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
+            <NavLink class="nav-link" href="CreateUser">
+                <img src="imagenes/agregarusuario.png" alt="Logo DIGESETT" class="nav-icon" />
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Agregar Usuario
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="Buscar">
-                <img src="imagenes/search-normal-1.svg" alt="Logo DIGESETT" class="buscar" />
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Buscar
+                <img src="imagenes/search-normal-1.svg" alt="Logo DIGESETT" class="nav-icon" />
+                <span class="bi bi-search" aria-hidden="true"></span> Buscar
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Notificaciones">
-                <img src="imagenes/notification.svg" alt="Logo DIGESETT" class="notificaciones" />
+                <img src="imagenes/notification.svg" alt="Logo DIGESETT" class="nav-icon" />
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Notificaciones
             </NavLink>
         </div>
-
-        <!-- Botón de salir -->
-        <div @onclick="salir" class="btn salir">
-            <a class="btnsalirr" href="LoginAdmimistrador">
-                <img src="imagenes/logout_icon.svg" alt="Logo DIGESETT" class="salir-icon" />
-                <span class="textsalir">Salir</span>
-            </a>
-        </div>
-
-
     </nav>
-
 </div>
-
 
 @code {
     private bool collapseNavMenu = true;
@@ -61,14 +48,5 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
-    }
-
-
-}
-
-@code{
- private void salir()
-    {
-        NavigationManager.NavigateTo("LoginAdmimistrador");
     }
 }

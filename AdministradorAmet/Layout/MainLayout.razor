@@ -1,33 +1,56 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-   <div style="background-image:none;background-color:white;" class="sidebar">
-    <NavMenu />
-</div>
+<div class="page" @onclick="CloseMenu">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <NavMenu />
+    </div>
 
+    <!-- Main Content -->
     <main>
-
-        <div class="top-row px-4 d-flex align-items-center justify-content-center">
-           
-            <a href="#" class="icon-link mx-2">
-                <img src="imagenes/user-circle.svg" alt="Icon 1" class="icon" />
-            </a>
-
-            <a href="#" class="icon-link mx-2">
-                <img src="imagenes/notification.svg" alt="Icon 2" class="icon" />
-            </a>
-
-            <a href="#" class="icon-link mx-2">
-                <img src="imagenes/settingIcon.svg" alt="Icon 3" class="icon" />
-            </a>
-
+        <!-- Top Row -->
+        <div class="top-row d-flex align-items-center">
+            <div class="user-menu ml-auto" @onclick:stopPropagation>
+                <button @onclick="ToggleMenu" class="icon-link d-flex align-items-center">
+                    <img src="imagenes/user-circle.svg" alt="User Icon" class="icon" />
+                    <span class="user-text">@UserName</span>
+                </button>
+                <div class="dropdown-menu" style="display: @(isMenuVisible ? "block" : "none")">
+                    <a href="perfilAgente" class="dropdown-item" @onclick="CloseMenu">
+                        <img src="imagenes/detalleperfil.png" alt="Profile Icon" class="dropdown-icon" />
+                        Mi Perfil
+                    </a>
+                    <a href="/change-password" class="dropdown-item" @onclick="CloseMenu">
+                        <img src="imagenes/restcontrasena.png" alt="Password Icon" class="dropdown-icon" />
+                        Cambiar Contraseña
+                    </a>
+                    <div class="divider"></div>
+                    <a href="LoginAdministrador" class="dropdown-item" @onclick="CloseMenu">
+                        <img src="imagenes/logout_icon.svg" alt="Logout Icon" class="dropdown-icon" />
+                        Salir
+                    </a>
+                </div>
+            </div>
         </div>
-
 
         <article class="content px-4">
             @Body
         </article>
-
     </main>
-
 </div>
+
+@code {
+    private bool isMenuVisible = false;
+
+    [CascadingParameter] public string UserName { get; set; } = "Administradorrrrrrrrrrrrrrrrr"; // Nombre del usuario actual.
+
+    private void ToggleMenu()
+    {
+        isMenuVisible = !isMenuVisible;
+    }
+
+    private void CloseMenu()
+    {
+        isMenuVisible = false;
+    }
+}

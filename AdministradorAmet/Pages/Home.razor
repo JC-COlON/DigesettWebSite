@@ -1,21 +1,21 @@
 ﻿@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
 @page "/"
-<PageTitle>Administrador Digesett</PageTitle>
+<PageTitle>Home</PageTitle>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
 
 <div class="container">
-    <!-- Parte Superior -->
+    <!-- Parte Superior 
     <div class="header">
         <h1 class="title">ANÁLISIS</h1>
-        <button @onclick="IrAcreateAgente" class="btn-create">
+        <button @onclick="IrAcreateUser" class="btn-create">
             <span>CREAR USUARIO   + </span>
            @*  <img src="icono-mas.png" alt="Icono +" class="icon-plus"> *@
         </button>
-    </div>
+    </div>-->
     
     <!-- Cuadro transparente  -->
     <div class="Cuadro-Grande">
@@ -122,9 +122,9 @@
 </div>
 
 @code {
-    private void IrAcreateAgente()
+    private void IrAcreateUser()
     {
-        NavigationManager.NavigateTo("createAgente");
+        NavigationManager.NavigateTo("CreateUser");
     }
 
     private void IraVerAgente(){

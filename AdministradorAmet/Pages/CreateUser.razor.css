@@ -1,0 +1,153 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin-top: 20px;
+    background-color: white;
+    margin-left: 10px;
+    padding: 0px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+}
+
+.back-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-back {
+    width: 27px;
+    height: auto;
+    cursor: pointer;
+}
+
+.back-text {
+    font-size: 16px;
+    color: black;
+}
+
+.header h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 20px;
+    color: #09c940;
+}
+
+.inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .input-group input,
+    .input-group select {
+        height: 40px;
+        width: 100%;
+        max-width: 300px;
+        border: 2px solid #828282; /* Borde uniforme para todos los campos */
+        border-radius: 6px;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+        appearance: none;
+        background-color: #fff;
+        color: #333;
+    }
+
+    .input-group label {
+        margin-bottom: 3px;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .input-group input:disabled,
+    .input-group select:disabled {
+        background-color: #f2f2f2;
+        color: #aaa;
+    }
+
+/* Alinear botones a la derecha del campo de imagen */
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    margin-top: -80px; /* Alinear verticalmente con el campo de imagen */
+    grid-column: 3;
+}
+
+.create-button,
+.cancel-button {
+    width: 140px; /* Más anchos */
+    height: 50px; /* Más altos */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px; /* Texto más grande */
+    padding: 12px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.create-button {
+    background-color: #009C40;
+    color: white;
+}
+
+    .create-button:hover {
+        background-color: #007A30;
+    }
+
+.cancel-button {
+    background-color: #ff0000;
+    color: white;
+}
+
+    .cancel-button:hover {
+        background-color: #990101;
+    }
+
+/* Mejora visual: menor margen entre filas */
+.inputs-grid > .input-group {
+    margin-bottom: 10px;
+}
+
+/* Botón "ojito" mejor integrado */
+.password-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #828282;
+    font-size: 18px;
+}
+
+    .password-toggle:hover {
+        color: #333;
+    }

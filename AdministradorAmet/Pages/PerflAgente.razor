@@ -12,10 +12,10 @@
 
     <!-- Primera columna -->
     <div class="column left">
-        <div class="back-container">
+        @* <div class="back-container">
             <img @onclick="Atras" src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
             <span class="back-text">Atrás</span>
-        </div>
+        </div> *@
     </div>
 
     <!-- Segunda columna (Centro) -->
@@ -25,7 +25,7 @@
                 <!-- Foto -->
                 @* <div class="photo-box"> Foto </div> *@
                 <img crs="imagenes/foto-svg" alt="imagenperfil" class="photo-box" />
-             
+
                 <!-- Textos al lado de la foto -->
 
                 <div class="info-list">
@@ -43,7 +43,7 @@
             <div class="additional-info">
                 <p class="location"><strong>Santiago de los caballeros</strong></p>
                 <p><strong>Edad:</strong> <span>35 </span></p>
-               @*  <p><strong>Altura:</strong> <span>1.75 m</span></p> *@
+                @*  <p><strong>Altura:</strong> <span>1.75 m</span></p> *@
                 <p><strong>Estado Civil:</strong> <span>Casado</span></p>
                 <p><strong>Fecha de Nacimiento:</strong> <span>1988-05-10</span></p>
             </div>
@@ -92,6 +92,22 @@
                 <span>20%</span>
             </div>
         </div>
+
+
+        <div class="score-box">
+            <h3>Multas</h3>
+
+            <div class="score-row">
+                <span>Excelente</span>
+                <div class="progress-bar excellent">
+                    <div class="progress" style="width: 80%;"></div>
+                </div>
+                <span>80%</span>
+            </div>
+
+          
+        </div>
+     
     </div>
 </div>
 
@@ -99,7 +115,8 @@
 
 
 @code {
-    private void Atras(){
+    private void Atras()
+    {
         NavigationManager.NavigateTo("");
 
     }

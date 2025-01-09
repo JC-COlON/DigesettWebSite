@@ -3,55 +3,61 @@
     background-color: white;
     display: flex;
     align-items: center;
-    gap: 5px; /* Ajusta el espacio de 5px entre la imagen y el texto */
+    gap: 10px; /* Reduce el espacio entre la imagen y el texto */
+    margin-left: 0; /* Elimina cualquier margen adicional */
+    margin-right: 0;
 }
+
 .title-Digesett {
     color: black;
     font-weight: bold;
     font-family: 'Poppins', sans-serif;
     font-size: 20px;
     text-decoration: none;
+    margin-left: 5px; /* Añadir un pequeño margen a la izquierda para mejor alineación */
 }
+
 .logoarriba {
     width: 40px;
     height: auto;
 }
 
-/* Elimina o ajusta el top para que los iconos no afecten la alineación */
-.bi {
-    display: inline-block;
-    position: relative;
-    width: 1.25rem;
-    height: 1.25rem;
+/* Ajuste común de tamaño para los iconos */
+.nav-icon {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem; /* 20px */
     margin-right: 0.75rem;
-    background-size: cover;
-    
+    object-fit: contain;
 }
 
-
-/* Iconos por defecto (Bootstrap y las imágenes) */
+/* Estilo de los iconos en el menú */
 .nav-link .bi,
 .nav-link img {
-    color: #707070; /* Color por defecto de los iconos */
+    color: black; /* Cambiar el color de los iconos a negro */
 }
 
-/* Cuando el enlace está activo */
+/* Estilo de las letras en negrita */
+.nav-link {
+    font-weight: bold; /* Negrita en el texto de las opciones */
+}
+
+/* Estilo de los iconos activos */
 .nav-item ::deep a.active .bi,
 .nav-item ::deep a.active img {
     color: white; /* Cambiar el color de los iconos a blanco cuando el enlace está activo */
 }
 
-/* Estilo adicional para el enlace cuando está activo */
+/* Estilos cuando el enlace está activo */
 .nav-item ::deep a.active {
     background-color: #009C40;
     color: white;
 }
 
-/* Estilos para los enlaces y la alineación */
+/* Ajustes para los enlaces y alineación */
 .nav-item {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    padding-bottom: 0.9rem;
+    margin-top: 8px; /* Reducir el margen superior */
+    font-size: 1rem; /* Tamaño de letra ligeramente mayor */
+    padding-bottom: 0.8rem; /* Ajustar el padding inferior para menos espacio en blanco */
 }
 
     .nav-item:first-of-type {
@@ -71,22 +77,18 @@
         line-height: 3rem;
     }
 
-
 @media (min-width: 641px) {
-  
     .collapse {
-        /* Never collapse the sidebar for wide screens */
         display: block;
-    } 
+    }
+
     .nav-scrollable {
-        /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        height: calc(100vh - 3.5rem); /* Ajuste para que ocupe toda la altura disponible */
         overflow-y: auto;
     }
 }
 
-/* Ajustes para el botón de salir */
-
+/* Ajustes para el botón de salir (si lo habilitas en el futuro) */
 .btn.salir {
     display: flex;
     justify-content: flex-start;
@@ -94,27 +96,23 @@
     text-decoration: none;
     margin-top: 320px;
 }
+
 .btnsalirr {
     color: red;
     display: flex;
     align-items: center;
     text-decoration: none;
 }
+
 .salir-icon {
     width: 27px;
     height: 27px;
     object-fit: contain;
-    text-decoration: none;
     margin-right: 10px;
     filter: invert(34%) sepia(94%) saturate(6444%) hue-rotate(-3deg) brightness(93%) contrast(93%);
 }
+
 .textsalir {
     color: #FF0000;
     text-decoration: none;
 }
-
-
-
-
-
-

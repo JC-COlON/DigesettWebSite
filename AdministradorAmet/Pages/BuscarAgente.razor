@@ -1,0 +1,135 @@
+﻿@inject NavigationManager NavigationManager
+
+<PageTitle>Administrador Digesett - Buscar Agentes</PageTitle>
+@page "/BuscarAgentes"
+
+<div class="main-container">
+    <!-- Contenedor de resultados a la izquierda -->
+    <div class="results-section">
+        <h1 class="results-title">Resultados de Agentes</h1>
+        <div class="results-container">
+            <div class="result-item" @key="1">
+                <h4>Agente #AG12345</h4>
+                <p>Cédula: 402-3404722-9</p>
+                <p>Nombre: Juan Pérez</p>
+                <p>Estado Civil: Casado</p>
+                <p>Lugar de Trabajo: Zona Centro</p>
+            </div>
+            <div class="result-item" @key="2">
+                <h4>Agente #AG67890</h4>
+                <p>Cédula: 402-3404722-9</p>
+                <p>Nombre: Ana García</p>
+                <p>Estado Civil: Soltera</p>
+                <p>Lugar de Trabajo: Zona Norte</p>
+            </div>
+            <!-- Aquí se cargarán los resultados dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Contenedor de filtros a la derecha -->
+    <div class="filters-section">
+        <h2 class="filters-title">Filtros</h2>
+        <div class="filters-container">
+            <div class="filter-group">
+                <label for="cedula">Cédula</label>
+                <input type="text" id="cedula" class="form-control" placeholder="Ej. 402-3404722-9">
+            </div>
+            <div class="filter-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" class="form-control" placeholder="Ej. Juan">
+            </div>
+            <div class="filter-group">
+                <label for="apellido">Apellido</label>
+                <input type="text" id="apellido" class="form-control" placeholder="Ej. Pérez">
+            </div>
+            <div class="filter-group">
+                <label for="genero">Género</label>
+                <select id="genero" class="form-control">
+                    <option value="">Seleccionar</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="tipoSangre">Tipo de Sangre</label>
+                <select id="estadoCivil" class="form-control">
+                    <option value="">Seleccionar</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="estadoCivil">Estado Civil</label>
+                <select id="estadoCivil" class="form-control">
+                    <option value="">Seleccionar</option>
+                    <option value="Soltero">Soltero</option>
+                    <option value="Casado">Casado</option>
+                    <option value="Divorciado">Divorciado</option>
+                    <option value="Viudo">Viudo</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="noAgente">No. de Agente</label>
+                <input type="text" id="noAgente" class="form-control" placeholder="Ej. AG12345">
+            </div>
+            <div class="filter-group">
+                <label for="provincia">Provincia</label>
+                <select id="provincia" class="form-control">
+                    <option value="">Seleccionar</option>
+                    <option value="Azua">Azua</option>
+                    <option value="Bahoruco">Bahoruco</option>
+                    <option value="Barahona">Barahona</option>
+                    <option value="Dajabon">Dajabón</option>
+                    <option value="Distrito Nacional">Distrito Nacional</option>
+                    <option value="Duarte">Duarte</option>
+                    <option value="El Seybo">El Seybo</option>
+                    <option value="Elias Piña">Elías Piña</option>
+                    <option value="Espaillat">Espaillat</option>
+                    <option value="Hato Mayor">Hato Mayor</option>
+                    <option value="Hermanas Mirabal">Hermanas Mirabal</option>
+                    <option value="Independencia">Independencia</option>
+                    <option value="La Altagracia">La Altagracia</option>
+                    <option value="La Romana">La Romana</option>
+                    <option value="La Vega">La Vega</option>
+                    <option value="Maria Trinidad Sanchez">María Trinidad Sánchez</option>
+                    <option value="Monseñor Nouel">Monseñor Nouel</option>
+                    <option value="Monte Plata">Monte Plata</option>
+                    <option value="Montecristi">Montecristi</option>
+                    <option value="Pedernales">Pedernales</option>
+                    <option value="Peravia">Peravia</option>
+                    <option value="Puerto Plata">Puerto Plata</option>
+                    <option value="Samana">Samaná</option>
+                    <option value="San Cristobal">San Cristóbal</option>
+                    <option value="San Jose de Ocoa">San José de Ocoa</option>
+                    <option value="San Juan">San Juan</option>
+                    <option value="San Pedro de Macoris">San Pedro de Macorís</option>
+                    <option value="Sanchez Ramirez">Sánchez Ramírez</option>
+                    <option value="Santiago">Santiago</option>
+                    <option value="Santiago Rodriguez">Santiago Rodríguez</option>
+                    <option value="Santo Domingo">Santo Domingo</option>
+                    <option value="Valverde">Valverde</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button class="apply-filters" @onclick="BuscarAgentes">Aplicar Filtros</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void BuscarAgentes()
+    {
+        // Lógica para filtrar agentes según los parámetros.
+        Console.WriteLine("Aplicando filtros para buscar agentes...");
+    }
+}}
+

@@ -3,7 +3,6 @@
     display: grid;
     grid-template-columns: 1fr 2.5fr 1fr; /* Ajuste de ancho de las columnas */
     gap: 10px;
-    
 }
 
 /* Primera columna */
@@ -15,18 +14,21 @@
     width: 90px;
     height: 35px;
 }
+
 .back-container {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: -20px; /* Mueve hacia arriba el texto y el icono */
 }
+
 .icon-back {
     margin-top: -20px;
     width: 27px;
     height: auto;
     cursor: pointer;
 }
+
 .back-text {
     margin-top: -20px;
     font-size: 16px;
@@ -62,16 +64,18 @@
         margin-right: 0; /* Elimina margen derecho para pantallas pequeñas */
     }
 }
+
 .photo-info {
     display: flex;
     align-items: center;
     gap: 20px;
 }
+
 .photo-box {
     width: 120px;
     height: 130px;
-   /* background-color: #d9d9d9;*/
-   
+    /* background-color: #d9d9d9;*/
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -86,6 +90,7 @@
     margin-top: -19px;
     color: black; /* Esto lo sube 2px para que se quede más arriba respecto al texto */
 }
+
 .info-list p {
     font-family: 'Inter', sans-serif;
     font-size: 10px;
@@ -96,11 +101,13 @@
     font-family: 'Inter', sans-serif;
     color: #009C40;
 }
+
 .additional-info .location {
-    font-size: 12px; 
-    margin-bottom: 14px; 
-    margin-top: -2px; 
+    font-size: 12px;
+    margin-bottom: 14px;
+    margin-top: -2px;
 }
+
 .additional-info p,
 .other-data h3,
 .other-data p {
@@ -117,6 +124,7 @@
     margin-top: auto; /* Asegura que los iconos se coloquen al final del contenedor */
     margin-bottom: 3px; /* Margen inferior de 15px */
 }
+
     .icons .icon {
         width: 20px;
         height: 20px;
@@ -134,7 +142,7 @@
     max-height: 220px; /* Altura máxima */
     text-align: center;
     border: none;
-    margin-left:10px;
+    margin-left: 10px;
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0px 4px 15px rgba(00, 50, 50, 0.2);
@@ -149,6 +157,7 @@
         margin: 20px auto; /* Centrado horizontal */
     }
 }
+
 .score-box h3 {
     margin-top: 10px;
     margin-bottom: 25px;
@@ -156,6 +165,7 @@
     font-family: 'Manrope', sans-serif;
     font-weight: bold;
 }
+
 .score-row {
     padding: 6px 13px;
     display: flex;
@@ -163,10 +173,12 @@
     justify-content: space-between;
     margin-bottom: 15px;
 }
-.score-row span {
+
+    .score-row span {
         font-size: 12px;
         font-family: 'Manrope', sans-serif;
     }
+
 .progress-bar {
     flex: 1;
     height: 10px;

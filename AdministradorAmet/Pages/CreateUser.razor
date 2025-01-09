@@ -1,0 +1,220 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<PageTitle>Administrador Digesett</PageTitle>
+@page "/CreateUser"
+
+<div class="container">
+    <div class="header">
+      @*   <div class="back-container">
+            <img @onclick="Atras" src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
+            <span class="back-text">Atrás</span>
+        </div> *@
+        <h1>Crear Usuarios </h1>
+    </div>
+
+    <div class="inputs-grid">
+        <div class="input-group">
+            <label for="tipoUsuario">Tipo de Usuario</label>
+            <select id="tipoUsuario" class="form-select" @onchange="TipoUsuarioChanged">
+                <option value="" selected disabled>Seleccionar</option>
+                <option value="Agente">Agente</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Ciudadano">Ciudadano</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputNombre">Nombre</label>
+            <input id="inputNombre" type="text" class="form-input" disabled="@IsDisabled("Nombre")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputApellido">Apellido</label>
+            <input id="inputApellido" type="text" class="form-input" disabled="@IsDisabled("Apellido")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputCedula">Cédula</label>
+            <input id="inputCedula" type="text" class="form-input" maxlength="13" @oninput="FormatCedula" disabled="@IsDisabled("Cedula")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputTelefono">Teléfono</label>
+            <input id="inputTelefono" type="text" class="form-input" maxlength="12" @oninput="FormatTelefono" disabled="@IsDisabled("Telefono")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputNoAgente">No. Agente</label>
+            <input id="inputNoAgente" type="text" class="form-input" disabled="@IsDisabled("NoAgente")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputPassword">Contraseña</label>
+            <div class="password-container">
+                <input id="inputPassword" type="@PasswordFieldType" class="form-input" disabled="@IsDisabled("Password")">
+                <button type="button" class="password-toggle" @onclick="TogglePasswordField">👁</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="inputEmail">Email</label>
+            <input id="inputEmail" type="email" class="form-input" disabled="@IsDisabled("Email")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputNacionalidad">Nacionalidad</label>
+            <select id="inputNacionalidad" class="form-select" disabled="@IsDisabled("Nacionalidad")">
+                <option value="" selected disabled>Seleccionar</option>
+                <option>Dominicana</option>
+                <option>Estadounidense</option>
+                <option>Mexicana</option>
+                <option>Colombiana</option>
+                <option>Argentina</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputEstatura">Estatura (metros)</label>
+            <input id="inputEstatura" type="number" step="0.01" class="form-input" disabled="@IsDisabled("Estatura")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputFechaNacimiento">Fecha de Nacimiento</label>
+            <input id="inputFechaNacimiento" type="date" class="form-input" disabled="@IsDisabled("FechaNacimiento")">
+        </div>
+
+        <div class="input-group">
+            <label for="inputSexo">Sexo</label>
+            <select id="inputSexo" class="form-select" disabled="@IsDisabled("Sexo")">
+                <option value="" selected disabled>Seleccionar</option>
+                <option>Masculino</option>
+                <option>Femenino</option>
+                <option>Otros</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputTipoSangre">Tipo de Sangre</label>
+            <select id="inputTipoSangre" class="form-select" disabled="@IsDisabled("TipoSangre")">
+                <option value="" selected disabled>Seleccionar</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputEstadoCivil">Estado Civil</label>
+            <select id="inputEstadoCivil" class="form-select" disabled="@IsDisabled("EstadoCivil")">
+                <option value="" selected disabled>Seleccionar</option>
+                <option>Soltero</option>
+                <option>Casado</option>
+                <option>Divorciado</option>
+                <option>Viudo</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputLugarTrabajo">Lugar de Trabajo</label>
+            <select id="inputLugarTrabajo" class="form-select" disabled="@IsDisabled("LugarTrabajo")">
+                <option value="" selected disabled>Seleccionar</option>
+                <option>Azua</option>
+                <option>Bahoruco</option>
+                <option>Barahona</option>
+                <option>Dajabon</option>
+                <option>Distrito Nacional</option>
+                <option>Duarte</option>
+                <option>El Seybo</option>
+                <option>Elias Piña</option>
+                <option>Espaillat</option>
+                <option>Hato Mayor</option>
+                <option>Hermanas Mirabal</option>
+                <option>Independencia</option>
+                <option>La Altagracia</option>
+                <option>La Romana</option>
+                <option>La Vega</option>
+                <option>Maria Trinidad Sanchez</option>
+                <option>Monseñor Nouel</option>
+                <option>Monte Plata</option>
+                <option>Montecristi</option>
+                <option>Pedernales</option>
+                <option>Peravia</option>
+                <option>Puerto Plata</option>
+                <option>Samana</option>
+                <option>San Cristobal</option>
+                <option>San Jose de Ocoa</option>
+                <option>San Juan</option>
+                <option>San Pedro de Macoris</option>
+                <option>Sanchez Ramirez</option>
+                <option>Santiago</option>
+                <option>Santiago Rodriguez</option>
+                <option>Santo Domingo</option>
+                <option>Valverde</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="inputImagenPerfil">Imagen de Perfil</label>
+            <input id="inputImagenPerfil" type="file" class="form-input" disabled="@IsDisabled("ImagenPerfil")">
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="cancel-button">Cancelar</button>
+        <button class="create-button">Crear</button>
+    </div>
+</div>
+
+@code {
+    private string SelectedUserType = string.Empty;
+    private string PasswordFieldType = "password";
+
+    private readonly HashSet<string> EnabledFieldsForCitizen = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email" };
+    private readonly HashSet<string> EnabledFieldsForAdmin = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email", "NoAgente", "FechaNacimiento", "Estatura", "Sexo", "TipoSangre", "EstadoCivil", "LugarTrabajo", "ImagenPerfil", "Nacionalidad" };
+    private readonly HashSet<string> EnabledFieldsForAgent = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email", "NoAgente", "FechaNacimiento", "Estatura", "Sexo", "TipoSangre", "EstadoCivil", "LugarTrabajo", "ImagenPerfil", "Nacionalidad" };
+
+    private void Atras()
+    {
+        NavigationManager.NavigateTo("");
+    }
+
+    private void FormatCedula(ChangeEventArgs e)
+    {
+        var cedula = e.Value?.ToString()?.Replace("-", "");
+        if (cedula?.Length > 3) cedula = cedula.Insert(3, "-");
+        if (cedula?.Length > 11) cedula = cedula.Insert(11, "-");
+    }
+
+    private void FormatTelefono(ChangeEventArgs e)
+    {
+        var telefono = e.Value?.ToString()?.Replace("-", "");
+        if (telefono?.Length > 3) telefono = telefono.Insert(3, "-");
+        if (telefono?.Length > 7) telefono = telefono.Insert(7, "-");
+    }
+
+    private void TogglePasswordField()
+    {
+        PasswordFieldType = PasswordFieldType == "password" ? "text" : "password";
+    }
+
+    private void TipoUsuarioChanged(ChangeEventArgs e)
+    {
+        SelectedUserType = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private bool IsDisabled(string fieldName)
+    {
+        return SelectedUserType switch
+        {
+            "Ciudadano" => !EnabledFieldsForCitizen.Contains(fieldName),
+            "Administrador" => !EnabledFieldsForAdmin.Contains(fieldName),
+            "Agente" => !EnabledFieldsForAgent.Contains(fieldName),
+            _ => true,
+        };
+    }
+}
