@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
-@page "/"
+@page "/Home"
 <PageTitle>Home</PageTitle>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
@@ -8,15 +8,14 @@
 
 
 <div class="container">
-    <!-- Parte Superior 
+    <!-- Parte Superior
     <div class="header">
         <h1 class="title">ANÁLISIS</h1>
         <button @onclick="IrAcreateUser" class="btn-create">
             <span>CREAR USUARIO   + </span>
-           @*  <img src="icono-mas.png" alt="Icono +" class="icon-plus"> *@
+    @*  <img src="icono-mas.png" alt="Icono +" class="icon-plus"> *@
         </button>
     </div>-->
-    
     <!-- Cuadro transparente  -->
     <div class="Cuadro-Grande">
 
@@ -25,7 +24,7 @@
         <div class="top-row">
 
             <!-- Cuadros de agentes -->
-            <div class="agent-box" >
+            <div class="agent-box">
                 <span class="number orange">150</span>
                 <span class="text1">Agentes</span>
             </div>
@@ -38,7 +37,7 @@
                 <span class="text1">Inactivos</span>
             </div>
 
-            
+
 
             <div class="green-box1">
                 <span class="text">6</span>
@@ -88,9 +87,9 @@
 
             <!-- Cuadros al lado derecho -->
             <div class="side-boxes">
-             
 
-                <h3 class="second-box-title">Más Multas</h3> 
+
+                <h3 class="second-box-title">Más Multas</h3>
 
                 <div class="green-box">
                     <span class="text">240</span>
@@ -114,7 +113,7 @@
             </div>
 
         </div>
-       
+
 
 
     </div>
@@ -127,7 +126,8 @@
         NavigationManager.NavigateTo("CreateUser");
     }
 
-    private void IraVerAgente(){
+    private void IraVerAgente()
+    {
         NavigationManager.NavigateTo("provinciasAgentes");
     }
 }

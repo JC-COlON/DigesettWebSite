@@ -27,11 +27,12 @@
                         Cambiar Contraseña
                     </a>
                     <div class="divider"></div>
-                    <a href="#" class="dropdown-item logout" @onclick="ShowLogoutConfirmation">
+                    <a href="" class="dropdown-item logout">
                         <img src="imagenes/cerrarsesion.png" alt="Logout Icon" class="dropdown-icon logout-icon" />
                         Cerrar Sesión
                     </a>
 
+                    <!-- Modal de confirmación -->
                     @if (isLogoutModalVisible)
                     {
                         <div class="modal-overlay">
@@ -45,14 +46,16 @@
                             </div>
                         </div>
                     }
-
-
-
                 </div>
             </div>
         </div>
 
+        <!-- Aquí agregamos la condición para mostrar el título -->
         <article class="content px-4">
+            @if (!string.IsNullOrEmpty(PageTitle))
+            {
+                <h1>@PageTitle</h1>  <!-- Muestra el título solo si está definido -->
+            }
             @Body
         </article>
     </main>
@@ -64,6 +67,9 @@
 
     [CascadingParameter]
     public string UserName { get; set; } = "Usuario: Administrador";
+
+    [CascadingParameter]
+    public string PageTitle { get; set; }  // Agregamos esta propiedad para que las páginas puedan pasar el título
 
     private void ToggleMenu()
     {
@@ -77,6 +83,7 @@
 
     private void ShowLogoutConfirmation()
     {
+        Console.WriteLine("Se activó el modal.");
         isLogoutModalVisible = true;
     }
 

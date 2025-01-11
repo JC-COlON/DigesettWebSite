@@ -1,16 +1,21 @@
 ﻿@inject NavigationManager NavigationManager
 @inject HttpClient Http
-<PageTitle>Administrador Digesett</PageTitle>
+<PageTitle>Administrador Digesett - Crear Usuario</PageTitle>
 @page "/CreateUser"
 
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+<div class="header">
+    <h1 class="title">Crear Usuarios</h1>
+
+</div>
+
 <div class="container">
-    <div class="header">
-      @*   <div class="back-container">
-            <img @onclick="Atras" src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
-            <span class="back-text">Atrás</span>
-        </div> *@
-        @* <h1>Crear Usuarios </h1> *@
-    </div>
+
+
+
+
 
     <hr class="divider" />
     <!-- Sección de imagen -->
@@ -28,7 +33,7 @@
     <!-- Línea divisora -->
     <hr class="divider" />
 
-    
+
     <div class="inputs-grid">
         <div class="input-group">
             <label for="tipoUsuario">Tipo de Usuario</label>
@@ -181,10 +186,7 @@
             </select>
         </div>
 
-       @*  <div class="input-group">
-            <label for="inputImagenPerfil">Imagen de Perfil</label>
-            <input id="inputImagenPerfil" type="file" class="form-input" disabled="@IsDisabled("ImagenPerfil")">
-        </div> *@
+
     </div>
 
     <div class="buttons">
@@ -235,11 +237,11 @@
         };
     }
 
-    
+
 
     private string PasswordFieldTypee = "password";
 
- 
+
 
     private string GetToggleClass()
     {
