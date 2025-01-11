@@ -176,3 +176,25 @@ body{
     max-width: 500px; /* Tamaño máximo del logo */
     height: auto;
 }
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    bottom: 5px; /* Baja el botón */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: White;
+    font-size: 24px; /* Aumenta el tamaño */
+}
+
+    .password-toggle:hover {
+        color: white;
+    }
+

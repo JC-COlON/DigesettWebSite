@@ -11,28 +11,46 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All" @onclick="() => CloseSubMenu()">
                 <img src="imagenes/home-2.svg" alt="Logo DIGESETT" class="nav-icon" />
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="CreateUser">
-                <img src="imagenes/agregarusuario.png" alt="Logo DIGESETT" class="nav-icon" />
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Agregar Usuario
+            <NavLink class="nav-link" href="CreateUser" @onclick="() => CloseSubMenu()">
+                <img src="imagenes/userlist.png" alt="Logo DIGESETT" class="nav-icon" />
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Usuarios
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Buscar">
+            <NavLink class="nav-link" @onclick="() => ToggleSubMenu()">
                 <img src="imagenes/search-normal-1.svg" alt="Logo DIGESETT" class="nav-icon" />
                 <span class="bi bi-search" aria-hidden="true"></span> Buscar
             </NavLink>
+
+            @if (isSubMenuVisible)
+            {
+                <div class="sub-menu">
+                    <div class="sub-menu-item">
+                        <span class="sub-menu-dash">-</span>
+                        <NavLink class="sub-menu-link" href="Buscar" >
+                            Multa
+                        </NavLink>
+                    </div>
+                    <div class="sub-menu-item">
+                        <span class="sub-menu-dash">-</span>
+                        <NavLink class="sub-menu-link" href="BuscarAgentes" >
+                            Agente
+                        </NavLink>
+                    </div>
+                </div>
+            }
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Notificaciones">
+            <NavLink class="nav-link" href="Notificaciones" @onclick="() => CloseSubMenu()">
                 <img src="imagenes/notification.svg" alt="Logo DIGESETT" class="nav-icon" />
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Notificaciones
             </NavLink>
@@ -40,8 +58,10 @@
     </nav>
 </div>
 
+
 @code {
     private bool collapseNavMenu = true;
+    private bool isSubMenuVisible = false;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
@@ -49,4 +69,17 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    private void ToggleSubMenu()
+    {
+        // Cambiar la visibilidad del submenú
+        isSubMenuVisible = !isSubMenuVisible;
+    }
+
+    private void CloseSubMenu()
+    {
+        // Cerrar el submenú
+        isSubMenuVisible = false;
+    }
 }
+

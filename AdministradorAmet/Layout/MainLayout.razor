@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <div class="page" @onclick="CloseMenu">
     <!-- Sidebar -->
@@ -9,26 +10,44 @@
     <!-- Main Content -->
     <main>
         <!-- Top Row -->
-        <div class="top-row d-flex align-items-center">
-            <div class="user-menu ml-auto" @onclick:stopPropagation>
-                <button @onclick="ToggleMenu" class="icon-link d-flex align-items-center">
+        <div class="top-row d-flex align-items-center justify-content-end">
+            <!-- User Menu -->
+            <div class="user-menu d-flex align-items-center" @onclick:stopPropagation>
+                <button @onclick="ToggleMenu" class="user-button d-flex align-items-center">
                     <img src="imagenes/user-circle.svg" alt="User Icon" class="icon" />
                     <span class="user-text">@UserName</span>
                 </button>
                 <div class="dropdown-menu" style="display: @(isMenuVisible ? "block" : "none")">
                     <a href="perfilAgente" class="dropdown-item" @onclick="CloseMenu">
-                        <img src="imagenes/detalleperfil.png" alt="Profile Icon" class="dropdown-icon" />
+                        <img src="imagenes/user.png" alt="Profile Icon" class="dropdown-icon" />
                         Mi Perfil
                     </a>
                     <a href="/change-password" class="dropdown-item" @onclick="CloseMenu">
-                        <img src="imagenes/restcontrasena.png" alt="Password Icon" class="dropdown-icon" />
+                        <img src="imagenes/settingIcon.svg" alt="Password Icon" class="dropdown-icon" />
                         Cambiar Contraseña
                     </a>
                     <div class="divider"></div>
-                    <a href="LoginAdministrador" class="dropdown-item" @onclick="CloseMenu">
-                        <img src="imagenes/logout_icon.svg" alt="Logout Icon" class="dropdown-icon" />
-                        Salir
+                    <a href="#" class="dropdown-item logout" @onclick="ShowLogoutConfirmation">
+                        <img src="imagenes/cerrarsesion.png" alt="Logout Icon" class="dropdown-icon logout-icon" />
+                        Cerrar Sesión
                     </a>
+
+                    @if (isLogoutModalVisible)
+                    {
+                        <div class="modal-overlay">
+                            <div class="modal">
+                                <h3 class="modal-title">Confirmación</h3>
+                                <p class="modal-body">¿Estás seguro de que deseas cerrar sesión?</p>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" @onclick="CancelLogout">Cancelar</button>
+                                    <button class="btn btn-danger" @onclick="ConfirmLogout">Salir</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+
                 </div>
             </div>
         </div>
@@ -41,8 +60,10 @@
 
 @code {
     private bool isMenuVisible = false;
+    private bool isLogoutModalVisible = false;
 
-    [CascadingParameter] public string UserName { get; set; } = "Administradorrrrrrrrrrrrrrrrr"; // Nombre del usuario actual.
+    [CascadingParameter]
+    public string UserName { get; set; } = "Usuario: Administrador";
 
     private void ToggleMenu()
     {
@@ -52,5 +73,21 @@
     private void CloseMenu()
     {
         isMenuVisible = false;
+    }
+
+    private void ShowLogoutConfirmation()
+    {
+        isLogoutModalVisible = true;
+    }
+
+    private void CancelLogout()
+    {
+        isLogoutModalVisible = false;
+    }
+
+    private void ConfirmLogout()
+    {
+        isLogoutModalVisible = false;
+        NavigationManager.NavigateTo("LoginAdministrador");
     }
 }

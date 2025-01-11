@@ -116,3 +116,59 @@
     color: #FF0000;
     text-decoration: none;
 }
+/* Estilo para el submenú */
+.sub-menu {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.sub-menu-link {
+    font-size: 0.9rem;
+    color: #707070;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+}
+
+    .sub-menu-link:hover {
+        color: #009C40;
+        text-decoration: underline;
+    }
+
+/* Estilo para el submenú */
+.sub-menu {
+    margin-left: 1.5rem; /* Margen izquierdo para alinear con el menú principal */
+    margin-top: 0.5rem; /* Separación con el botón principal */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Espacio entre las opciones */
+}
+
+/* Estilo para cada elemento del submenú */
+.sub-menu-item {
+    display: flex;
+    align-items: center; /* Alineación vertical del guion y texto */
+    gap: 0.5rem; /* Espacio entre el guion y el texto */
+}
+
+/* Estilo para el guion del submenú */
+.sub-menu-dash {
+    color: #009C40; /* Color del guion */
+    font-size: 1rem; /* Tamaño del guion */
+    font-weight: bold; /* Negrita para el guion */
+}
+
+/* Estilo para los enlaces del submenú */
+.sub-menu-link {
+    font-size: 0.9rem; /* Tamaño de fuente más pequeño */
+    color: #707070; /* Color inicial */
+    text-decoration: none; /* Quitar subrayado */
+    font-weight: bold; /* Negrita para el texto */
+}
+
+    /* Hover y enfoque para los enlaces del submenú */
+    .sub-menu-link:hover,
+    .sub-menu-link:focus {
+        color: #009C40; /* Cambiar color en hover */
+    }

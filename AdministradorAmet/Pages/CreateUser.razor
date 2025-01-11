@@ -9,9 +9,26 @@
             <img @onclick="Atras" src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
             <span class="back-text">Atrás</span>
         </div> *@
-        <h1>Crear Usuarios </h1>
+        @* <h1>Crear Usuarios </h1> *@
     </div>
 
+    <hr class="divider" />
+    <!-- Sección de imagen -->
+    <div class="image-section">
+        <h2>Imagen</h2>
+        <div class="profile-image-container">
+            <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" />
+        </div>
+        <div class="image-input">
+            <input id="inputImagenPerfil" type="file" class="form-input" disabled="@IsDisabled("ImagenPerfil")" />
+        </div>
+    </div>
+    <!-- Información Personal -->
+    <h2 class="section-title">Información Personal</h2>
+    <!-- Línea divisora -->
+    <hr class="divider" />
+
+    
     <div class="inputs-grid">
         <div class="input-group">
             <label for="tipoUsuario">Tipo de Usuario</label>
@@ -52,9 +69,15 @@
             <label for="inputPassword">Contraseña</label>
             <div class="password-container">
                 <input id="inputPassword" type="@PasswordFieldType" class="form-input" disabled="@IsDisabled("Password")">
-                <button type="button" class="password-toggle" @onclick="TogglePasswordField">👁</button>
+                <button type="button"
+                        class="password-toggle @GetToggleClass()"
+                        @onclick="TogglePasswordField"
+                        disabled="@IsDisabled("Password")">
+                    👁
+                </button>
             </div>
         </div>
+
 
         <div class="input-group">
             <label for="inputEmail">Email</label>
@@ -158,10 +181,10 @@
             </select>
         </div>
 
-        <div class="input-group">
+       @*  <div class="input-group">
             <label for="inputImagenPerfil">Imagen de Perfil</label>
             <input id="inputImagenPerfil" type="file" class="form-input" disabled="@IsDisabled("ImagenPerfil")">
-        </div>
+        </div> *@
     </div>
 
     <div class="buttons">
@@ -169,6 +192,8 @@
         <button class="create-button">Crear</button>
     </div>
 </div>
+
+
 
 @code {
     private string SelectedUserType = string.Empty;
@@ -178,11 +203,10 @@
     private readonly HashSet<string> EnabledFieldsForAdmin = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email", "NoAgente", "FechaNacimiento", "Estatura", "Sexo", "TipoSangre", "EstadoCivil", "LugarTrabajo", "ImagenPerfil", "Nacionalidad" };
     private readonly HashSet<string> EnabledFieldsForAgent = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email", "NoAgente", "FechaNacimiento", "Estatura", "Sexo", "TipoSangre", "EstadoCivil", "LugarTrabajo", "ImagenPerfil", "Nacionalidad" };
 
-    private void Atras()
+    private void TogglePasswordField()
     {
-        NavigationManager.NavigateTo("");
+        PasswordFieldType = PasswordFieldType == "password" ? "text" : "password";
     }
-
     private void FormatCedula(ChangeEventArgs e)
     {
         var cedula = e.Value?.ToString()?.Replace("-", "");
@@ -196,17 +220,10 @@
         if (telefono?.Length > 3) telefono = telefono.Insert(3, "-");
         if (telefono?.Length > 7) telefono = telefono.Insert(7, "-");
     }
-
-    private void TogglePasswordField()
-    {
-        PasswordFieldType = PasswordFieldType == "password" ? "text" : "password";
-    }
-
     private void TipoUsuarioChanged(ChangeEventArgs e)
     {
         SelectedUserType = e.Value?.ToString() ?? string.Empty;
     }
-
     private bool IsDisabled(string fieldName)
     {
         return SelectedUserType switch
@@ -217,4 +234,20 @@
             _ => true,
         };
     }
+
+    
+
+    private string PasswordFieldTypee = "password";
+
+ 
+
+    private string GetToggleClass()
+    {
+        return PasswordFieldType == "password" ? "toggle-hidden" : "toggle-visible";
+    }
 }
+
+
+
+
+
