@@ -1,89 +1,162 @@
 ﻿@layout EmtyLayout
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
-<PageTitle>Login Admimistrador</PageTitle>
+@inject IJSRuntime JSRuntime
+@using System.IdentityModel.Tokens.Jwt
+@using System.Text.Json
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Login Administrador</PageTitle>
 @page "/"
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
 <body>
-
     <section id="display-div">
         <div class="rectangle-green">
-
             <div class="login-section">
-
                 <div class="header-login">
                     <h1>Login</h1>
                     <p>Ingresa tus datos para poder entrar a la aplicación</p>
                 </div>
 
-                <div class="usuario">
-                    <label for="usuario">Usuario</label>
-                    <input type="text" id="usuario" class="input-field" />
-                </div>
+                <EditForm Model="@userInput" OnValidSubmit="EntrarApp">
+                    <DataAnnotationsValidator />
 
-                <div class="password">
-                    <label for="password">Contraseña</label>
-                    <div class="input-wrapper">
-                        <input type="@PasswordFieldType" id="password" class="input-field" />
-                        <button type="button" class="password-toggle" @onclick="TogglePasswordField">👁</button>
+                    <div class="usuario">
+                        <label for="usuario">Usuario</label>
+                        <input type="text" id="usuario" class="input-field" @bind="userInput.Usuario" />
+                        <ValidationMessage For="@(() => userInput.Usuario)" />
+                        @if (!string.IsNullOrEmpty(userInput.MensajeError))
+                        {
+                            <p class="error-message">@userInput.MensajeError</p>
+                        }
                     </div>
-                </div>
 
+                    <div class="password">
+                        <label for="password">Contraseña</label>
+                        <div class="input-wrapper">
+                            <input type="@PasswordFieldType" id="password" class="input-field" @bind="userInput.Password" />
+                            <button type="button" class="password-toggle" @onclick="TogglePasswordField">👁</button>
+                        </div>
+                        <ValidationMessage For="@(() => userInput.Password)" />
+                    </div>
 
-                <div class="extras">
-                    <label>
-                        <input type="checkbox" /> Recordar
-                    </label>
-                    <a @onclick="irAOlvideContrasenna" href="#">Olvidaste la contraseña?</a>
-                </div>
+                    <div class="extras">
+                        <label>
+                            <input type="checkbox" /> Recordar
+                        </label>
+                        <a @onclick="irAOlvideContrasenna" href="#">Olvidaste la contraseña?</a>
+                    </div>
 
-                <button @onclick="EntrarApp" class="btn-primary">
-                    Entrar
-                </button>
-
-                @*  <button class="btn-google">
-                    <img src="imagenes/logodegoogle.png" alt="Google" />
-                    Entrar con Google
-                </button>
-
-                <div class="register-container">
-                    <p class="register">¿No tienes una cuenta? <a href="#">Crea una</a></p>
-                </div> *@
-
+                    <button type="submit" class="btn-primary" disabled="@Loading">
+                        @if (Loading)
+                        {
+                            <span>Cargando...</span>
+                        }
+                        else
+                        {
+                            <span>Entrar</span>
+                        }
+                    </button>
+                </EditForm>
             </div>
         </div>
 
         <div class="content">
-
             <h1>DIGESETT</h1>
             <img src="imagenes/ametlogo.png" alt="Logo DIGESETT" class="logo" />
-
         </div>
-
     </section>
-
 </body>
 
-
 @code {
+    private UserInputModel userInput = new UserInputModel();
     private string PasswordFieldType = "password";
+    private bool Loading = false;
 
     private void TogglePasswordField()
     {
         PasswordFieldType = PasswordFieldType == "password" ? "text" : "password";
     }
 
-    private void EntrarApp()
+    private async Task EntrarApp()
     {
-        NavigationManager.NavigateTo("Home");
+        Loading = true;
+        userInput.MensajeError = string.Empty;
+
+        try
+        {
+            // Crear el objeto de la solicitud
+            var requestBody = new
+            {
+                cedula = userInput.Usuario,
+                password = userInput.Password
+            };
+
+            // Eliminar token previo si existe
+            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+
+            // Enviar la solicitud POST a la API
+            var response = await Http.PostAsJsonAsync("https://localhost:7277/api/UserAccess/Login", requestBody);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
+                if (tokenResponse != null && !string.IsNullOrWhiteSpace(tokenResponse.Token))
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(tokenResponse.Token);
+                    var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
+
+                    if (claims.TryGetValue("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", out var role) && role == "1")
+                    {
+                        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", tokenResponse.Token);
+                        NavigationManager.NavigateTo("Home");
+                    }
+                    else
+                    {
+                        userInput.MensajeError = "Acceso denegado. Solo los administradores pueden ingresar.";
+                    }
+                }
+                else
+                {
+                    userInput.MensajeError = "Cédula o contraseña incorrectos.";
+                }
+            }
+            else
+            {
+                userInput.MensajeError = "Cédula o contraseña incorrectos.";
+            }
+        }
+        catch (Exception ex)
+        {
+            userInput.MensajeError = $"Ocurrió un error: {ex.Message}";
+        }
+        finally
+        {
+            Loading = false;
+        }
     }
 
     private void irAOlvideContrasenna()
     {
         NavigationManager.NavigateTo("enviarAlCorreo");
     }
+
+    private class TokenResponse
+    {
+        public string Token { get; set; }
+    }
+
+    private class UserInputModel
+    {
+        [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
+        public string Usuario { get; set; }
+
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        public string Password { get; set; }
+
+        public string MensajeError { get; set; } = string.Empty;
+    }
 }
-
-

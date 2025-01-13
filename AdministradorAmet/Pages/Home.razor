@@ -1,5 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @page "/Home"
 <PageTitle>Home</PageTitle>
 
@@ -129,5 +131,15 @@
     private void IraVerAgente()
     {
         NavigationManager.NavigateTo("provinciasAgentes");
+    }
+}
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
 }

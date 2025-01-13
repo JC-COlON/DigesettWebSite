@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using System.IdentityModel.Tokens.Jwt
+@inject NavigationManager NavigationManager
 
 <div class="page" @onclick="CloseMenu">
     <!-- Sidebar -->
@@ -96,5 +99,25 @@
     {
         isLogoutModalVisible = false;
         NavigationManager.NavigateTo("LoginAdministrador");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
+
+            if (claims.TryGetValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", out var name))
+            {
+                UserName = $"Usuario: {name}";
+            }
+        }
     }
 }
