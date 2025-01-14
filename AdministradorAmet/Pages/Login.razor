@@ -24,7 +24,7 @@
                     <DataAnnotationsValidator />
 
                     <div class="usuario">
-                        <label for="usuario">Usuario</label>
+                        <label for="usuario">Cedula</label>
                         <input type="text" id="usuario" class="input-field" @bind="userInput.Usuario" />
                         <ValidationMessage For="@(() => userInput.Usuario)" />
                         @if (!string.IsNullOrEmpty(userInput.MensajeError))

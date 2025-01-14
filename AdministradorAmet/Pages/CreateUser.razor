@@ -1,5 +1,8 @@
-﻿@inject NavigationManager NavigationManager
+﻿
+@inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
 <PageTitle>Administrador Digesett - Crear Usuario</PageTitle>
 @page "/CreateUser"
 
@@ -8,74 +11,77 @@
 
 <div class="header">
     <h1 class="title">Crear Usuarios</h1>
-
 </div>
 
 <div class="container">
-
-
-
-
-
     <hr class="divider" />
     <!-- Sección de imagen -->
     <div class="image-section">
-       
+        <!-- Vista previa de la imagen -->
         <div class="profile-image-container">
-            <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" />
+            <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" />
         </div>
+
+        <!-- Entrada para subir imagen -->
         <div class="image-input">
-            <input id="inputImagenPerfil" type="file" class="form-input" disabled="@IsDisabled("ImagenPerfil")" />
+            <InputFile OnChange="ImagenPerfilSeleccionada" disabled="@IsDisabled("profileImg")" />
         </div>
     </div>
+
+
+
     <!-- Información Personal -->
     <h2 class="section-title">Información Personal</h2>
-    <!-- Línea divisora -->
     <hr class="divider" />
 
-
-    <div class="inputs-grid">
+   <div class="inputs-grid">
+        <!-- Tipo de Usuario -->
         <div class="input-group">
             <label for="tipoUsuario">Tipo de Usuario</label>
-            <select id="tipoUsuario" class="form-select" @onchange="TipoUsuarioChanged">
+            <select id="rolId" class="form-select" @onchange="TipoUsuarioChanged">
                 <option value="" selected disabled>Seleccionar</option>
-                <option value="Administrador">Administrador</option>
-                <option value="Agente">Agente</option>
-                <option value="Ciudadano">Ciudadano</option>
+                <option value="1">Administrador</option>
+                <option value="2">Agente</option>
+                <option value="3">Ciudadano</option>
             </select>
         </div>
 
+
+
+
+
+        <!-- Campos de entrada -->
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
-            <input id="inputNombre" type="text" class="form-input" disabled="@IsDisabled("Nombre")">
+            <input id="inputNombre" type="text" class="form-input" @bind="name" disabled="@IsDisabled("name")" />
         </div>
 
         <div class="input-group">
             <label for="inputApellido">Apellido</label>
-            <input id="inputApellido" type="text" class="form-input" disabled="@IsDisabled("Apellido")">
+            <input id="inputApellido" type="text" class="form-input" @bind="lastname" disabled="@IsDisabled("lastname")" />
         </div>
 
         <div class="input-group">
             <label for="inputCedula">Cédula</label>
-            <input id="inputCedula" type="text" class="form-input" maxlength="13" @oninput="FormatCedula" disabled="@IsDisabled("Cedula")">
+            <input id="inputCedula" type="text" class="form-input" maxlength="13"  @bind="Cedula" disabled="@IsDisabled("Cedula")" />
         </div>
 
         <div class="input-group">
             <label for="inputTelefono">Teléfono</label>
-            <input id="inputTelefono" type="text" class="form-input" maxlength="12" @oninput="FormatTelefono" disabled="@IsDisabled("Telefono")">
+            <input id="inputTelefono" type="text" class="form-input" maxlength="12" @bind="phone" disabled="@IsDisabled("phone")" />
         </div>
 
         <div class="input-group">
             <label for="inputNoAgente">No. Agente</label>
-            <input id="inputNoAgente" type="text" class="form-input" disabled="@IsDisabled("NoAgente")">
+            <input id="inputNoAgente" type="text" class="form-input" @bind="noAgente" disabled="@IsDisabled("noAgente")" />
         </div>
 
         <div class="input-group">
             <label for="inputPassword">Contraseña</label>
             <div class="password-container">
-                <input id="inputPassword" type="@PasswordFieldType" class="form-input" disabled="@IsDisabled("Password")">
+                <input id="inputPassword" type="@PasswordFieldType" class="form-input" @bind="password" disabled="@IsDisabled("password")" />
                 <button type="button"
-                        class="password-toggle @GetToggleClass()"
+                        class="password-toggle @PasswordToggleClass"
                         @onclick="TogglePasswordField"
                         disabled="@IsDisabled("Password")">
                     👁
@@ -83,171 +89,265 @@
             </div>
         </div>
 
-
         <div class="input-group">
             <label for="inputEmail">Email</label>
-            <input id="inputEmail" type="email" class="form-input" disabled="@IsDisabled("Email")">
+            <input id="inputEmail" type="email" class="form-input" @bind="email" disabled="@IsDisabled("email")" />
         </div>
-
-     @*    <div class="input-group">
-            <label for="inputNacionalidad">Nacionalidad</label>
-            <select id="inputNacionalidad" class="form-select" disabled="@IsDisabled("Nacionalidad")">
-                <option value="" selected disabled>Seleccionar</option>
-                <option>Dominicana</option>
-                <option>Estadounidense</option>
-                <option>Mexicana</option>
-                <option>Colombiana</option>
-                <option>Argentina</option>
-            </select>
-        </div> *@
 
         <div class="input-group">
             <label for="inputEstatura">Estatura (metros)</label>
-            <input id="inputEstatura" type="number" step="0.01" class="form-input" disabled="@IsDisabled("Estatura")">
+            <input id="inputEstatura" type="number" step="0.01" class="form-input" @bind="height" disabled="@IsDisabled("height")" />
         </div>
 
         <div class="input-group">
             <label for="inputFechaNacimiento">Fecha de Nacimiento</label>
-            <input id="inputFechaNacimiento" type="date" class="form-input" disabled="@IsDisabled("FechaNacimiento")">
+            <input id="inputFechaNacimiento" type="date" class="form-input" @bind="birthdate" disabled="@IsDisabled("birthdate")" />
         </div>
-
         <div class="input-group">
             <label for="inputSexo">Sexo</label>
-            <select id="inputSexo" class="form-select" disabled="@IsDisabled("Sexo")">
+            <select id="inputSexo" class="form-select" @bind="genderId" disabled="@IsDisabled("genderId")">
                 <option value="" selected disabled>Seleccionar</option>
-                <option>Masculino</option>
-                <option>Femenino</option>
-                <option>Otros</option>
+                <option value="1">Masculino</option>
+                <option value="2">Femenino</option>
+                <option value="3">Otros</option>
             </select>
         </div>
-
         <div class="input-group">
             <label for="inputTipoSangre">Tipo de Sangre</label>
-            <select id="inputTipoSangre" class="form-select" disabled="@IsDisabled("TipoSangre")">
+            <select id="inputTipoSangre" class="form-select" @bind="bloodTypeId" disabled="@IsDisabled("bloodTypeId")">
                 <option value="" selected disabled>Seleccionar</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>O+</option>
-                <option>O-</option>
-                <option>AB+</option>
-                <option>AB-</option>
+                <option value="1">A+</option>
+                <option value="2">A-</option>
+                <option value="3">B+</option>
+                <option value="4">B-</option>
+                <option value="5">O+</option>
+                <option value="6">O-</option>
+                <option value="7">AB+</option>
+                <option value="8">AB-</option>
             </select>
         </div>
-
         <div class="input-group">
             <label for="inputEstadoCivil">Estado Civil</label>
-            <select id="inputEstadoCivil" class="form-select" disabled="@IsDisabled("EstadoCivil")">
+            <select id="inputEstadoCivil" class="form-select" @bind="civilStatusId" disabled="@IsDisabled("civilStatusId")">
                 <option value="" selected disabled>Seleccionar</option>
-                <option>Soltero</option>
-                <option>Casado</option>
-                <option>Divorciado</option>
-                <option>Viudo</option>
+                <option value="1">Soltero</option>
+                <option value="2">Casado</option>
+                <option value="3">Divorciado</option>
+                <option value="4">Viudo</option>
             </select>
         </div>
 
         <div class="input-group">
             <label for="inputLugarTrabajo">Lugar de Trabajo</label>
-            <select id="inputLugarTrabajo" class="form-select" disabled="@IsDisabled("LugarTrabajo")">
+            <select id="inputLugarTrabajo" class="form-select" @bind="workLocationId" disabled="@IsDisabled("workLocationId")">
                 <option value="" selected disabled>Seleccionar</option>
-                <option>Azua</option>
-                <option>Bahoruco</option>
-                <option>Barahona</option>
-                <option>Dajabon</option>
-                <option>Distrito Nacional</option>
-                <option>Duarte</option>
-                <option>El Seybo</option>
-                <option>Elias Piña</option>
-                <option>Espaillat</option>
-                <option>Hato Mayor</option>
-                <option>Hermanas Mirabal</option>
-                <option>Independencia</option>
-                <option>La Altagracia</option>
-                <option>La Romana</option>
-                <option>La Vega</option>
-                <option>Maria Trinidad Sanchez</option>
-                <option>Monseñor Nouel</option>
-                <option>Monte Plata</option>
-                <option>Montecristi</option>
-                <option>Pedernales</option>
-                <option>Peravia</option>
-                <option>Puerto Plata</option>
-                <option>Samana</option>
-                <option>San Cristobal</option>
-                <option>San Jose de Ocoa</option>
-                <option>San Juan</option>
-                <option>San Pedro de Macoris</option>
-                <option>Sanchez Ramirez</option>
-                <option>Santiago</option>
-                <option>Santiago Rodriguez</option>
-                <option>Santo Domingo</option>
-                <option>Valverde</option>
+                <option value="1">Azua</option>
+                <option value="2">Bahoruco</option>
+                <option value="3">Barahona</option>
+                <option value="4">Dajabon</option>
+                <option value="5">Distrito Nacional</option>
+                <option value="6">Duarte</option>
+                <option value="7">El Seybo</option>
+                <option value="8">Elias Piña</option>
+                <option value="9">Espaillat</option>
+                <option value="10">Hato Mayor</option>
+                <option value="11">Hermanas Mirabal</option>
+                <option value="12">Independencia</option>
+                <option value="13">La Altagracia</option>
+                <option value="14">La Romana</option>
+                <option value="15">La Vega</option>
+                <option value="16">Maria Trinidad Sanchez</option>
+                <option value="17">Monseñor Nouel</option>
+                <option value="18">Monte Plata</option>
+                <option value="19">Montecristi</option>
+                <option value="20">Pedernales</option>
+                <option value="21">Peravia</option>
+                <option value="22">Puerto Plata</option>
+                <option value="23">Samana</option>
+                <option value="24">San Cristobal</option>
+                <option value="25">San Jose de Ocoa</option>
+                <option value="26">San Juan</option>
+                <option value="27">San Pedro de Macoris</option>
+                <option value="28">Sanchez Ramirez</option>
+                <option value="29">Santiago</option>
+                <option value="30">Santiago Rodriguez</option>
+                <option value="31">Santo Domingo</option>
+                <option value="32">Valverde</option>
             </select>
         </div>
-
-
     </div>
 
     <div class="buttons">
-        <button class="cancel-button">Cancelar</button>
-        <button class="create-button">Crear</button>
+        <button class="cancel-button" @onclick="Cancelar">Cancelar</button>
+        <button class="create-button" @onclick="CrearUsuario">Crear</button>
     </div>
 </div>
 
-
-
 @code {
-    private string SelectedUserType = string.Empty;
-    private string PasswordFieldType = "password";
+    private const string ApiUrl = "https://localhost:7277/api/UserAccess/Create"; // URL de la API
+    private int? rolId { get; set; } // Guardará el tipo de usuario seleccionado (1, 2, 3)
+    private string profileImgPreview { get; set; } = string.Empty; // Guardará el dataUrl para la vista previa
+    private string name { get; set; } = string.Empty;
+    private string lastname { get; set; } = string.Empty;
+    private string Cedula { get; set; } = string.Empty;
+    private string phone { get; set; } = string.Empty;
+    private string noAgente { get; set; } = string.Empty;
+    private string password { get; set; } = string.Empty;
+    private string email { get; set; } = string.Empty;
+    private decimal? height { get; set; }
+    private DateTime? birthdate { get; set; }
+    private int? genderId { get; set; }
+    private int? bloodTypeId { get; set; }
+    private int? civilStatusId { get; set; }
+    private int? workLocationId { get; set; }
+    private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
 
-    private readonly HashSet<string> EnabledFieldsForCitizen = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email" };
-    private readonly HashSet<string> EnabledFieldsForAdmin = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email", "NoAgente", "FechaNacimiento", "Estatura", "Sexo", "TipoSangre", "EstadoCivil", "LugarTrabajo", "ImagenPerfil", "Nacionalidad" };
-    private readonly HashSet<string> EnabledFieldsForAgent = new() { "Nombre", "Apellido", "Cedula", "Telefono", "Password", "Email", "NoAgente", "FechaNacimiento", "Estatura", "Sexo", "TipoSangre", "EstadoCivil", "LugarTrabajo", "ImagenPerfil", "Nacionalidad" };
+    private string PasswordFieldType { get; set; } = "password";
+    private string PasswordToggleClass { get; set; } = "toggle-hidden";
+    private Dictionary<string, bool> DisabledFields = new()
+{
+    { "name", true },
+    { "lastname", true },
+    { "Cedula", true },
+    { "phone", true },
+    { "noAgente", true },
+    { "password", true },
+    { "email", true },
+    { "height", true },
+    { "birthdate", true },
+    { "genderId", true },
+    { "bloodTypeId", true },
+    { "civilStatusId", true },
+    { "workLocationId", true },
+    { "profileImg", true }
+};
 
+
+    private bool IsDisabled(string fieldName) => DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName];
+
+    // Función que cambia la visibilidad de la contraseña
     private void TogglePasswordField()
     {
-        PasswordFieldType = PasswordFieldType == "password" ? "text" : "password";
-    }
-    private void FormatCedula(ChangeEventArgs e)
-    {
-        var cedula = e.Value?.ToString()?.Replace("-", "");
-        if (cedula?.Length > 3) cedula = cedula.Insert(3, "-");
-        if (cedula?.Length > 11) cedula = cedula.Insert(11, "-");
+        if (PasswordFieldType == "password")
+        {
+            PasswordFieldType = "text";   // La contraseña se hace visible
+            PasswordToggleClass = "toggle-visible"; // Cambia la clase a verde
+        }
+        else
+        {
+            PasswordFieldType = "password"; // La contraseña se oculta
+            PasswordToggleClass = "toggle-hidden"; // Vuelve a la clase negra
+        }
     }
 
-    private void FormatTelefono(ChangeEventArgs e)
-    {
-        var telefono = e.Value?.ToString()?.Replace("-", "");
-        if (telefono?.Length > 3) telefono = telefono.Insert(3, "-");
-        if (telefono?.Length > 7) telefono = telefono.Insert(7, "-");
-    }
+
+
+    private string GetToggleClass() => PasswordFieldType == "password" ? "toggle-off" : "toggle-on";
+
     private void TipoUsuarioChanged(ChangeEventArgs e)
     {
-        SelectedUserType = e.Value?.ToString() ?? string.Empty;
-    }
-    private bool IsDisabled(string fieldName)
-    {
-        return SelectedUserType switch
+        // Convierte el valor a un número entero, si es posible
+        rolId = int.TryParse(e.Value?.ToString(), out var value) ? value : (int?)null;
+
+        // Deshabilitar todos los campos por defecto
+        foreach (var field in DisabledFields.Keys.ToList())
+            DisabledFields[field] = true;
+
+        // Habilitar campos dependiendo del tipo de usuario seleccionado
+        if (rolId == 3) // Ciudadano
         {
-            "Ciudadano" => !EnabledFieldsForCitizen.Contains(fieldName),
-            "Administrador" => !EnabledFieldsForAdmin.Contains(fieldName),
-            "Agente" => !EnabledFieldsForAgent.Contains(fieldName),
-            _ => true,
-        };
+            DisabledFields["name"] = false;
+            DisabledFields["lastname"] = false;
+            DisabledFields["Cedula"] = false;
+            DisabledFields["phone"] = false;
+            DisabledFields["password"] = false;
+            DisabledFields["email"] = false;
+        }
+        else if (rolId == 1 || rolId == 2) // Administrador o Agente
+        {
+            foreach (var field in DisabledFields.Keys.ToList())
+                DisabledFields[field] = false; // Habilitar todos los campos
+
+            DisabledFields["profileImg"] = false; // Habilitar imagen solo para Agente/Administrador
+        }
     }
 
 
 
-    private string PasswordFieldTypee = "password";
-
-
-
-    private string GetToggleClass()
+    private async Task CrearUsuario()
     {
-        return PasswordFieldType == "password" ? "toggle-hidden" : "toggle-visible";
+        var usuario = new
+        {
+            cedula = Cedula,
+            name = name,
+            lastname = lastname,
+            password = string.IsNullOrWhiteSpace(password) ? null : password,
+            rolId = rolId, // Aquí agregamos el rolId
+            email = string.IsNullOrWhiteSpace(email) ? null : email,
+            phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
+            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg, // Enviar solo el nombre del archivo de la imagen
+            nacionalityId = (int?)null,
+            birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null, // Formato de fecha esperado en la API
+            genderId = genderId, // Debería ser un valor numérico (1, 2, 3)
+            bloodTypeId = bloodTypeId, // Debería ser un valor numérico (1-8)
+            height = height.HasValue ? height.Value : (decimal?)null, // Si está vacío, enviar null
+            workLocationId = workLocationId, // Este también debería ser un valor numérico
+            civilStatusId = civilStatusId, // Lo mismo para el estado civil
+            noAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente, // Si es un campo vacío, enviarlo como null
+            statusId = 1 // Este siempre será 1 según lo especificado
+        };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(ApiUrl, usuario);
+            if (response.IsSuccessStatusCode)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Usuario creado con éxito.");
+                NavigationManager.NavigateTo("/Users");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                await JSRuntime.InvokeVoidAsync("alert", $"Error: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al crear usuario: {ex.Message}");
+            Console.WriteLine($"Error al crear usuario: {ex}");
+        }
+    }
+
+
+
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/Users");
+    }
+
+    // Función para manejar la selección de la imagen
+    private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is not null)
+        {
+            // Solo almacenamos el nombre del archivo
+            profileImg = file.Name;
+
+            // Generar el dataUrl para la vista previa
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            var base64 = Convert.ToBase64String(memoryStream.ToArray());
+            profileImgPreview = $"data:{file.ContentType};base64,{base64}";
+
+            // Llamar a la función JavaScript para actualizar la vista previa de la imagen
+            await JSRuntime.InvokeVoidAsync("setImagePreview", "#previewImagenPerfil", profileImgPreview);
+        }
     }
 }
+
+
 
 
 

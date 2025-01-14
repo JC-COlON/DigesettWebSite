@@ -21,6 +21,7 @@ body {
     align-items: center;
     margin-bottom: 20px;
     max-width: 97%;
+    margin-top:-20px;
 }
 
 .title {
@@ -185,8 +186,7 @@ body {
         color: #990101;
         border-color: #990101;
     }
-
-/* SECCIÓN DE CONTRASEÑA CON VISUALIZACIÓN */
+<!-- SECCIÓN DE CONTRASEÑA CON VISUALIZACIÓN -->
 .password-container {
     position: relative;
     display: flex;
@@ -209,7 +209,7 @@ body {
 }
 
     .password-toggle.toggle-hidden {
-        color: gray; /* Gris cuando la contraseña no es visible */
+        color: black; /* Negro cuando la contraseña no es visible */
     }
 
     .password-toggle.toggle-visible {
