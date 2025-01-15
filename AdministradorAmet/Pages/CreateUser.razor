@@ -48,46 +48,62 @@
 
 
 
-
-
         <!-- Campos de entrada -->
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
             <input id="inputNombre" type="text" class="form-input" @bind="name" disabled="@IsDisabled("name")" />
+            @if (!string.IsNullOrEmpty(nameError))
+            {
+                <span class="error-message">@nameError</span>
+            }
         </div>
 
         <div class="input-group">
             <label for="inputApellido">Apellido</label>
             <input id="inputApellido" type="text" class="form-input" @bind="lastname" disabled="@IsDisabled("lastname")" />
+            @if (!string.IsNullOrEmpty(lastnameError))
+            {
+                <span class="error-message">@lastnameError</span>
+            }
         </div>
 
         <div class="input-group">
             <label for="inputCedula">Cédula</label>
-            <input id="inputCedula" type="text" class="form-input" maxlength="13"  @bind="Cedula" disabled="@IsDisabled("Cedula")" />
+            <input id="inputCedula" type="text" class="form-input" maxlength="11" @bind="Cedula" disabled="@IsDisabled("Cedula")" />
+            @if (!string.IsNullOrEmpty(cedulaError))
+            {
+                <span class="error-message">@cedulaError</span>
+            }
         </div>
 
         <div class="input-group">
             <label for="inputTelefono">Teléfono</label>
-            <input id="inputTelefono" type="text" class="form-input" maxlength="12" @bind="phone" disabled="@IsDisabled("phone")" />
+            <input id="inputTelefono" type="text" class="form-input" maxlength="10" @bind="phone" disabled="@IsDisabled("phone")" />
+            @if (!string.IsNullOrEmpty(phoneError))
+            {
+                <span class="error-message">@phoneError</span>
+            }
         </div>
+        <div class="input-group">
+            <label for="inputPassword">Contraseña</label>
+            <div class="password-container">
+                <input id="inputPassword" type="@PasswordFieldType" class="form-input" @bind="password" disabled="@IsDisabled("password")" />
+                <button type="button" class="password-toggle @PasswordToggleClass" @onclick="TogglePasswordField" disabled="@IsDisabled("Password")">
+                    👁
+                </button>
+            </div>
+            @if (!string.IsNullOrEmpty(passwordError))
+            {
+                <span class="error-message">@passwordError</span>
+            }
+        </div>
+
 
         <div class="input-group">
             <label for="inputNoAgente">No. Agente</label>
             <input id="inputNoAgente" type="text" class="form-input" @bind="noAgente" disabled="@IsDisabled("noAgente")" />
         </div>
 
-        <div class="input-group">
-            <label for="inputPassword">Contraseña</label>
-            <div class="password-container">
-                <input id="inputPassword" type="@PasswordFieldType" class="form-input" @bind="password" disabled="@IsDisabled("password")" />
-                <button type="button"
-                        class="password-toggle @PasswordToggleClass"
-                        @onclick="TogglePasswordField"
-                        disabled="@IsDisabled("Password")">
-                    👁
-                </button>
-            </div>
-        </div>
 
         <div class="input-group">
             <label for="inputEmail">Email</label>
@@ -102,6 +118,10 @@
         <div class="input-group">
             <label for="inputFechaNacimiento">Fecha de Nacimiento</label>
             <input id="inputFechaNacimiento" type="date" class="form-input" @bind="birthdate" disabled="@IsDisabled("birthdate")" />
+            @if (!string.IsNullOrEmpty(birthdateError))
+            {
+                <span class="error-message">@birthdateError</span>
+            }
         </div>
         <div class="input-group">
             <label for="inputSexo">Sexo</label>
@@ -205,25 +225,31 @@
     private string PasswordFieldType { get; set; } = "password";
     private string PasswordToggleClass { get; set; } = "toggle-hidden";
     private Dictionary<string, bool> DisabledFields = new()
-{
-    { "name", true },
-    { "lastname", true },
-    { "Cedula", true },
-    { "phone", true },
-    { "noAgente", true },
-    { "password", true },
-    { "email", true },
-    { "height", true },
-    { "birthdate", true },
-    { "genderId", true },
-    { "bloodTypeId", true },
-    { "civilStatusId", true },
-    { "workLocationId", true },
-    { "profileImg", true }
-};
-
+    {
+        { "name", true },
+        { "lastname", true },
+        { "Cedula", true },
+        { "phone", true },
+        { "noAgente", true },
+        { "password", true },
+        { "email", true },
+        { "height", true },
+        { "birthdate", true },
+        { "genderId", true },
+        { "bloodTypeId", true },
+        { "civilStatusId", true },
+        { "workLocationId", true },
+        { "profileImg", true }
+    };
 
     private bool IsDisabled(string fieldName) => DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName];
+
+    private string nameError { get; set; }
+    private string lastnameError { get; set; }
+    private string cedulaError { get; set; }
+    private string phoneError { get; set; }
+    private string passwordError { get; set; }
+    private string birthdateError { get; set; }
 
     // Función que cambia la visibilidad de la contraseña
     private void TogglePasswordField()
@@ -239,8 +265,6 @@
             PasswordToggleClass = "toggle-hidden"; // Vuelve a la clase negra
         }
     }
-
-
 
     private string GetToggleClass() => PasswordFieldType == "password" ? "toggle-off" : "toggle-on";
 
@@ -272,10 +296,86 @@
         }
     }
 
-
-
     private async Task CrearUsuario()
     {
+        // Validaciones
+        bool isValid = true;
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            nameError = "El nombre es obligatorio.";
+            isValid = false;
+        }
+        else
+        {
+            nameError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(lastname))
+        {
+            lastnameError = "El apellido es obligatorio.";
+            isValid = false;
+        }
+        else
+        {
+            lastnameError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(Cedula))
+        {
+            cedulaError = "La cédula es obligatoria.";
+            isValid = false;
+        }
+        else if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
+        {
+            cedulaError = "Cédula inválida. Debe tener 11 números.";
+            isValid = false;
+        }
+        else
+        {
+            cedulaError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            phoneError = "El teléfono es obligatorio.";
+            isValid = false;
+        }
+        else if (phone.Length != 10 || !phone.All(char.IsDigit))
+        {
+            phoneError = "Número de teléfono inválido. Debe tener 10 números.";
+            isValid = false;
+        }
+        else
+        {
+            phoneError = null;
+        }
+
+        if (password.Length <= 6)
+        {
+            passwordError = "La contraseña debe tener más de 6 caracteres.";
+            isValid = false;
+        }
+        else
+        {
+            passwordError = null;
+        }
+
+        if (birthdate.HasValue && (DateTime.Now.Year - birthdate.Value.Year) < 18)
+        {
+            birthdateError = "El usuario debe ser mayor de 18 años.";
+            isValid = false;
+        }
+        else
+        {
+            birthdateError = null;
+        }
+
+        if (!isValid)
+        {
+            return;
+        }
+
         var usuario = new
         {
             cedula = Cedula,
@@ -300,6 +400,7 @@
         try
         {
             var response = await Http.PostAsJsonAsync(ApiUrl, usuario);
+            Console.WriteLine(response); // Agrega esto para ver la respuesta del servidor
             if (response.IsSuccessStatusCode)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Usuario creado con éxito.");
@@ -317,9 +418,6 @@
             Console.WriteLine($"Error al crear usuario: {ex}");
         }
     }
-
-
-
 
     private void Cancelar()
     {
@@ -346,9 +444,6 @@
         }
     }
 }
-
-
-
 
 
 

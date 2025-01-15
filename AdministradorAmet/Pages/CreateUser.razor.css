@@ -215,3 +215,7 @@ body {
     .password-toggle.toggle-visible {
         color: #009c40; /* Verde cuando la contraseña es visible */
     }
+.error-message {
+    color: red;
+    font-size: 0.875em;
+}
