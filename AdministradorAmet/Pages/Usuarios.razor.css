@@ -1,0 +1,167 @@
+﻿
+.container {
+    display: grid;
+    grid-template-rows: auto auto 1fr; 
+    gap: 20px;
+    width: 98%;
+    margin: auto;
+}
+
+/* Fila 1: Header */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 130px; 
+}
+
+.icon-back {
+
+    width: 30px;
+    height: auto;
+    cursor: pointer;
+}
+.back-container { 
+   
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.back-text {
+
+    font-size: 15px;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+}
+
+.city-title {
+
+    font-size: 24px;
+    color: #FD8402;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+/* Fila 2: Actions */
+.actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-create {
+    background-color: #009C40;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    height:36px;
+}
+
+.text-links {
+    margin-bottom:-29px;
+    display: flex;
+    gap: 30px;
+}
+
+.text-link {
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    color: #000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+    .text-link:hover {
+        color: #009C40; /* Hover color */
+    }
+
+
+/* Fila 3: Cuadro Grande */
+.big-frame {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Main Table */
+.main-table {
+    border-radius: 18px;
+    overflow-x: auto;
+    overflow-y: auto;
+    width: 98%;
+    height: 70vh;
+    /*margin-bottom:20px;*/
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+    padding: 6px;
+    background-color: white;
+    position: relative;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
+    box-shadow: none;
+}
+th, td {
+    border: none;
+    padding: 4px;
+    font-size: 10px;
+    text-align: center;
+    background-color: white;
+    height: 38px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+th {
+    background-color: white;
+    font-weight: bold;
+    font-size: 12px;
+    color: black;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+td {
+    cursor: pointer;
+    padding: 2px;
+    font-size: 10px;
+    color: #989898;
+    background-color: white;
+    text-align: center;
+}
+/* Botón de estado */
+.status-btn {
+    background-color: #009C40;
+    color: white;
+    border: none;
+    width:73px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .status-btn:hover {
+        background-color: #007A30;
+    }
+
+/* Iconos de acción */
+.icon-action {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+    .icon-action:hover {
+        transform: scale(1.2); 
+    }
+

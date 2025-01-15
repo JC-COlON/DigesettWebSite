@@ -1,0 +1,134 @@
+﻿@page "/usuarios"
+@using MudBlazor
+@using AdministradorAmet.Models
+@inject HttpClient Http
+@using Newtonsoft.Json
+@inject NavigationManager NavigationManager
+
+<div class="header">
+    <h1 class="title">Usuarios</h1>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrearUsuario" Class="ml-auto">
+        Crear Usuario
+    </MudButton>
+</div>
+
+<MudDataGrid T="Users" MultiSelection="true" Items="@usuarios" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
+             Hideable="true" RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Buscar" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <SelectColumn T="Users" />
+        <PropertyColumn Property="x => x.FullName" Title="Nombre Completo" Filterable="true" />
+        <PropertyColumn Property="x => x.cedula" Title="Cédula" />
+        <PropertyColumn Property="x => x.phone" Title="Teléfono" />
+        <PropertyColumn Property="x => x.role" Title="Tipo de Usuario" />
+        <PropertyColumn Property="x => x.status" Title="Estatus" />
+      
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Users" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<Users> usuarios = new();
+    private string _searchString = string.Empty;
+    private bool _sortNameByLength = false;
+    private List<string> _events = new();
+
+    private Func<Users, object> _sortBy => x => _sortNameByLength ? x.name.Length : x.name;
+
+    private Func<Users, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        return x.cedula?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
+               x.name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
+               x.lastName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
+               x.phone?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
+               x.role?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
+               x.status?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true;
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
+        try
+        {
+            var response = await Http.GetStringAsync("https://localhost:7277/api/User/all");
+            var deserializedResponse = JsonConvert.DeserializeObject<List<Users>>(response);
+
+            if (deserializedResponse != null)
+            {
+                usuarios = deserializedResponse;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar usuarios: {ex.Message}");
+        }
+    }
+
+    private void RowClicked(DataGridRowClickEventArgs<Users> args)
+    {
+        _events.Insert(0, $"Fila seleccionada: Nombre = {args.Item.FullName}");
+    }
+
+    private void RowRightClicked(DataGridRowClickEventArgs<Users> args)
+    {
+        _events.Insert(0, $"Click derecho en fila: Nombre = {args.Item.FullName}");
+    }
+
+    private void SelectedItemsChanged(HashSet<Users> items)
+    {
+        _events.Insert(0, $"Elementos seleccionados: {System.Text.Json.JsonSerializer.Serialize(items)}");
+    }
+
+    private void CrearUsuario()
+    {
+        NavigationManager.NavigateTo("CreateUser");
+    }
+
+    private void VerPerfil(Users usuario)
+    {
+        NavigationManager.NavigateTo("perfilAgente");
+    }
+
+    private void EliminarUsuario(Users usuario)
+    {
+        // Lógica para eliminar al usuario
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
