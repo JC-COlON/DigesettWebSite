@@ -1,31 +1,8 @@
-﻿@* @inject NavigationManager NavigationManager
-<PageTitle>Administrador Digesett</PageTitle>
-@page "/Buscar"
-
-
-
-<div class="search-container">
-    <h1 class="search-title">Buscar</h1>
-    <div class="search-box-container">
-        <div class="search-box">
-            <input type="text" class="form-control" placeholder="Escribe aqui...">
-        </div>
-        <button @onclick="IrALogin" class="search-button">Buscar</button>
-    </div>
-</div>
-
-
-
-@code {
-
-    private void IrALogin()
-    {        
-        NavigationManager.NavigateTo("LoginAdmimistrador");
-    }
-}
- *@
-
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using AdministradorAmet.Models
 
 <PageTitle>Administrador Digesett</PageTitle>
 @page "/Buscar"
@@ -35,107 +12,256 @@
     <div class="results-section">
         <h1 class="results-title">Resultados de Multas</h1>
         <div class="results-container">
-            <div class="result-item" @key="1">
-                <h4>Multa #12345</h4>
-                <p>Cédula: 000-0000000-0</p>
-                <p>Estado: Pendiente</p>
-            </div>
-            <div class="result-item" @key="2">
-                <h4>Multa #67890</h4>
-                <p>Cédula: 000-0000000-0</p>
-                <p>Estado: Pagada</p>
-            </div>
-            <!-- Aquí se cargarán los resultados dinámicamente -->
+            @if (multas != null && multas.Any())
+            {
+                @foreach (var multa in multas)
+                {
+                    <div class="result-item" @key="multa.TicketId">
+                        <h4>Multa #@multa.TicketId</h4>
+                        <p>Nombre: @multa.Name @multa.LastName</p>
+                        <p>Cédula: @multa.Identification</p>
+                        <p>Agente: @multa.Agente.Name @multa.Agente.LastName (No. @multa.AgentNumber)</p>
+                        <p>Estado: @multa.Status</p>
+                    </div>
+                }
+            }
+            else if (isLoading)
+            {
+                <MudProgressCircular Color="Color.Success" Style="height:70px;width:70px;" Indeterminate="true" />
+                <p>Cargando resultados...</p>
+            }
+            else
+            {
+                <p>No se encontraron resultados.</p>
+            }
         </div>
     </div>
 
-    <!-- Contenedor de filtros -->
+    <!-- Sección de filtros -->
     <div class="filters-section">
         <h2 class="filters-title">Buscar</h2>
         <div class="filters-container">
+            <!-- Filtros básicos -->
             <div class="filter-group">
                 <label for="ticketId">No. Multa</label>
-                <input type="number" id="ticketId" class="form-control" placeholder="Ej. 12345">
+                <input type="number" id="ticketId" class="form-control" @bind="filter.TicketId" />
             </div>
             <div class="filter-group">
                 <label for="cedula">Cédula</label>
-                <input type="text" id="cedula" class="form-control" placeholder="Ej. 000-0000000-0">
+                <input type="text" id="cedula" class="form-control" @bind="filter.Identification" />
             </div>
             <div class="filter-group">
                 <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" class="form-control" placeholder="Ej. Juan">
+                <input type="text" id="nombre" class="form-control" @bind="filter.Name" />
             </div>
             <div class="filter-group">
                 <label for="apellido">Apellido</label>
-                <input type="text" id="apellido" class="form-control" placeholder="Ej. Pérez">
+                <input type="text" id="apellido" class="form-control" @bind="filter.LastName" />
             </div>
             <div class="filter-group">
-                <label for="zona">Zona</label>
-                <input type="text" id="zona" class="form-control" placeholder="Ej. Centro">
-            </div>
-            <div class="filter-group">
-                <label for="tipoVehiculoId">Tipo de Vehículo</label>
-                <select id="tipoVehiculoId" class="form-control">
-                    <option value="">Seleccionar</option>
-                    <option value="1">Motocicleta</option>
-                    <option value="2">Automovil</option>
-                    <option value="1">Camioneta</option>
-                    <option value="2">Autobus</option>
-                    <option value="1">Otro</option>
-
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="placaVehiculo">Placa del Vehículo</label>
-                <input type="text" id="placaVehiculo" class="form-control" placeholder="Ej. ABC-123">
-            </div>
-            <div class="filter-group">
-                <label for="marca">Marca del Vehículo</label>
-                <input type="text" id="marca" class="form-control" placeholder="Ej. Toyota">
-            </div>
-            <div class="filter-group">
-                <label for="modelo">Modelo del Vehículo</label>
-                <input type="text" id="modelo" class="form-control" placeholder="Ej. Corolla">
-            </div>
-            <div class="filter-group">
-                <label for="articuloInfringidoId">Artículo Infringido</label>
-                <input type="number" id="articuloInfringidoId" class="form-control" placeholder="Ej. 45">
-            </div>
-            <div class="filter-group">
-                <label for="lugarHecho">Lugar del Hecho</label>
-                <input type="text" id="lugarHecho" class="form-control" placeholder="Ej. Av. Principal">
-            </div>
-            <div class="filter-group">
-                <label for="noAgente">No. de Agente</label>
-                <input type="text" id="noAgente" class="form-control" placeholder="Ej. AG12345">
-            </div>
-            <div class="filter-group">
-                <label for="estado">Estado</label>
-                <select id="estado" class="form-control">
-                    <option value="">Seleccionar</option>
-                    <option value="Pendiente">Pendiente</option>
-                    <option value="Pagada">Pagada</option>
+                <label for="articuloInfringidoId">Articulo Infringido</label>
+                <select id="articuloInfringidoId" class="form-control" @bind="filter.ViolatedArticle">
+                    <option value="">Seleccione</option>
+                    <option value="1">ART 29</option>
+                    <option value="2">ART 40-41</option>
+                    <option value="3">ART 47-7</option>
+                    <option value="4">ART 146/02</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label for="fechaInicio">Fecha Inicio</label>
-                <input type="date" id="fechaInicio" class="form-control">
+                <input type="date" id="fechaInicio" class="form-control" @bind="filter.FechaInicio" />
             </div>
             <div class="filter-group">
                 <label for="fechaFin">Fecha Fin</label>
-                <input type="date" id="fechaFin" class="form-control">
+                <input type="date" id="fechaFin" class="form-control" @bind="filter.FechaFin" />
             </div>
-            <div class="filter-actions">
-                <button class="apply-filters" @onclick="BuscarMultas">Buscar</button>
-            </div>
+
+            <!-- Botón para alternar visibilidad de filtros adicionales -->
+            <button class="btn btn-primary" @onclick="ToggleAdditionalFilters">
+                @(showAdditionalFilters ? "Ocultar Filtros Adicionales" : "Ver Más Filtros")
+            </button>
+
+            <!-- Filtros adicionales -->
+            @if (showAdditionalFilters)
+            {
+                <div class="additional-filters">
+                    <div class="filter-group">
+                        <label for="zona">Zona</label>
+                        <input type="text" id="zona" class="form-control" @bind="filter.Zone" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="tipoVehiculo">Tipo de Vehículo</label>
+                        <select id="tipoVehiculo" class="form-control" @bind="filter.VehicleTypeId">
+                            <option value="">Seleccione</option>
+                            <option value="1">Motocicleta</option>
+                            <option value="2">Automóvil</option>
+                            <option value="3">Camioneta</option>
+                            <option value="4">Autobús</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="No. agente">No. Agente</label>
+                        <input type="text" id="noAgente" class="form-control" @bind="filter.AgentNumber" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="Marca">Marca</label>
+                        <input type="text" id="marca" class="form-control" @bind="filter.Brand" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="Modelo">Modelo</label>
+                        <input type="text" id="modelo" class="form-control" @bind="filter.Model" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="placaVehiculo">Placa</label>
+                        <input type="text" id="placaVehiculo" class="form-control" @bind="filter.LicensePlate" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="lugarHecho">Lugar del Incidente</label>
+                        <input type="text" id="lugarHecho" class="form-control" @bind="filter.IncidentLocation" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" class="form-control" @bind="filter.Status">
+                            <option value="">Seleccione</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="paid">Pagada</option>
+                        </select>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Botón de búsqueda -->
+        <div class="filter-actions">
+            <button class="apply-filters" @onclick="BuscarMultas">Buscar</button>
         </div>
     </div>
 </div>
 
 @code {
-    private void BuscarMultas()
+    private FilterModels filter;
+    private List<Multa> multas;
+    private bool isLoading;
+    private bool showAdditionalFilters = false; // Estado de los filtros adicionales
+
+    private void ToggleAdditionalFilters()
     {
-        // Lógica para filtrar multas según los parámetros.
-        Console.WriteLine("Aplicando filtros...");
+        showAdditionalFilters = !showAdditionalFilters;
     }
+    // Clases de modelo
+    public class TicketResponse
+    {
+        [JsonPropertyName("$values")]
+        public List<Multa> Multas { get; set; }
+    }
+
+    public class Multa
+    {
+        public int TicketId { get; set; }
+        public string Zone { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+        public string Identification { get; set; }
+        public VehicleType VehicleType { get; set; }
+        public string LicensePlate { get; set; }
+        public string Brand { get; set; }
+        public string Model { get; set; }
+        public string IncidentLocation { get; set; }
+        public string Observations { get; set; }
+        public string AgentNumber { get; set; }
+        public DateTime TicketDate { get; set; }
+        public Articulo Articulo { get; set; }
+        public Agente Agente { get; set; }
+        public int Hidden { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class VehicleType
+    {
+        public string Name { get; set; }
+    }
+
+    public class Articulo
+    {
+        public string ArticleNum { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class Agente
+    {
+        public string Name { get; set; }
+        public string LastName { get; set; }
+    }
+
+
+    protected override void OnInitialized()
+    {
+        filter = new FilterModels();
+        multas = new List<Multa>();
+        isLoading = false;
+    }
+    private async Task BuscarMultas()
+    {
+        isLoading = true;
+        multas = null; // Vaciar resultados anteriores
+        try
+        {
+            // Crear la lista de parámetros para la URL
+            var consulta = new List<string>();
+
+            // Agregar filtros sólo si tienen valores
+            if (filter.TicketId.HasValue) consulta.Add($"ticketId={filter.TicketId}");
+            if (!string.IsNullOrEmpty(filter.Identification)) consulta.Add($"cedula={filter.Identification}");
+            if (!string.IsNullOrEmpty(filter.Name)) consulta.Add($"nombre={filter.Name}");
+            if (!string.IsNullOrEmpty(filter.LastName)) consulta.Add($"apellido={filter.LastName}");
+            if (!string.IsNullOrEmpty(filter.Zone)) consulta.Add($"zona={filter.Zone}");
+            if (filter.VehicleTypeId.HasValue) consulta.Add($"tipoVehiculoId={filter.VehicleTypeId}");
+            if (!string.IsNullOrEmpty(filter.LicensePlate)) consulta.Add($"placaVehiculo={filter.LicensePlate}");
+            if (!string.IsNullOrEmpty(filter.Brand)) consulta.Add($"marca={filter.Brand}");
+            if (!string.IsNullOrEmpty(filter.Model)) consulta.Add($"modelo={filter.Model}");
+            if (filter.ViolatedArticle.HasValue) consulta.Add($"articuloInfringidoId={filter.ViolatedArticle}");
+            if (!string.IsNullOrEmpty(filter.IncidentLocation)) consulta.Add($"lugarHecho={filter.IncidentLocation}");
+            if (!string.IsNullOrEmpty(filter.AgentNumber)) consulta.Add($"noAgente={filter.AgentNumber}");
+            if (!string.IsNullOrEmpty(filter.Status)) consulta.Add($"estado={filter.Status}");
+            if (filter.FechaInicio.HasValue) consulta.Add($"fechaInicio={filter.FechaInicio.Value:yyyy-MM-dd}");
+            if (filter.FechaFin.HasValue) consulta.Add($"fechaFin={filter.FechaFin.Value:yyyy-MM-dd}");
+
+            // Validar si no se especifican filtros
+            if (!consulta.Any())
+            {
+                Console.WriteLine("No se especifican filtros. No se realizará la búsqueda.");
+                multas = new List<Multa>(); // Vaciar resultados
+                isLoading = false;
+                return;
+            }
+
+            // Construir la URL final
+            string baseUrl = "https://localhost:7277/api/Ticket/FilterOrGetTicket";
+            string url = $"{baseUrl}?{string.Join("&", consulta)}"; // Concatenar todos los parámetros
+            Console.WriteLine($"URL generada: {url}");
+
+            // Solicitar datos de la API
+            var response = await HttpClient.GetFromJsonAsync<List<Multa>>(url);
+            multas = response ?? new List<Multa>(); // Asignar resultados o lista vacía si no hay datos
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al buscar las multas: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+
+
+
+
+
+
 }

@@ -94,33 +94,9 @@
 }
 
 /* Ajustes para el botón de salir (si lo habilitas en el futuro) */
-.btn.salir {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    text-decoration: none;
-    margin-top: 320px;
-}
 
-.btnsalirr {
-    color: red;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
 
-.salir-icon {
-    width: 27px;
-    height: 27px;
-    object-fit: contain;
-    margin-right: 10px;
-    filter: invert(34%) sepia(94%) saturate(6444%) hue-rotate(-3deg) brightness(93%) contrast(93%);
-}
 
-.textsalir {
-    color: #FF0000;
-    text-decoration: none;
-}
 /* Estilo para el submenú */
 .sub-menu {
     margin-left: 1.5rem;

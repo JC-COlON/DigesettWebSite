@@ -1,119 +1,12 @@
-﻿/*.search-container {
-    display: flex;
-    flex-direction: column; 
-    align-items: center; 
-    padding-top: 50px;
-}
-
-.search-title {
-    font-size: 32px;*/ /* Tamaño del texto */
-    /*font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    color: #000;
-    margin-bottom: 40px; 
-    text-align: center;
-}
-
-.search-box-container {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    justify-content: flex-start;*/ /* Alinea los elementos a la izquierda */
-    /*margin-left: 40PX;*/ /* Mueve el contenedor hacia la derecha */
-/*}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    width: 610px;
-    height: 67px;
-    border: 1px solid #ccc;
-    border-radius: 15px;
-    padding: 0 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-.search-box .form-control {
-        border: none;
-        outline: none;
-        flex: 1;
-        font-size: 18px;
-        height: 100%;
-        padding: 0 10px;
-    }
-.search-box .form-control:focus {
-            outline: none; 
-            box-shadow: none; 
-        }
-
-.search-button {
-    border: none;
-    background-color: #009C40;
-    color: white;
-    width: 146px;
-    height: 67px; 
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease; 
-}
-.search-button:hover {
-        background-color: #007D2B; 
-    }*/
-
-/* Contenedor principal */
-.main-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-}
-
-/* Sección de resultados */
-.results-section {
-    flex: 3;
-    margin-right: 20px;
-}
-
-.results-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.results-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.result-item {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-    .result-item h4 {
-        margin: 0;
-        font-size: 18px;
-        color: #333;
-    }
-
-    .result-item p {
-        margin: 5px 0;
-        color: #666;
-    }
-
-/* Sección de filtros */
+﻿/* Sección de filtros */
 .filters-section {
-    flex: 1;
+    flex: 0.4; /* Limita el espacio que ocupa la sección de filtros */
     background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 20px; /* Aseguramos que sea 'padding' y no 'relleno' */
+    border-radius: 10px; /* Aseguramos que sea 'border-radius' y no 'radio del borde' */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 300px; /* Limita el tamaño máximo de la sección de filtros */
+    min-width: 250px; /* Establece un ancho mínimo para que no se haga demasiado pequeña */
 }
 
 .filters-title {
@@ -125,12 +18,13 @@
 .filters-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 5px; /* Reduce el espacio entre los filtros */
 }
 
 .filter-group {
     display: flex;
     flex-direction: column;
+    margin-bottom: 5px; /* Reduce el espacio entre los grupos de filtros */
 }
 
     .filter-group label {
@@ -144,11 +38,13 @@
         padding: 10px;
         border: 1px solid #ddd;
         border-radius: 5px;
+        margin-bottom: 5px; /* Reduce el espacio entre los inputs */
     }
 
 /* Botón de aplicar filtros */
 .filter-actions {
     text-align: center;
+    margin-top: 20px;
 }
 
 .apply-filters {
@@ -160,8 +56,22 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
+    margin-top: 15px; /* Asegurarse de que el botón no esté pegado al campo anterior */
 }
 
     .apply-filters:hover {
         background-color: #007D2B;
     }
+
+/* Botón para ver más filtros */
+button.btn.btn-primary {
+    margin-top: 10px; /* Espacio adicional para separar los filtros */
+}
+
+/* Ajuste del contenedor de los resultados y los filtros */
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 10px; /* Asegura un espacio adecuado entre las secciones de resultados y filtros */
+}

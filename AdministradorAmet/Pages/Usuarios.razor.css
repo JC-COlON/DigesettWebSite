@@ -1,167 +1,112 @@
-﻿
-.container {
-    display: grid;
-    grid-template-rows: auto auto 1fr; 
-    gap: 20px;
-    width: 98%;
-    margin: auto;
-}
-
-/* Fila 1: Header */
+﻿/* Header */
 .header {
     display: flex;
+    justify-content: flex-end; /* Alinea el botón a la derecha */
     align-items: center;
-    gap: 130px; 
+    margin-bottom: 20px;
+    max-width: 97%;
+    /* margin-top: -20px;*/
 }
 
-.icon-back {
-
-    width: 30px;
-    height: auto;
-    cursor: pointer;
+.container {
+    width: 97%; /* Contenedor más ancho */
+    margin: 20px auto; /* Centrar horizontalmente */
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para efecto visual */
 }
-.back-container { 
-   
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.back-text {
 
-    font-size: 15px;
+.title {
+    font-size: 35px;
+    font-family: 'Poppins', sans-serif;
     font-weight: bold;
-    font-family: 'Poppins', sans-serif;
-}
-
-.city-title {
-
-    font-size: 24px;
-    color: #FD8402;
-    font-family: 'Poppins', sans-serif;
-}
-
-
-/* Fila 2: Actions */
-.actions-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-create {
-    background-color: #009C40;
-    color: white;
-    border: none;
-    padding: 10px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-    height:36px;
-}
-
-.text-links {
-    margin-bottom:-29px;
-    display: flex;
-    gap: 30px;
-}
-
-.text-link {
-    font-size: 12px;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    color: #000;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-    .text-link:hover {
-        color: #009C40; /* Hover color */
-    }
-
-
-/* Fila 3: Cuadro Grande */
-.big-frame {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Main Table */
-.main-table {
-    border-radius: 18px;
-    overflow-x: auto;
-    overflow-y: auto;
-    width: 98%;
-    height: 70vh;
-    /*margin-bottom:20px;*/
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
-    padding: 6px;
-    background-color: white;
-    position: relative;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: none;
-    box-shadow: none;
-}
-th, td {
-    border: none;
-    padding: 4px;
-    font-size: 10px;
-    text-align: center;
-    background-color: white;
-    height: 38px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-th {
-    background-color: white;
-    font-weight: bold;
-    font-size: 12px;
     color: black;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px; /* Mover más arriba */
 }
 
-td {
-    cursor: pointer;
-    padding: 2px;
-    font-size: 10px;
-    color: #989898;
-    background-color: white;
-    text-align: center;
-}
-/* Botón de estado */
-.status-btn {
-    background-color: #009C40;
-    color: white;
-    border: none;
-    width:73px;
-    border-radius: 5px;
-    padding: 5px 10px;
-    font-size: 11px;
+/* Fuente general */
+body {
     font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
-    .status-btn:hover {
-        background-color: #007A30;
-    }
-
-/* Iconos de acción */
-.icon-action {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+/* Estilos para el botón de crear usuario */
+::deep .create-button {
+    background-color: #009C40 !important; /* Color verde */
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    font-size: 18px !important; /* Aumentar tamaño de la fuente */
+    padding: 8px 20px !important; /* Reducir el padding vertical para evitar que el botón se haga muy alto */
+    cursor: pointer !important;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1 !important; /* Asegura que el botón tenga una altura controlada */
 }
 
-    .icon-action:hover {
-        transform: scale(1.2); 
+    ::deep .create-button:hover {
+        background-color: #007B32 !important; /* Oscurece al pasar el ratón */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
     }
 
+    /* Ajustar espacio entre el ícono y el texto */
+    ::deep .create-button .mud-icon {
+        margin-right: 8px; /* Ajusta el espacio entre el ícono y el texto */
+        font-size: 20px; /* Ajusta el tamaño del ícono */
+    }
+
+/* Contenedor para la barra de búsqueda y el botón Nuevo */
+.search-actions-container {
+    display: flex;
+    justify-content: flex-end; /* Alinea la barra de búsqueda y el botón "Nuevo" a la derecha */
+    align-items: center; /* Alinea verticalmente */
+    gap: 10px; /* Espacio entre los elementos */
+    margin-bottom: 10px; /* Espacio debajo de esta fila */
+}
+
+/* Estilo para la barra de búsqueda */
+::deep .search-field {
+    width: 200px !important; /* Hacer que la barra de búsqueda tenga un tamaño adecuado */
+    border-radius: 5px !important;
+    padding: 10px 14px !important;
+    font-size: 16px !important;
+}
+
+/* Contenedor para los botones Agentes, Ciudadanos, Administradores */
+.buttons-container {
+    display: flex;
+    justify-content: flex-start; /* Alinea los botones a la izquierda */
+    gap: 10px; /* Espacio entre los botones */
+    margin-bottom: 20px; /* Espacio debajo de los botones */
+}
+
+/* Estilos para los botones de filtro */
+.filter-button {
+    background-color: #009C40 !important;
+    color: white !important;
+    border-radius: 5px !important;
+    font-size: 16px !important;
+    padding: 8px 20px !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+}
+
+    .filter-button:hover {
+        background-color: #007B32 !important; /* Oscurece al pasar el ratón */
+    }
+
+/* Línea divisora */
+.divider {
+    border-bottom: 1px solid #ccc;
+    margin: 20px 0;
+}
+
+/* Estilo para las columnas */
+::deep .mud-th {
+    font-size: 18px; /* Aumentar tamaño de las columnas */
+    font-weight: bold; /* Poner las columnas en negrita */
+    color: #333; /* Color de texto para las cabeceras */
+}
