@@ -1,4 +1,4 @@
-﻿@page "/usuarios"
+﻿@* @page "/usuarios"
 @using MudBlazor
 @using AdministradorAmet.Models
 @inject HttpClient Http
@@ -12,7 +12,7 @@
 <h1 class="title">Usuarios</h1>
 <div class="container">
     <div class="header">
-        <MudButton Class="create-button" Variant="Variant.Filled" OnClick="CrearUsuario">
+        <MudButton Class="create-button"  OnClick="CrearUsuario">
             <MudIcon Icon="@Icons.Material.Filled.Add" />  Nuevo
         </MudButton>
 
@@ -149,3 +149,4 @@
 
 
 }
+ *@

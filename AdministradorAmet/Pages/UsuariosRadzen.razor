@@ -1,0 +1,66 @@
+﻿@page "/UsuariosRadzen"
+@using AdministradorAmet.Models
+@using Newtonsoft.Json
+@using Radzen.Blazor
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (users == null)
+{
+    <p>Cargando....</p>
+}
+else
+{
+    <RadzenDataGrid AllowPaging="true" AllowFiltering="true" PageSize="5"
+                    AllowSorting="true" Data="@users" TItem="User"
+                    RowClick="@(args => RowClicked(args.Data))" 
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowColumnResize="true">
+        <Columns>
+            <!-- Columna de Imagen -->
+            <RadzenDataGridColumn TItem="User" Title="" Width="20px">
+                <Template Context="usuario">
+                    <RadzenGravatar Path="imagenes/usuario.png" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <!-- Otras columnas -->
+            <RadzenDataGridColumn TItem="User" Property="FullName" Title="Nombre completo" Width="100px"  />
+            <RadzenDataGridColumn TItem="User" Property="Gender" Title="Sexo" Width="75px" />
+            <RadzenDataGridColumn TItem="User" Property="Cedula" Title="Cédula" Width="80px" />
+            <RadzenDataGridColumn TItem="User" Property="Phone" Title="Teléfono" Width="80px" />
+            <RadzenDataGridColumn TItem="User" Property="Role" Title="Tipo de Usuario" Width="80px" />
+            <RadzenDataGridColumn TItem="User" Property="" Title="Accion" Width="50px" />
+        </Columns>
+        
+    </RadzenDataGrid>
+}
+
+@code {
+    private IEnumerable<User> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
+        try
+        {
+            var response = await Http.GetStringAsync("https://localhost:7277/api/User/all");
+            users = JsonConvert.DeserializeObject<List<User>>(response);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar usuarios: {ex.Message}");
+        }
+    }
+
+    private void RowClicked(User user)
+    {
+        Console.WriteLine($"Ver perfil del usuario: {user.Name} {user.LastName}");
+        // Navegar a la página del perfil del usuario
+        NavigationManager.NavigateTo("perfilUsuario");
+    }
+}
