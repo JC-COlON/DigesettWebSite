@@ -1,112 +1,113 @@
-﻿/* Header */
-.header {
-    display: flex;
-    justify-content: flex-end; /* Alinea el botón a la derecha */
-    align-items: center;
-    margin-bottom: 20px;
-    max-width: 97%;
-    /* margin-top: -20px;*/
-}
-
-.container {
-    width: 97%; /* Contenedor más ancho */
-    margin: 20px auto; /* Centrar horizontalmente */
-    background-color: white;
-    padding: 20px;
-    box-sizing: border-box;
-    border-radius: 3px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para efecto visual */
-}
-
+﻿/* Estilo del título */
 .title {
     font-size: 35px;
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
     color: black;
-    margin-bottom: 10px; /* Mover más arriba */
+    margin-bottom: 20px;
 }
 
-/* Fuente general */
-body {
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Estilos para el botón de crear usuario */
-::deep .create-button {
-    background-color: #009C40 !important; /* Color verde */
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    font-size: 18px !important; /* Aumentar tamaño de la fuente */
-    padding: 8px 20px !important; /* Reducir el padding vertical para evitar que el botón se haga muy alto */
-    cursor: pointer !important;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+.header-container {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    line-height: 1 !important; /* Asegura que el botón tenga una altura controlada */
+    margin-bottom: 20px;
+    max-width: 97%;
+    margin-top: -20px;
 }
 
-    ::deep .create-button:hover {
-        background-color: #007B32 !important; /* Oscurece al pasar el ratón */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+.container {
+    width: 99%;
+    margin: 20px auto; /* Centrar la página horizontalmente */
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual */
+}
+/* Estilos del botón */
+.create-button {
+    width: 140px;
+    height: 40px;
+    border: 3px solid #828282;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.create-button {
+    background-color: #009C40;
+    color: white;
+    border-color: #009C40;
+}
+
+    .create-button:hover {
+        background-color: #007A30;
     }
 
-    /* Ajustar espacio entre el ícono y el texto */
-    ::deep .create-button .mud-icon {
-        margin-right: 8px; /* Ajusta el espacio entre el ícono y el texto */
-        font-size: 20px; /* Ajusta el tamaño del ícono */
-    }
 
-/* Contenedor para la barra de búsqueda y el botón Nuevo */
-.search-actions-container {
-    display: flex;
-    justify-content: flex-end; /* Alinea la barra de búsqueda y el botón "Nuevo" a la derecha */
-    align-items: center; /* Alinea verticalmente */
-    gap: 10px; /* Espacio entre los elementos */
-    margin-bottom: 10px; /* Espacio debajo de esta fila */
+/* Contenedor del botón para alinearlo a la derecha */
+.button-container {
+    text-align: right;
+    margin-right: 20px;
 }
 
-/* Estilo para la barra de búsqueda */
-::deep .search-field {
-    width: 200px !important; /* Hacer que la barra de búsqueda tenga un tamaño adecuado */
-    border-radius: 5px !important;
-    padding: 10px 14px !important;
-    font-size: 16px !important;
-}
-
-/* Contenedor para los botones Agentes, Ciudadanos, Administradores */
-.buttons-container {
-    display: flex;
-    justify-content: flex-start; /* Alinea los botones a la izquierda */
-    gap: 10px; /* Espacio entre los botones */
-    margin-bottom: 20px; /* Espacio debajo de los botones */
-}
-
-/* Estilos para los botones de filtro */
-.filter-button {
-    background-color: #009C40 !important;
-    color: white !important;
-    border-radius: 5px !important;
-    font-size: 16px !important;
-    padding: 8px 20px !important;
-    cursor: pointer !important;
-    transition: background-color 0.3s ease !important;
-}
-
-    .filter-button:hover {
-        background-color: #007B32 !important; /* Oscurece al pasar el ratón */
-    }
-
-/* Línea divisora */
+/* Divider style */
 .divider {
-    border-bottom: 1px solid #ccc;
-    margin: 20px 0;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-/* Estilo para las columnas */
-::deep .mud-th {
-    font-size: 18px; /* Aumentar tamaño de las columnas */
-    font-weight: bold; /* Poner las columnas en negrita */
-    color: #333; /* Color de texto para las cabeceras */
+/* Barra de búsqueda y texto "Buscar" alineados */
+.search-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    align-items: center; /* Esto ya debería centrar los elementos verticalmente */
 }
+
+.search-label {
+    margin-right: 10px;
+    font-size: 22px; /* Tamaño del texto "Buscar" */
+    color: black;
+    font-weight: bold; /* Negrita */
+    line-height: normal; /* Asegura que no haya espacios adicionales verticalmente */
+}
+
+.radzen-textbox {
+    width: 250px;
+}
+
+/* Asegúrate de aplicar los estilos a los botones Radzen */
+.radzen-button.new-button {
+    width: 140px;
+    height: 40px;
+    border: 3px solid #828282;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #009C40;
+    color: white;
+    border-color: #009C40;
+}
+
+    .radzen-button.new-button:hover {
+        background-color: #007A30;
+    }
+/* Aplica la fuente 'Roboto' al contenido del DataGrid */
+.radzen-data-grid {
+    font-family: 'Roboto', sans-serif;
+}
+
+    /* Aplica la fuente 'Roboto' a las celdas del DataGrid */
+    .radzen-data-grid td, .radzen-data-grid th {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    /* Estilo de los títulos de las columnas en negrita */
+    .radzen-data-grid th {
+        font-weight: bold;
+    }

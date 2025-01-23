@@ -1,97 +1,94 @@
-﻿@* @page "/usuarios"
-@using MudBlazor
+﻿@page "/Usuarios"
 @using AdministradorAmet.Models
-@inject HttpClient Http
 @using Newtonsoft.Json
+@using Radzen.Blazor
+@inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
-<h1 class="title">Usuarios</h1>
+
+<div class="header-container">
+    <!-- Título -->
+    <h1 class="title">Usuarios</h1>
+</div>
+
 <div class="container">
-    <div class="header">
-        <MudButton Class="create-button"  OnClick="CrearUsuario">
-            <MudIcon Icon="@Icons.Material.Filled.Add" />  Nuevo
-        </MudButton>
+    <!-- Contenedor para el botón alineado a la derecha -->
+    <div class="button-container">
+        <!-- Botón "Nuevo" con clase CSS personalizada -->
+        <RadzenButton Text="Nuevo" Icon="add"
+                      Class="create-button"
+                      Click="NavigateToCrearUsuario" />
 
-        <div class="actions-container">
-            <MudTextField Class="search-field" @bind-Value="_searchString" Placeholder="Buscar" 
-                Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium">
-            </MudTextField>
-            <MudButton Class="filter-button" OnClick="FiltrarPorAgentes">Agentes</MudButton>
-            <MudButton Class="filter-button" OnClick="FiltrarPorCiudadanos">Ciudadanos</MudButton>
-            <MudButton Class="filter-button" OnClick="FiltrarPorAdministradores">Administradores</MudButton>
-        </div>
+    </div>
+    <hr class="divider" />
+    <!-- Barra de búsqueda alineada a la derecha con el texto "Buscar" -->
+    <div class="search-container">
+        <label for="search" class="search-label">Buscar</label>
+        <RadzenTextBox Placeholder="Buscar usuario..."
+                       ValueChanged="@(value => BuscarUsuario(value))"
+                       Style="margin-bottom: 10px;"
+                       Value="@searchText"
+                       id="search" />
     </div>
 
-    <div class="divider"></div>
 
-    <div class="divider"></div>
-    <div>
-        <MudFilterContext>
-            <MudDataGrid T="Users" Items="@usuarios" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
-                Hideable="true" RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged">
+   
+
+    @if (users == null)
+    {
+        <p>Cargando....</p>
+    }
+    else
+    {
+        <div>
+            <!-- DataGrid con los resultados filtrados -->
+            <RadzenDataGrid AllowPaging="true" AllowFiltering="true" PageSize="9"
+                            AllowSorting="true" Data="@filteredUsers" TItem="User"
+                            RowClick="@(args => RowClicked(args.Data))"
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            AllowColumnResize="true">
                 <Columns>
-                    <!-- Columna de Imagen -->
-                    <TemplateColumn Title="Foto">
-                        <Template>
-                            <MudAvatar Image="imagenes/usuario.png" Alt="Usuario" Size="Size.Medium" Class="mud-border-circle" />
+                    <RadzenDataGridColumn TItem="User" Title="" Width="35px">
+                        <Template Context="usuario">
+                            <RadzenGravatar Path="imagenes/usuario.png" />
                         </Template>
-                    </TemplateColumn>
+                    </RadzenDataGridColumn>
 
-                    <!-- Otras columnas -->
-                    <PropertyColumn Property="x => x.FullName" Title="Nombre Completo" HeaderClass="bold-header" Filterable="true" />
-                    <PropertyColumn Property="x => x.gender" Title="Sexo" HeaderClass="bold-header" Filterable="true" />
-                    <PropertyColumn Property="x => x.cedula" Title="Cédula" HeaderClass="bold-header" Filterable="true" />
-                    <PropertyColumn Property="x => x.phone" Title="Teléfono" HeaderClass="bold-header" Filterable="true" />
-                    <PropertyColumn Property="x => x.role" Title="Tipo de Usuario" HeaderClass="bold-header" Filterable="true" />
-
+                    <RadzenDataGridColumn TItem="User" Property="FullName" Title="Nombre completo" Width="100px" />
+                    <RadzenDataGridColumn TItem="User" Property="Gender" Title="Sexo" Width="75px" />
+                    <RadzenDataGridColumn TItem="User" Property="Cedula" Title="Cédula" Width="80px" />
+                    <RadzenDataGridColumn TItem="User" Property="Phone" Title="Teléfono" Width="80px" />
+                    <RadzenDataGridColumn TItem="User" Property="Role" Title="Tipo de Usuario" Width="80px" />
+                    <RadzenDataGridColumn TItem="User" Property="" Title="Acción" Width="50px" />
                 </Columns>
-                <PagerContent>
-                    <MudDataGridPager T="Users" />
-                </PagerContent>
-            </MudDataGrid>
-        </MudFilterContext>
-    </div>
+            </RadzenDataGrid>
+        </div>
+    }
 </div>
 
 @code {
-  
-    private List<Users> usuarios = new();
-    private string _searchString = string.Empty;
+    private IEnumerable<User> users;
+    private IEnumerable<User> filteredUsers;
+    private string searchText = string.Empty;
 
-    private Func<Users, bool> _quickFilter => x =>
-    {
-        if (string.IsNullOrWhiteSpace(_searchString))
-            return true;
-
-        return x.cedula?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
-               x.name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
-               x.lastName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
-               x.phone?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
-               x.role?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true ||
-               x.gender?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true;
-    };
-
+    // Cargar los usuarios al inicializar la página
     protected override async Task OnInitializedAsync()
     {
         await CargarUsuarios();
+        filteredUsers = users;
     }
 
+    // Método para obtener los usuarios desde la API
     private async Task CargarUsuarios()
     {
         try
         {
             var response = await Http.GetStringAsync("https://localhost:7277/api/User/all");
-            var deserializedResponse = JsonConvert.DeserializeObject<List<Users>>(response);
-
-            if (deserializedResponse != null)
-            {
-                usuarios = deserializedResponse;
-                StateHasChanged();
-            }
+            users = JsonConvert.DeserializeObject<List<User>>(response);
+            filteredUsers = users;
         }
         catch (Exception ex)
         {
@@ -99,54 +96,39 @@
         }
     }
 
-    private void RowClicked(DataGridRowClickEventArgs<Users> args)
+    // Método de búsqueda que se ejecuta cada vez que el valor cambia
+    private void BuscarUsuario(string value)
     {
-        // Lógica para manejar el click en una fila
+        // Si el campo de búsqueda está vacío, mostramos todos los usuarios
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            filteredUsers = users;
+            return;
+        }
+
+        // Filtrar usuarios según el texto de búsqueda
+        filteredUsers = users.Where(user =>
+        {
+            // Verificar si user es null antes de acceder a sus propiedades
+            return user != null &&
+                   (user.FullName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
+                    user.Gender?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
+                    user.Cedula?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
+                    user.Phone?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
+                    user.Role?.Contains(value, StringComparison.OrdinalIgnoreCase) == true);
+        }).ToList();
     }
 
-    private void RowRightClicked(DataGridRowClickEventArgs<Users> args)
+    // Acción al hacer clic en una fila del grid
+    private void RowClicked(User user)
     {
-        // Lógica para manejar el click derecho en una fila
-    }
-
-    private void SelectedItemsChanged(HashSet<Users> items)
-    {
-        // Lógica para manejar los elementos seleccionados
-    }
-
-    private void CrearUsuario()
-    {
-        NavigationManager.NavigateTo("CreateUser");
-    }
-    private void VerPerfil(Users usuario)
-    {
-        Console.WriteLine($"Ver perfil del usuario: {usuario.FullName}");
-        // Navegar a la página del perfil del usuario
+        Console.WriteLine($"Ver perfil del usuario: {user.FullName}");
         NavigationManager.NavigateTo("perfilUsuario");
     }
 
-
-
-    private void EliminarUsuario(Users usuario)
+    // Método para redirigir a la página CrearUsuario
+    private void NavigateToCrearUsuario()
     {
-        Console.WriteLine($"Eliminar usuario: {usuario.FullName}");
-        // Lógica para eliminar el usuario
+        NavigationManager.NavigateTo("/CreateUser");
     }
-    private void FiltrarPorAgentes()
-    {
-        // Lógica para filtrar por Agentes
-    }
-
-    private void FiltrarPorCiudadanos()
-    {
-        // Lógica para filtrar por Ciudadanos
-    }
-
-    private void FiltrarPorAdministradores()
-    {
-        // Lógica para filtrar por Administradores
-    }
-
-
 }
- *@
