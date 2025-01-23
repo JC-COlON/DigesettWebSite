@@ -5,6 +5,7 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
@@ -20,7 +21,6 @@
                       Click="NavigateToCrearUsuario"
                       ButtonStyle="ButtonStyle.Success"
                       Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
-
     </div>
     <hr class="divider" />
     <div class="search-and-buttons-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -48,9 +48,6 @@
         </div>
     </div>
 
-
-
-
     @if (users == null)
     {
         <p>Cargando....</p>
@@ -58,52 +55,14 @@
     else
     {
         <div>
-            <head>
-                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-            </head>
-
             <RadzenDataGrid AllowPaging="true" AllowFiltering="true" PageSize="9"
                             AllowSorting="true" Data="@filteredUsers" TItem="User"
-                            RowClick="@(args => RowClicked(args.Data))"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
-                            
                 <Columns>
-       @*              <RadzenDataGridColumn TItem="User" Title="" Width="35px">
-                        <Template Context="usuario">
-                            @if (usuario.Gender == "Masculino")
-                            {
-                                <img src="imagenes/usuario.png" alt="Masculino" style="width: 30px; height: 30px; border-radius: 50%;" />
-                            }
-                            else if (usuario.Gender == "Femenino")
-                            {
-                                <img src="imagenes/femenina.png" alt="Femenino" style="width: 30px; height: 30px; border-radius: 50%;" />
-                            }
-                            else
-                            {
-                                <img src="imagenes/usuario.png" alt="Sin género" style="width: 30px; height: 30px; border-radius: 50%;" />
-                            }
-                        </Template>
-                    </RadzenDataGridColumn> *@
-@* 
-
-
-                    <RadzenDataGridColumn TItem="User" Property="FullName" Width="85px">
-                        <HeaderTemplate>
-                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre completo</span>
-                        </HeaderTemplate>
-                        <Template Context="usuario">
-                            <span style="font-family: 'Roboto', sans-serif; font-size: medium">@usuario.FullName</span>
-                        </Template>
-                    </RadzenDataGridColumn> *@
-
                     <RadzenDataGridColumn TItem="User" Title="Nombre Completo" Width="95px">
                         <HeaderTemplate>
                             <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre completo</span>
                         </HeaderTemplate>
-                        <Template Context="usuario">
-                            <span style="font-family: 'Roboto', sans-serif; font-size: medium">@usuario.FullName</span>
-                        </Template>
                         <Template Context="usuario">
                             <div style="display: flex; align-items: center;">
                                 <img src="@GetImagePath(usuario.Gender)" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 20px;" />
@@ -111,7 +70,6 @@
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
-
 
                     <RadzenDataGridColumn TItem="User" Property="Cedula" Width="70px">
                         <HeaderTemplate>
@@ -159,33 +117,41 @@
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Width="50px" Title="Acción" >
+                    <RadzenDataGridColumn TItem="User" Width="50px" Title="Acción">
                         <HeaderTemplate>
                             <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Acción</span>
                         </HeaderTemplate>
                         <Template Context="usuario">
-                            <RadzenSplitButton Icon="more_vert" />
-                            <Radzen.Blazor.Rendering.Popup>
-                                <RadzenMenu>
-                                    <RadzenMenuItem Text="Ver" Icon="visibility" Click="@(args => VerUsuario(usuario))" />
-                                    <RadzenMenuItem Text="Eliminar" Icon="delete" Click="@(args => EliminarUsuario(usuario))" />
-                                </RadzenMenu>
-                            </Radzen.Blazor.Rendering.Popup>
+                            <!-- Icono de ojo para "Ver" -->
+                            <span style="cursor: pointer; margin-right: 10px;" @onclick="() => VerUsuario(usuario)">
+                                <i class="material-icons" style="font-size: 20px; color: #009C40;">visibility</i>
+                            </span>
+
+                            <!-- Icono de papelera para "Eliminar" -->
+                            <span style="cursor: pointer;" @onclick="() => ConfirmarEliminacion(usuario)">
+                                <i class="material-icons" style="font-size: 20px; color: #d32f2f;">delete</i>
+                            </span>
                         </Template>
                     </RadzenDataGridColumn>
+
                 </Columns>
             </RadzenDataGrid>
-
-
-
         </div>
     }
+
 </div>
+
+
 
 @code {
     private IEnumerable<User> users;
     private IEnumerable<User> filteredUsers;
     private string searchText = string.Empty;
+    private User usuarioAEliminar; // Para almacenar el usuario a eliminar
+    private Radzen.DialogService dialogService;
+
+    [Inject]
+    Radzen.DialogService DialogService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -226,32 +192,47 @@
         }).ToList();
     }
 
-    private void RowClicked(User user)
-    {
-        Console.WriteLine($"Ver perfil del usuario: {user.FullName}");
-        NavigationManager.NavigateTo("perfilUsuario");
-    }
-
     private void NavigateToCrearUsuario()
     {
         NavigationManager.NavigateTo("/CreateUser");
     }
 
-    private void MenuClick(User user)
-    {
-        Console.WriteLine($"Menú clic para el usuario: {user.FullName}");
-    }
-
     private void VerUsuario(User user)
     {
-
-        NavigationManager.NavigateTo("/perfilAgente");
+        NavigationManager.NavigateTo($"/perfilAgente");
     }
 
-    private void EliminarUsuario(User user)
+    private async Task ConfirmarEliminacion(User user)
     {
-        Console.WriteLine($"Eliminar usuario: {user.FullName}");
-        // Eliminar el usuario o realizar la acción deseada
+        var result = await DialogService.Confirm($"¿Está seguro de que desea eliminar al usuario {user.FullName}?", "Confirmar eliminación", new Radzen.ConfirmOptions { Width = "400px", Height = "200px" });
+
+        if (result.HasValue && result.Value)
+        {
+            await EliminarUsuario(user);
+        }
+    }
+
+    private async Task EliminarUsuario(User user)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{user.Cedula}");
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Usuario {user.FullName} eliminado exitosamente.");
+                // Elimina el usuario de la lista local
+                users = users.Where(u => u.Cedula != user.Cedula).ToList();
+                filteredUsers = users;
+            }
+            else
+            {
+                Console.WriteLine($"Error al eliminar usuario: {user.FullName}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al eliminar el usuario: {ex.Message}");
+        }
     }
 
     private string GetImagePath(string gender)

@@ -119,3 +119,9 @@
     .radzen-data-grid th {
         font-weight: bold;
     }
+
+.custom-split-button .rz-splitbutton-trigger {
+    display: none;
+}
+
+
