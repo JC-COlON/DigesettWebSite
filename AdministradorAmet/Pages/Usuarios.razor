@@ -23,14 +23,32 @@
 
     </div>
     <hr class="divider" />
-    <div class="search-container">
-        <label for="search" class="search-label">Buscar:</label>
-        <RadzenTextBox Placeholder="Buscar usuario..."
-                       ValueChanged="@(value => BuscarUsuario(value))"
-                       Style="margin-bottom: 10px; height: 30px; width: 280px;"
-                       Value="@searchText"
-                       id="search" />
+    <div class="search-and-buttons-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <!-- Botones (Izquierda) -->
+        <div class="buttons-container" style="display: flex; align-items: center;">
+            <RadzenButton Text="Agente"
+                          Class="search-button"
+                          Style="height: 30px; border-radius: 10px; border: 2px solid #009C40; background-color: white; color: #009C40; font-family: 'Poppins', sans-serif; font-weight: 500; padding: 5px 10px; font-size: 14px; margin-left: 10px;" />
+            <RadzenButton Text="Administrador"
+                          Class="search-button"
+                          Style="height: 30px; border-radius: 10px; border: 2px solid #009C40; background-color: white; color: #009C40; font-family: 'Poppins', sans-serif; font-weight: 500; padding: 5px 10px; font-size: 14px; margin-left: 10px;" />
+            <RadzenButton Text="Ciudadano"
+                          Class="search-button"
+                          Style="height: 30px; border-radius: 10px; border: 2px solid #009C40; background-color: white; color: #009C40; font-family: 'Poppins', sans-serif; font-weight: 500; padding: 5px 10px; font-size: 14px; margin-left: 10px;" />
+        </div>
+
+        <!-- Barra de búsqueda (Derecha) -->
+        <div class="search-container">
+            <label for="search" class="search-label" style="margin-right: 10px;">Buscar:</label>
+            <RadzenTextBox Placeholder="Buscar usuario..."
+                           ValueChanged="@(value => BuscarUsuario(value))"
+                           Style="margin-bottom: 10px; height: 30px; width: 280px;"
+                           Value="@searchText"
+                           id="search" />
+        </div>
     </div>
+
+
 
 
     @if (users == null)
@@ -51,7 +69,7 @@
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
                             
                 <Columns>
-                    <RadzenDataGridColumn TItem="User" Title="" Width="35px">
+       @*              <RadzenDataGridColumn TItem="User" Title="" Width="35px">
                         <Template Context="usuario">
                             @if (usuario.Gender == "Masculino")
                             {
@@ -66,8 +84,8 @@
                                 <img src="imagenes/usuario.png" alt="Sin género" style="width: 30px; height: 30px; border-radius: 50%;" />
                             }
                         </Template>
-                    </RadzenDataGridColumn>
-
+                    </RadzenDataGridColumn> *@
+@* 
 
 
                     <RadzenDataGridColumn TItem="User" Property="FullName" Width="85px">
@@ -77,7 +95,23 @@
                         <Template Context="usuario">
                             <span style="font-family: 'Roboto', sans-serif; font-size: medium">@usuario.FullName</span>
                         </Template>
+                    </RadzenDataGridColumn> *@
+
+                    <RadzenDataGridColumn TItem="User" Title="Nombre Completo" Width="95px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre completo</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif; font-size: medium">@usuario.FullName</span>
+                        </Template>
+                        <Template Context="usuario">
+                            <div style="display: flex; align-items: center;">
+                                <img src="@GetImagePath(usuario.Gender)" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 20px;" />
+                                <span style="font-family: 'Roboto', sans-serif; font-size: medium;">@usuario.FullName</span>
+                            </div>
+                        </Template>
                     </RadzenDataGridColumn>
+
 
                     <RadzenDataGridColumn TItem="User" Property="Cedula" Width="70px">
                         <HeaderTemplate>
@@ -94,6 +128,16 @@
                         </HeaderTemplate>
                         <Template Context="usuario">
                             <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Gender</span>
+                        </Template>
+                        <Template Context="usuario">
+                            @if (string.IsNullOrWhiteSpace(usuario.Gender))
+                            {
+                                <span style="display: block; text-align:justify; width: 100%;font-size:large">-</span>  <!-- Muestra un guion si no hay valor -->
+                            }
+                            else
+                            {
+                                <span style="font-family: 'Roboto', sans-serif; font-size: medium;">@usuario.Gender</span>
+                            }
                         </Template>
                     </RadzenDataGridColumn>
 
@@ -115,7 +159,7 @@
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Width="50px" Title="Acción">
+                    <RadzenDataGridColumn TItem="User" Width="50px" Title="Acción" >
                         <HeaderTemplate>
                             <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Acción</span>
                         </HeaderTemplate>
@@ -208,5 +252,21 @@
     {
         Console.WriteLine($"Eliminar usuario: {user.FullName}");
         // Eliminar el usuario o realizar la acción deseada
+    }
+
+    private string GetImagePath(string gender)
+    {
+        if (gender == "Masculino")
+        {
+            return "imagenes/usuario.png";
+        }
+        else if (gender == "Femenino")
+        {
+            return "imagenes/femenina.png";
+        }
+        else
+        {
+            return "imagenes/usuario.png";  // Imagen predeterminada
+        }
     }
 }
