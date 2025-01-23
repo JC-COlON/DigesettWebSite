@@ -8,34 +8,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
-
 <div class="header-container">
-    <!-- Título -->
     <h1 class="title">Usuarios</h1>
 </div>
 
 <div class="container">
-    <!-- Contenedor para el botón alineado a la derecha -->
     <div class="button-container">
-        <!-- Botón "Nuevo" con clase CSS personalizada -->
-        <RadzenButton Text="Nuevo" Icon="add"
+        <RadzenButton Text="Nuevo"
+                      Icon="add"
                       Class="create-button"
-                      Click="NavigateToCrearUsuario" />
+                      Click="NavigateToCrearUsuario"
+                      ButtonStyle="ButtonStyle.Success"
+                      Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
 
     </div>
     <hr class="divider" />
-    <!-- Barra de búsqueda alineada a la derecha con el texto "Buscar" -->
     <div class="search-container">
-        <label for="search" class="search-label">Buscar</label>
+        <label for="search" class="search-label">Buscar:</label>
         <RadzenTextBox Placeholder="Buscar usuario..."
                        ValueChanged="@(value => BuscarUsuario(value))"
-                       Style="margin-bottom: 10px;"
+                       Style="margin-bottom: 10px; height: 30px; width: 280px;"
                        Value="@searchText"
                        id="search" />
     </div>
 
-
-   
 
     @if (users == null)
     {
@@ -44,27 +40,100 @@
     else
     {
         <div>
-            <!-- DataGrid con los resultados filtrados -->
+            <head>
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+            </head>
+
             <RadzenDataGrid AllowPaging="true" AllowFiltering="true" PageSize="9"
                             AllowSorting="true" Data="@filteredUsers" TItem="User"
                             RowClick="@(args => RowClicked(args.Data))"
-                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                            AllowColumnResize="true">
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+                            
                 <Columns>
                     <RadzenDataGridColumn TItem="User" Title="" Width="35px">
                         <Template Context="usuario">
-                            <RadzenGravatar Path="imagenes/usuario.png" />
+                            @if (usuario.Gender == "Masculino")
+                            {
+                                <img src="imagenes/usuario.png" alt="Masculino" style="width: 30px; height: 30px; border-radius: 50%;" />
+                            }
+                            else if (usuario.Gender == "Femenino")
+                            {
+                                <img src="imagenes/femenina.png" alt="Femenino" style="width: 30px; height: 30px; border-radius: 50%;" />
+                            }
+                            else
+                            {
+                                <img src="imagenes/usuario.png" alt="Sin género" style="width: 30px; height: 30px; border-radius: 50%;" />
+                            }
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Property="FullName" Title="Nombre completo" Width="100px" />
-                    <RadzenDataGridColumn TItem="User" Property="Gender" Title="Sexo" Width="75px" />
-                    <RadzenDataGridColumn TItem="User" Property="Cedula" Title="Cédula" Width="80px" />
-                    <RadzenDataGridColumn TItem="User" Property="Phone" Title="Teléfono" Width="80px" />
-                    <RadzenDataGridColumn TItem="User" Property="Role" Title="Tipo de Usuario" Width="80px" />
-                    <RadzenDataGridColumn TItem="User" Property="" Title="Acción" Width="50px" />
+
+
+                    <RadzenDataGridColumn TItem="User" Property="FullName" Width="85px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre completo</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif; font-size: medium">@usuario.FullName</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="User" Property="Cedula" Width="70px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Cédula</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Cedula</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="User" Property="Gender" Width="65px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Sexo</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Gender</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="User" Property="Phone" Width="70px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Teléfono</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif; font-size: medium">@usuario.Phone</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="User" Property="Role" Width="70px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Tipo de Usuario</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Role</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="User" Width="50px" Title="Acción">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Acción</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <RadzenSplitButton Icon="more_vert" />
+                            <Radzen.Blazor.Rendering.Popup>
+                                <RadzenMenu>
+                                    <RadzenMenuItem Text="Ver" Icon="visibility" Click="@(args => VerUsuario(usuario))" />
+                                    <RadzenMenuItem Text="Eliminar" Icon="delete" Click="@(args => EliminarUsuario(usuario))" />
+                                </RadzenMenu>
+                            </Radzen.Blazor.Rendering.Popup>
+                        </Template>
+                    </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
+
+
+
         </div>
     }
 </div>
@@ -74,14 +143,12 @@
     private IEnumerable<User> filteredUsers;
     private string searchText = string.Empty;
 
-    // Cargar los usuarios al inicializar la página
     protected override async Task OnInitializedAsync()
     {
         await CargarUsuarios();
         filteredUsers = users;
     }
 
-    // Método para obtener los usuarios desde la API
     private async Task CargarUsuarios()
     {
         try
@@ -96,20 +163,16 @@
         }
     }
 
-    // Método de búsqueda que se ejecuta cada vez que el valor cambia
     private void BuscarUsuario(string value)
     {
-        // Si el campo de búsqueda está vacío, mostramos todos los usuarios
         if (string.IsNullOrWhiteSpace(value))
         {
             filteredUsers = users;
             return;
         }
 
-        // Filtrar usuarios según el texto de búsqueda
         filteredUsers = users.Where(user =>
         {
-            // Verificar si user es null antes de acceder a sus propiedades
             return user != null &&
                    (user.FullName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Gender?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
@@ -119,16 +182,31 @@
         }).ToList();
     }
 
-    // Acción al hacer clic en una fila del grid
     private void RowClicked(User user)
     {
         Console.WriteLine($"Ver perfil del usuario: {user.FullName}");
         NavigationManager.NavigateTo("perfilUsuario");
     }
 
-    // Método para redirigir a la página CrearUsuario
     private void NavigateToCrearUsuario()
     {
         NavigationManager.NavigateTo("/CreateUser");
+    }
+
+    private void MenuClick(User user)
+    {
+        Console.WriteLine($"Menú clic para el usuario: {user.FullName}");
+    }
+
+    private void VerUsuario(User user)
+    {
+
+        NavigationManager.NavigateTo("/perfilAgente");
+    }
+
+    private void EliminarUsuario(User user)
+    {
+        Console.WriteLine($"Eliminar usuario: {user.FullName}");
+        // Eliminar el usuario o realizar la acción deseada
     }
 }
