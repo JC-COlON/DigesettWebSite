@@ -4,6 +4,8 @@
 @using Radzen.Blazor
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject Radzen.DialogService DialogService
+
 
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
@@ -12,6 +14,21 @@
 <div class="header-container">
     <h1 class="title">Usuarios</h1>
 </div>
+
+@if (alertaVisible)
+{
+    <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Info" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
+        Usuario eliminado correctamente.
+    </RadzenAlert>
+}
+
+@if (errorVisible)
+{
+    <RadzenAlert Title="Error" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
+        No se pudo eliminar el usuario.
+    </RadzenAlert>
+}
+
 
 <div class="container">
     <div class="button-container">
@@ -126,7 +143,6 @@
                             <span style="cursor: pointer; margin-right: 10px;" @onclick="() => VerUsuario(usuario)">
                                 <i class="material-icons" style="font-size: 20px; color: #009C40;">visibility</i>
                             </span>
-
                             <!-- Icono de papelera para "Eliminar" -->
                             <span style="cursor: pointer;" @onclick="() => ConfirmarEliminacion(usuario)">
                                 <i class="material-icons" style="font-size: 20px; color: #d32f2f;">delete</i>
@@ -134,12 +150,19 @@
                         </Template>
                     </RadzenDataGridColumn>
 
+
                 </Columns>
             </RadzenDataGrid>
         </div>
     }
 
 </div>
+@* <RadzenAlert Title="Usuario eliminado correctamente"
+             AlertStyle="AlertStyle.Success"
+             Shade="Shade.Lighter"
+             Visible="@showAlert"
+             Close="()=>showAlert = false" /> *@
+
 
 
 
@@ -147,11 +170,11 @@
     private IEnumerable<User> users;
     private IEnumerable<User> filteredUsers;
     private string searchText = string.Empty;
-    private User usuarioAEliminar; // Para almacenar el usuario a eliminar
-    private Radzen.DialogService dialogService;
+    private bool showAlert = false; // Controla si la alerta se muestra
+    bool alertaVisible = false;
+    bool errorVisible = false;
 
-    [Inject]
-    Radzen.DialogService DialogService { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -202,38 +225,57 @@
         NavigationManager.NavigateTo($"/perfilAgente");
     }
 
-    private async Task ConfirmarEliminacion(User user)
+  
+
+    // Método para mostrar el diálogo de confirmación
+    void ConfirmarEliminacion(User usuario)
     {
-        var result = await DialogService.Confirm($"¿Está seguro de que desea eliminar al usuario {user.FullName}?", "Confirmar eliminación", new Radzen.ConfirmOptions { Width = "400px", Height = "200px" });
-
-        if (result.HasValue && result.Value)
-        {
-            await EliminarUsuario(user);
-        }
+        DialogService.Confirm("¿Estás seguro de que deseas eliminar este usuario?", "Confirmar Eliminación", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" })
+            .ContinueWith(async task =>
+            {
+                if (task.Result == true)
+                {
+                    await EliminarUsuario(usuario.Cedula);
+                }
+            });
     }
-
-    private async Task EliminarUsuario(User user)
+    async Task EliminarUsuario(string cedula)
     {
         try
         {
-            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{user.Cedula}");
+            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{cedula}");
+
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"Usuario {user.FullName} eliminado exitosamente.");
-                // Elimina el usuario de la lista local
-                users = users.Where(u => u.Cedula != user.Cedula).ToList();
+                // Actualiza la lista local de usuarios eliminando al usuario eliminado
+                users = users.Where(u => u.Cedula != cedula).ToList();
                 filteredUsers = users;
+
+                // Notifica a la UI que hubo cambios
+                StateHasChanged();
+
+                // Muestra la alerta de éxito y la oculta después de 3 segundos
+                await MostrarAlerta(true);
             }
             else
             {
-                Console.WriteLine($"Error al eliminar usuario: {user.FullName}");
+                Console.WriteLine($"Error al eliminar usuario: {response.ReasonPhrase}");
+
+                // Muestra la alerta de error y la oculta después de 3 segundos
+                await MostrarAlerta(false);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al eliminar el usuario: {ex.Message}");
+            Console.WriteLine($"Error en la eliminación: {ex.Message}");
+
+            // Muestra la alerta de error y la oculta después de 3 segundos
+            await MostrarAlerta(false);
         }
     }
+
+
+
 
     private string GetImagePath(string gender)
     {
@@ -250,4 +292,28 @@
             return "imagenes/usuario.png";  // Imagen predeterminada
         }
     }
+    async Task MostrarAlerta(bool exito)
+    {
+        if (exito)
+        {
+            alertaVisible = true;
+            errorVisible = false;
+        }
+        else
+        {
+            alertaVisible = false;
+            errorVisible = true;
+        }
+
+        StateHasChanged(); // Actualiza la UI inmediatamente para que la alerta sea visible
+
+        await Task.Delay(2000); // Muestra la alerta durante 3 segundos
+
+        alertaVisible = false;
+        errorVisible = false;
+
+        StateHasChanged(); // Vuelve a actualizar la UI
+    }
+
 }
+

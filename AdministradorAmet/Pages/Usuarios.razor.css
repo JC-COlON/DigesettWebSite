@@ -125,3 +125,10 @@
 }
 
 
+.rz-dialog-button-ok {
+    background-color: #009C40 !important; /* Color verde */
+    color: white !important; /* Color del texto */
+    border: 2px solid #009C40 !important; /* Borde del botón */
+    font-family: 'Poppins', sans-serif; /* Fuente personalizada */
+    font-weight: bold;
+}
