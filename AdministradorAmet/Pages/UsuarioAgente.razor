@@ -219,7 +219,7 @@
                    (user.FullName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Gender?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Cedula?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
-                    user.Phone?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
+                    user.NoAgente?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Role?.Contains(value, StringComparison.OrdinalIgnoreCase) == true) &&
                    user.Role == "Agente";  // Filtrar solo administradores
         }).ToList();
