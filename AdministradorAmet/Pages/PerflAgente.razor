@@ -1,123 +1,92 @@
 ﻿@inject NavigationManager NavigationManager
 @inject HttpClient Http
-<PageTitle>Administrador Digesett</PageTitle>
+<PageTitle>Perfil del Agente</PageTitle>
 @page "/perfilAgente"
 
+<!-- Fuentes -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
+<h1 class="title">Perfil del Agente</h1>
 
-<div class="container">
-
-    <!-- Primera columna -->
-    <div class="column left">
-        @* <div class="back-container">
-            <img @onclick="Atras" src="imagenes/back-icon.svg" alt="Atrás" class="icon-back">
-            <span class="back-text">Atrás</span>
-        </div> *@
-    </div>
-
-    <!-- Segunda columna (Centro) -->
-    <div class="column center">
-        <div class="main-box">
-            <div class="photo-info">
-                <!-- Foto -->
-                @* <div class="photo-box"> Foto </div> *@
-                <img crs="imagenes/foto-svg" alt="imagenperfil" class="photo-box" />
-
-                <!-- Textos al lado de la foto -->
-
-                <div class="info-list">
-
-                    <p class="nombre"><strong>Jose Ferreira Rodriguez</strong></p>
-                    <p><strong>ID:</strong> <span class="info-value">12345</span></p>
-                    <p><strong>Estado:</strong> <span class="info-value active">Activo</span></p>
-                    <p><strong>Multas:</strong> <span class="info-value green">0</span></p>
-                </div>
-
-
-            </div>
-
-            <!-- Datos debajo de la foto -->
-            <div class="additional-info">
-                <p class="location"><strong>Santiago de los caballeros</strong></p>
-                <p><strong>Edad:</strong> <span>35 </span></p>
-                @*  <p><strong>Altura:</strong> <span>1.75 m</span></p> *@
-                <p><strong>Estado Civil:</strong> <span>Casado</span></p>
-                <p><strong>Fecha de Nacimiento:</strong> <span>1988-05-10</span></p>
-            </div>
-
-            <!-- Otros datos -->
-            <div class="other-data">
-                <h3>Otros Datos</h3>
-                <p>Información adicional sobre el agente.</p>
-            </div>
-
-            <!-- Iconos al final -->
+<div class="main-container">
+    <!-- Columna izquierda (70%) -->
+    <div class="left-column">
+        <div class="container large-container">
             <div class="icons">
-                <img src="imagenes/delete-icon.svg" alt="Icono 1" class="icon">
-                <img src="imagenes/edit-icon.svg" alt="Icono 2" class="icon">
-                <img src="imagenes/note-icon.svg" alt="Icono 3" class="icon">
+                
+                <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar">
+                <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
+                <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar">
+            </div>
+            <div class="agent-info">
+                <div class="photo-section">
+                    <img src="imagenes/usuario.png" alt="Foto de Perfil" class="profile-photo" />
+                    <h2>Alex Colon</h2>
+                    <p class="id">No. Agente: A001</p>
+                </div>
+
+                <div class="details-section">
+                    <div class="column">
+                        <p><strong>Cédula:</strong> 40234047228</p>
+                        <p><strong>Email:</strong> AlexColon@gmail.com</p>
+                        <p><strong>Teléfono:</strong> 8098378318</p>
+                        <p><strong>Nacionalidad:</strong> Dominicana</p>
+                        <p><strong>Género:</strong> Masculino</p>
+                    </div>
+                    <div class="column">
+                        <p><strong>Tipo de Sangre:</strong> B+</p>
+                        <p><strong>Ubicación de Trabajo:</strong> Monseñor Nouel</p>
+                        <p><strong>Estado Civil:</strong> Soltero</p>
+                        <p><strong>Fecha de Nacimiento:</strong> 2006-02-13</p>
+                        <p><strong>Altura:</strong> 1.78 m</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <h3>Últimas Reseñas</h3>
+            <div class="review">
+                <p><strong>Comentario 1:</strong> Excelente trabajo y muy profesional.</p>
+            </div>
+            <div class="review">
+                <p><strong>Comentario 2:</strong> Muy atento y servicial.</p>
+            </div>
+            <div class="review">
+                <p><strong>Comentario 3:</strong> Puntual y preciso en sus funciones.</p>
             </div>
         </div>
     </div>
 
-    <!-- Tercera columna -->
-    <div class="column right">
-        <div class="score-box">
-            <h3>Puntuación</h3>
-
-            <div class="score-row">
-                <span>Excelente</span>
-                <div class="progress-bar excellent">
-                    <div class="progress" style="width: 80%;"></div>
-                </div>
-                <span>80%</span>
+    <!-- Columna derecha (30%) -->
+    <div class="right-column">
+        <div class="container">
+            <h3>Multas Puestas</h3>
+            <div class="progress-bar">
+                <div class="progress" style="width: 80%;"></div>
             </div>
-
-            <div class="score-row">
-                <span>Regular</span>
-                <div class="progress-bar regular">
-                    <div class="progress" style="width: 50%;"></div>
-                </div>
-                <span>50%</span>
-            </div>
-
-            <div class="score-row">
-                <span>Malo</span>
-                <div class="progress-bar bad">
-                    <div class="progress" style="width: 20%;"></div>
-                </div>
-                <span>20%</span>
-            </div>
+            <span>80%</span>
         </div>
 
-
-        <div class="score-box">
-            <h3>Multas</h3>
-
-            <div class="score-row">
-                <span>Excelente</span>
-                <div class="progress-bar excellent">
-                    <div class="progress" style="width: 80%;"></div>
-                </div>
-                <span>80%</span>
+        <div class="container">
+            <h3>Promedio de Calificaciones</h3>
+            <div class="rating-bar">
+                <div class="progress" style="width: 85%;"></div>
             </div>
-
-          
+            <span>4.25 / 5</span>
         </div>
-     
+
+        <div class="container">
+            <h3>Multas por Artículo</h3>
+            <img src="imagenes/grafico.png" alt="Gráfico de Multas" class="chart" />
+        </div>
     </div>
 </div>
-
-
-
 
 @code {
     private void Atras()
     {
         NavigationManager.NavigateTo("");
-
     }
 }
