@@ -2,6 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
+@inject Radzen.DialogService DialogService
 
 <PageTitle>Administrador Digesett - Crear Usuario</PageTitle>
 @page "/CreateUser"
@@ -12,6 +13,10 @@
 <div class="header">
     <h1 class="title">Crear Usuarios</h1>
 </div>
+
+
+
+
 
 <div class="container">
     <hr class="divider" />
@@ -33,6 +38,23 @@
     <!-- Información Personal -->
     <h2 class="section-title">Información Personal</h2>
     <hr class="divider" />
+
+
+    @if (alertaVisible)
+    {
+        <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Success" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
+            Usuario Creado correctamente.
+        </RadzenAlert>
+    }
+
+    @if (errorVisible)
+    {
+        <RadzenAlert Title="Error" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
+            No se pudo Crear el usuario.
+        </RadzenAlert>
+    }
+
+
 
    <div class="inputs-grid">
         <!-- Tipo de Usuario -->
@@ -221,7 +243,8 @@
     private int? civilStatusId { get; set; }
     private int? workLocationId { get; set; }
     private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
-
+    bool alertaVisible = false;
+    bool errorVisible = false;
     private string PasswordFieldType { get; set; } = "password";
     private string PasswordToggleClass { get; set; } = "toggle-hidden";
     private Dictionary<string, bool> DisabledFields = new()
@@ -403,13 +426,13 @@
             Console.WriteLine(response); // Agrega esto para ver la respuesta del servidor
             if (response.IsSuccessStatusCode)
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Usuario creado con éxito.");
-                NavigationManager.NavigateTo("/Users");
+                await MostrarAlerta(true);
+                NavigationManager.NavigateTo("/Usuarios");
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
-                await JSRuntime.InvokeVoidAsync("alert", $"Error: {error}");
+
+                await MostrarAlerta(false);
             }
         }
         catch (Exception ex)
@@ -442,6 +465,28 @@
             // Llamar a la función JavaScript para actualizar la vista previa de la imagen
             await JSRuntime.InvokeVoidAsync("setImagePreview", "#previewImagenPerfil", profileImgPreview);
         }
+    }
+    async Task MostrarAlerta(bool exito)
+    {
+        if (exito)
+        {
+            alertaVisible = true;
+            errorVisible = false;
+        }
+        else
+        {
+            alertaVisible = false;
+            errorVisible = true;
+        }
+
+        StateHasChanged(); // Actualiza la UI inmediatamente para que la alerta sea visible
+
+        await Task.Delay(2000); // Muestra la alerta durante 3 segundos
+
+        alertaVisible = false;
+        errorVisible = false;
+
+        StateHasChanged(); // Vuelve a actualizar la UI
     }
 }
 

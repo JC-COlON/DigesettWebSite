@@ -1,4 +1,4 @@
-﻿@page "/Usuarios"
+﻿@page "/UsuarioAdministrador"
 @using AdministradorAmet.Models
 @using Newtonsoft.Json
 @using Radzen.Blazor
@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
 <div class="header-container">
-    <h1 class="title">Usuarios</h1>
+    <h1 class="title">Administradores</h1>
 </div>
 
 @if (alertaVisible)
@@ -185,7 +185,7 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarUsuarios();
-        filteredUsers = users;
+
     }
 
     private async Task CargarUsuarios()
@@ -194,7 +194,9 @@
         {
             var response = await Http.GetStringAsync("https://localhost:7277/api/User/all");
             users = JsonConvert.DeserializeObject<List<User>>(response);
-            filteredUsers = users;
+
+            // Filtrar solo los administradores
+            filteredUsers = users.Where(user => user.Role == "Administrador").ToList();
         }
         catch (Exception ex)
         {
@@ -202,11 +204,12 @@
         }
     }
 
+
     private void BuscarUsuario(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            filteredUsers = users;
+            filteredUsers = users.Where(user => user.Role == "Administrador").ToList();
             return;
         }
 
@@ -217,7 +220,8 @@
                     user.Gender?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Cedula?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Phone?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
-                    user.Role?.Contains(value, StringComparison.OrdinalIgnoreCase) == true);
+                    user.Role?.Contains(value, StringComparison.OrdinalIgnoreCase) == true) &&
+                   user.Role == "Administrador";  // Filtrar solo administradores
         }).ToList();
     }
 

@@ -1,0 +1,134 @@
+﻿/* Estilo del título */
+.title {
+    font-size: 35px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    max-width: 97%;
+    margin-top: -20px;
+}
+
+.container {
+    width: 99%;
+    margin: 20px auto; /* Centrar la página horizontalmente */
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual */
+}
+
+/* Estilos del botón */
+.create-button {
+    width: 180px; /* Aumentamos el tamaño */
+    height: 40px;
+    border: 3px solid #828282;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.create-button {
+    background-color: #009C40;
+    color: white;
+    border-color: #009C40;
+}
+
+    .create-button:hover {
+        background-color: #007A30;
+    }
+
+/* Contenedor del botón para alinearlo a la derecha */
+.button-container {
+    text-align: right;
+    margin-right: 20px;
+}
+
+/* Divider style */
+.divider {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+/* Estilos de la barra de búsqueda y texto "Buscar" alineados a la derecha */
+.search-container {
+    display: flex;
+    justify-content: flex-end; /* Alinea al lado derecho */
+    margin-top: 20px;
+    margin-bottom: 10px;
+    align-items: center; /* Centra los elementos verticalmente */
+    border-radius:7px;
+}
+
+.search-label {
+    margin-right: 10px; /* Separamos un poco más la palabra "Buscar" de la barra */
+    font-size: 14px; /* Tamaño más pequeño para el texto "Buscar" */
+    color: black;
+    font-weight: bold;
+    line-height: 40px; /* Alineamos verticalmente con la barra */
+    height: 48px; /* Igual que la altura de la barra de búsqueda */
+}
+
+
+
+
+
+
+.radzen-textbox {
+    width: 360px; /* Ancho reducido para la barra de búsqueda */
+    height: 40px; /* Aseguramos que la altura sea la misma que la del botón */
+}
+
+/* Asegúrate de aplicar los estilos a los botones Radzen */
+.radzen-button.new-button {
+    width: 180px; /* Aumentamos el tamaño */
+    height: 40px;
+    border: 3px solid #828282;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #009C40;
+    color: white;
+    border-color: #009C40;
+}
+
+    .radzen-button.new-button:hover {
+        background-color: #007A30;
+    }
+
+/* Aplica la fuente 'Roboto' al contenido del DataGrid */
+.radzen-data-grid {
+    font-family: 'Roboto', sans-serif;
+}
+
+    /* Aplica la fuente 'Roboto' a las celdas del DataGrid */
+    .radzen-data-grid td, .radzen-data-grid th {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    /* Estilo de los títulos de las columnas en negrita */
+    .radzen-data-grid th {
+        font-weight: bold;
+    }
+
+.custom-split-button .rz-splitbutton-trigger {
+    display: none;
+}
+
+
+.rz-dialog-button-ok {
+    background-color: #009C40 !important; /* Color verde */
+    color: white !important; /* Color del texto */
+    border: 2px solid #009C40 !important; /* Borde del botón */
+    font-family: 'Poppins', sans-serif; /* Fuente personalizada */
+    font-weight: bold;
+}
