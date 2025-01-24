@@ -248,7 +248,8 @@
 
     private void VerUsuario(User user)
     {
-        NavigationManager.NavigateTo($"/perfilAgente");
+        // Asumiendo que "user" tiene una propiedad llamada "Cedula" o algo único como su identificador
+        NavigationManager.NavigateTo($"/perfilAgente/{user.Cedula}");
     }
 
   

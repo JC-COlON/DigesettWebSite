@@ -1,7 +1,8 @@
 ﻿@inject NavigationManager NavigationManager
 @inject HttpClient Http
+@using AdministradorAmet.Models
 <PageTitle>Perfil del Agente</PageTitle>
-@page "/perfilAgente"
+@page "/perfilAgente/{cedula}"
 
 <!-- Fuentes -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
@@ -9,84 +10,100 @@
 
 <h1 class="title">Perfil del Agente</h1>
 
-<div class="main-container">
-    <!-- Columna izquierda (70%) -->
-    <div class="left-column">
-        <div class="container large-container">
-            <div class="icons">
-                
-                <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar">
-                <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
-                <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar">
-            </div>
-            <div class="agent-info">
-                <div class="photo-section">
-                    <img src="imagenes/usuario.png" alt="Foto de Perfil" class="profile-photo" />
-                    <h2>Alex Colon</h2>
-                    <p class="id">No. Agente: A001</p>
+<!-- Mostrar los datos del agente -->
+@if (usuario != null)
+{
+    <div class="main-container">
+        <!-- Columna izquierda (70%) -->
+        <div class="left-column">
+            <div class="container large-container">
+                <div class="icons">
+                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar">
+                    <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
+                    <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar">
                 </div>
+                <div class="agent-info">
+                    <div class="photo-section">
+                        <img src="imagenes/usuario.png" alt="Foto de Perfil" class="profile-photo" />
+                        <h2>@usuario.FullName</h2>
+                        <p class="id">No. Agente: @usuario.NoAgente</p>
+                    </div>
 
-                <div class="details-section">
-                    <div class="column">
-                        <p><strong>Cédula:</strong> 40234047228</p>
-                        <p><strong>Email:</strong> AlexColon@gmail.com</p>
-                        <p><strong>Teléfono:</strong> 8098378318</p>
-                        <p><strong>Nacionalidad:</strong> Dominicana</p>
-                        <p><strong>Género:</strong> Masculino</p>
+                    <div class="details-section">
+                        <div class="column">
+                            <p><strong>Cédula:</strong> @usuario.Cedula</p>
+                            <p><strong>Email:</strong> @usuario.email</p>
+                            <p><strong>Teléfono:</strong> @usuario.Phone</p>
+                            <p><strong>Nacionalidad:</strong> @usuario.nacionality</p>
+                            <p><strong>Género:</strong> @usuario.Gender</p>
+                        </div>
+                        <div class="column">
+                            <p><strong>Tipo de Sangre:</strong> @usuario.bloodType</p>
+                            <p><strong>Ubicación de Trabajo:</strong> @usuario.workLocation</p>
+                            <p><strong>Estado Civil:</strong> @usuario.civilStatus</p>
+                            <p><strong>Fecha de Nacimiento:</strong> @usuario.birthdate</p>
+                            <p><strong>Altura:</strong> @usuario.height</p>
+                        </div>
                     </div>
-                    <div class="column">
-                        <p><strong>Tipo de Sangre:</strong> B+</p>
-                        <p><strong>Ubicación de Trabajo:</strong> Monseñor Nouel</p>
-                        <p><strong>Estado Civil:</strong> Soltero</p>
-                        <p><strong>Fecha de Nacimiento:</strong> 2006-02-13</p>
-                        <p><strong>Altura:</strong> 1.78 m</p>
-                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <h3>Últimas Reseñas</h3>
+                <div class="review">
+                    <p><strong>Comentario 1:</strong> Excelente trabajo y muy profesional.</p>
+                </div>
+                <div class="review">
+                    <p><strong>Comentario 2:</strong> Muy atento y servicial.</p>
+                </div>
+                <div class="review">
+                    <p><strong>Comentario 3:</strong> Puntual y preciso en sus funciones.</p>
                 </div>
             </div>
         </div>
 
-        <div class="container">
-            <h3>Últimas Reseñas</h3>
-            <div class="review">
-                <p><strong>Comentario 1:</strong> Excelente trabajo y muy profesional.</p>
+        <!-- Columna derecha (30%) -->
+        <div class="right-column">
+            <div class="container">
+                <h3>Porcentaje de Multas</h3>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 80%;"></div>
+                </div>
+                <span>80%</span>
             </div>
-            <div class="review">
-                <p><strong>Comentario 2:</strong> Muy atento y servicial.</p>
+
+            <div class="container">
+                <h3>Promedio de Calificaciones</h3>
+                <div class="rating-bar">
+                    <div class="progress" style="width: 85%;"></div>
+                </div>
+                <span>4.25 / 5</span>
             </div>
-            <div class="review">
-                <p><strong>Comentario 3:</strong> Puntual y preciso en sus funciones.</p>
+
+            <div class="container">
+                <h3>Multas por Artículo</h3>
+                <img src="imagenes/grafico.png" alt="Gráfico de Multas" class="chart" />
             </div>
         </div>
     </div>
-
-    <!-- Columna derecha (30%) -->
-    <div class="right-column">
-        <div class="container">
-            <h3>Multas Puestas</h3>
-            <div class="progress-bar">
-                <div class="progress" style="width: 80%;"></div>
-            </div>
-            <span>80%</span>
-        </div>
-
-        <div class="container">
-            <h3>Promedio de Calificaciones</h3>
-            <div class="rating-bar">
-                <div class="progress" style="width: 85%;"></div>
-            </div>
-            <span>4.25 / 5</span>
-        </div>
-
-        <div class="container">
-            <h3>Multas por Artículo</h3>
-            <img src="imagenes/grafico.png" alt="Gráfico de Multas" class="chart" />
-        </div>
-    </div>
-</div>
+}
+else
+{
+    <p>Cargando datos del usuario...</p>
+}
 
 @code {
-    private void Atras()
+    [Parameter]
+    public string Cedula { get; set; }
+
+    private User usuario;
+
+    protected override async Task OnInitializedAsync()
     {
-        NavigationManager.NavigateTo("");
+        if (!string.IsNullOrEmpty(Cedula))
+        {
+            // Realizar la solicitud a la API usando la cédula
+            usuario = await Http.GetFromJsonAsync<User>($"https://localhost:7277/api/User/{Cedula}");
+        }
     }
 }
