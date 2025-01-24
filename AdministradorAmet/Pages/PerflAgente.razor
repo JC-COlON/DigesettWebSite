@@ -1,9 +1,12 @@
-﻿@inject NavigationManager NavigationManager
+﻿@page "/perfilAgente/{cedula}"
+
+@inject NavigationManager NavigationManager
 @inject HttpClient Http
 @using AdministradorAmet.Models
 @using Newtonsoft.Json
+@using Radzen
+
 <PageTitle>Perfil del Agente</PageTitle>
-@page "/perfilAgente/{cedula}"
 
 <!-- Fuentes -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
@@ -11,11 +14,9 @@
 
 <h1 class="title">Perfil del Agente</h1>
 
-<!-- Mostrar los datos del agente -->
 @if (usuario != null)
 {
     <div class="main-container">
-        <!-- Columna izquierda (70%) -->
         <div class="left-column">
             <div class="container large-container">
                 <div class="icons">
@@ -25,9 +26,7 @@
                 </div>
                 <div class="agent-info">
                     <div class="photo-section">
-                        <!-- Foto de Perfil basada en el género del usuario -->
-                        <img src="@((usuario.Gender.ToLower() == "masculino") ? "imagenes/usuario.png" : "imagenes/femenina.png")"
-                             alt="Foto de Perfil" class="profile-photo" />
+                        <img src="@((usuario.Gender.ToLower() == "masculino") ? "imagenes/usuario.png" : "imagenes/femenina.png")" alt="Foto de Perfil" class="profile-photo" />
                         <h3>@usuario.FullName</h3>
                         <p class="id">No. Agente: @usuario.NoAgente</p>
                     </div>
@@ -79,7 +78,6 @@
             </div>
         </div>
 
-        <!-- Columna derecha (30%) -->
         <div class="right-column">
             <div class="container">
                 <h3>Porcentaje de Multas</h3>
@@ -91,10 +89,10 @@
 
             <div class="container">
                 <h3>Promedio de Calificaciones</h3>
-                <div class="rating-bar">
-                    <div class="progress" style="width: 85%;"></div>
+                <div class="rz-p-12 rz-text-align-center">
+                    <RadzenRating Value="@promedioRatingInt" ReadOnly="true" Max="5" />
                 </div>
-                <span>4.25 / 5</span>
+                <span>@promedioRating / 5</span>
             </div>
 
             <div class="container">
@@ -115,6 +113,8 @@ else
 
     private User usuario;
     private List<Review> reseñas = new List<Review>();
+    private double promedioRating;
+    private int promedioRatingInt;
 
     protected override async Task OnInitializedAsync()
     {
@@ -122,26 +122,37 @@ else
         {
             try
             {
-                // Obtener los datos del usuario
                 usuario = await Http.GetFromJsonAsync<User>($"https://localhost:7277/api/User/{Cedula}");
 
-                // Obtener las reseñas para el agente
-                var response = await Http.GetStringAsync($"https://localhost:7277/api/Reviews/GetLatestReviewsForAgentByCedula/{Cedula}");
-                var reviewsResponse = JsonConvert.DeserializeObject<ReviewsResponse>(response);
+                var responseReviews = await Http.GetStringAsync($"https://localhost:7277/api/Reviews/GetLatestReviewsForAgentByCedula/{Cedula}");
+                var reviewsResponse = JsonConvert.DeserializeObject<ReviewsResponse>(responseReviews);
 
-                // Si el objeto response no es null y tiene reseñas
                 if (reviewsResponse?.Reviews != null && reviewsResponse.Reviews.Count > 0)
                 {
                     reseñas = reviewsResponse.Reviews;
                 }
                 else
                 {
-                    reseñas = new List<Review>(); // No hay reseñas
+                    reseñas = new List<Review>();
+                }
+
+                var responseRating = await Http.GetStringAsync($"https://localhost:7277/api/Reviews/GetAgentRatingAverage?cedula={Cedula}");
+                var ratingResponse = JsonConvert.DeserializeObject<RatingResponse>(responseRating);
+
+                if (ratingResponse != null)
+                {
+                    promedioRating = ratingResponse.PromedioRating;
+                    promedioRatingInt = (int)promedioRating; // Conversion
+                }
+                else
+                {
+                    promedioRating = 0;
+                    promedioRatingInt = 0;
                 }
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"Error al obtener reseñas: {ex.Message}");
+                Console.WriteLine($"Error al obtener datos: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -160,5 +171,10 @@ else
     public class ReviewsResponse
     {
         public List<Review> Reviews { get; set; }
+    }
+
+    public class RatingResponse
+    {
+        public double PromedioRating { get; set; }
     }
 }
