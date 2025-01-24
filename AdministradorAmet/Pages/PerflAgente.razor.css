@@ -128,23 +128,9 @@
     display: block;
     margin: auto;
 }
-.rating {
-    display: inline-block;
-    font-size: 0;
-    position: relative;
-}
 
-.star {
-    width: 100px; /* Ajusta el ancho según necesites */
-    height: 20px; /* Ajusta la altura según necesites */
-    background: url("/imagenes/starempty.png") repeat-x;
-    position: relative;
-}
+/*.ratingstar {
+    color: #fd8402;*/  /*Cambia el color de las estrellas */
+    /*font-size: 54px;*/  /*Cambia el tamaño de las estrellas*/ 
+/*}*/
 
-.filled-star {
-    height: 20px; /* Ajusta la altura según necesites */
-    background: url("/imagenes/starfilled.png") repeat-x;
-    position: absolute;
-    top: 0;
-    left: 0;
-}

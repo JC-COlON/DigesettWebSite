@@ -86,14 +86,25 @@
                 </div>
                 <span>80%</span>
             </div>
-
             <div class="container">
                 <h3>Promedio de Calificaciones</h3>
-                <div class="rz-p-12 rz-text-align-center">
-                    <RadzenRating Value="@promedioRatingInt" ReadOnly="true" Max="5" />
+                <div class="rz-p-12 rz-text-align-center custom-rating">
+                    <!-- Verificar si el agente tiene calificación, si no, mostrar estrellas vacías -->
+                    <RadzenRating Value="@promedioRatingInt" ReadOnly="true" Max="5"
+                                  Style="font-size: 52px; color:#fd8402  " />
                 </div>
-                <span>@promedioRating / 5</span>
+                <!-- Mostrar mensaje si no hay calificación -->
+                @if (promedioRatingInt == 0 || promedioRatingInt == null)
+                {
+                    <p>Este agente no ha sido calificado</p>
+                    <span>0/5</span>
+                }
+                else
+                {
+                    <span>@promedioRating / 5</span>
+                }
             </div>
+
 
             <div class="container">
                 <h3>Multas por Artículo</h3>
