@@ -1,0 +1,161 @@
+﻿body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.title {
+    font-size: 35px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 40px;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.mensaje {
+    font-size: 35px;
+    font-weight: bold;
+    color: green;
+    margin-bottom: 40px;
+    text-align: left;
+    padding-left: 20px;
+}
+
+/* Estructura principal */
+.main-container {
+    display: flex;
+    gap: 20px;
+    width: 97%;
+    margin: 20px auto;
+}
+
+/* Columna izquierda (70%) */
+.left-column {
+    flex: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Columna derecha (30%) */
+.right-column {
+    flex: 30%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Contenedor general */
+.container {
+    width: 100%;
+    background-color: white;
+    padding: 25px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.large-container {
+    position: relative;
+    padding-top: 60px; /* Para acomodar los iconos */
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Íconos */
+.icons {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 15px;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+/* Foto y detalles */
+.agent-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.photo-section {
+    text-align: center;
+    text-align: center;
+    position: relative; /* Para mover la foto dentro del contenedor */
+    top: -20px; /* Mueve la foto hacia arriba */
+    right: -45px; /* Mueve la foto hacia la derecha */
+}
+
+.profile-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+/* Reducción de espacio entre columnas y aumento de tamaño */
+.details-section {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-evenly; /* Reduce la separación horizontal */
+    gap: 5px; /* Ajusta el espacio entre columnas */
+}
+
+.column {
+    width: 49%; /* Ocupan casi la mitad del contenedor */
+    font-size: 16px; /* Incrementa el tamaño del texto */
+    line-height: 1.9; /* Mejora la legibilidad del texto */
+}
+.multa {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.progress-bar, .rating-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress {
+    height: 20px;
+    background-color: #4caf50;
+}
+
+.chart {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+}
+
+.rz-category-axis text {
+    transform: translateY(10px); /* Ajusta el valor según sea necesario */
+}
+/* Añadir borde rojo al contenedor */
+.border-red {
+    border: 2px solid red; /* Borde rojo de 2px */
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+
+.border-green {
+    border: 2px solid green; /* Borde rojo de 2px */
+    padding: 25px;
+    box-sizing: border-box;
+}
+

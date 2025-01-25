@@ -1,0 +1,449 @@
+﻿@page "/perfilCiudadano/{cedula}"
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using AdministradorAmet.Models
+@using Newtonsoft.Json
+@using Radzen.Blazor
+@using System.Globalization
+@inject Radzen.DialogService DialogService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Perfil del Agente</PageTitle>
+
+<!-- Fuentes -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+
+<h1 class="title">Perfil del Ciudadano</h1>
+
+@if (alertaVisible)
+{
+    <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
+        No se pudo Eliminar el Agente
+    </RadzenAlert>
+}
+
+@if (errorVisible)
+{
+    <RadzenAlert Title="Error" AlertStyle="AlertStyle.Info" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
+        Agente Eliminado Correctamente.
+    </RadzenAlert>
+}
+
+@if (usuario != null)
+{
+    <div class="main-container">
+        <div class="left-column">
+            <div class="container large-container">
+                <div class="icons">
+                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar">
+                    <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
+                    <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion(usuario)" />
+                </div>
+                <div class="agent-info">
+                    <div class="photo-section">
+                        <img src="@((string.IsNullOrEmpty(usuario.Gender) ? "imagenes/usuario.png" : (usuario.Gender.ToLower() == "masculino") ? "imagenes/usuario.png" : "imagenes/femenina.png"))" alt="Foto de Perfil" class="profile-photo" />
+                    </div>
+
+
+                    <div class="details-section">
+                        <div class="column">
+                            <h3>@(string.IsNullOrEmpty(usuario?.FullName) ? "N/A" : usuario.FullName)</h3>
+                            <p><strong>Cédula:</strong> @(string.IsNullOrEmpty(usuario?.Cedula) ? "N/A" : usuario.Cedula)</p>
+                            <p><strong>Email:</strong> @(string.IsNullOrEmpty(usuario?.email) ? "N/A" : usuario.email)</p>
+                            <p><strong>Teléfono:</strong> @(string.IsNullOrEmpty(usuario?.Phone) ? "N/A" : usuario.Phone)</p>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-container">
+                <h3 >Multas de este Ciudadano</h3>
+            </div>
+
+            @if (tickets == null)
+            {
+                <p class="mensaje">Este Usuario no tiene multas pendientes....</p>
+            }
+            else
+            {
+                <RadzenDataGrid AllowPaging="true" AllowFiltering="true" PageSize="4"
+                                AllowSorting="true" Data="@filteredTickets" TItem="Ticket"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Ticket" Title="NO." Property="TicketId" Width="45px">
+                            <HeaderTemplate>
+                                <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">ID</span>
+                            </HeaderTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Ticket" Title="ticketDate." Property="ticketDate" Width="80px">
+                            <HeaderTemplate>
+                                <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Fecha</span>
+                            </HeaderTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Ticket" Title="Placa" Property="LicensePlate" Width="60px">
+                            <HeaderTemplate>
+                                <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Placa</span>
+                            </HeaderTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Ticket" Title="Agente No." Property="AgentNumber" Width="75px">
+                            <HeaderTemplate>
+                                <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Agente No.</span>
+                            </HeaderTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Ticket" Title="Art." Property="Articulo.ArticleNum" Width="60px">
+                            <HeaderTemplate>
+                                <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Art.</span>
+                            </HeaderTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Ticket" Title="Estado" Width="100px">
+                            <HeaderTemplate>
+                                <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Estado</span>
+                            </HeaderTemplate>
+                            <Template Context="ticket">
+                                @if (ticket.Status == "Paid")
+                                {
+                                    <span style="font-weight: bold; color: green; font-size:medium">Pagada</span>
+                                }
+                                else if (ticket.Status == "pending")
+                                {
+                                    <span style="font-weight: bold; color: red; font-size:medium" >Pendiente</span>
+                                }
+                                else
+                                {
+                                    <span>@ticket.Status</span>
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+
+
+            }
+
+
+         
+        </div>
+
+        <div class="right-column">
+
+            <div class="container border-green">
+                <h3>Últimas Multas Pagas</h3>
+                @if (multasPagas != null && multasPagas.Count > 0)
+                {
+                    @foreach (var multa in multasPagas)
+                    {
+                        <div class="multa">
+                            <!-- Manejo de la fecha -->
+                            @if (multa.ticketDate != null && DateTime.TryParse(multa.ticketDate.ToString(), out DateTime ticketDate))
+                            {
+                                <p><strong>Fecha:</strong> @ticketDate.ToString("dd/MM/yyyy")</p>
+                            }
+                            else
+                            {
+                                <p><strong>Fecha:</strong> N/A</p>
+                            }
+
+                            <!-- Lugar del incidente y detalles del artículo -->
+                            <p><strong>Lugar del incidente:</strong> @(string.IsNullOrEmpty(multa.IncidentLocation) ? "N/A" : multa.IncidentLocation)</p>
+
+                            <!-- Mostrar el artículo, asegurándote de acceder a la propiedad 'Articulo' -->
+                            <p><strong>Artículo:</strong> @(string.IsNullOrEmpty(multa.Articulo?.ArticleNum) ? "N/A" : multa.Articulo.ArticleNum)</p>
+                            <p><strong>Descripción:</strong> @(string.IsNullOrEmpty(multa.Articulo?.Description) ? "N/A" : multa.Articulo.Description)</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No hay multas pagas.</p>
+                }
+            </div>
+
+            <div class="container border-red">
+                <h3>Últimas Multas Pendientes</h3>
+                @if (multasPendientes != null && multasPendientes.Count > 0)
+                {
+                    @foreach (var multa in multasPendientes)
+                    {
+                        <div class="multa">
+                            <!-- Manejo de la fecha -->
+                            @if (multa.ticketDate != null && DateTime.TryParse(multa.ticketDate.ToString(), out DateTime ticketDate))
+                            {
+                                <p><strong>Fecha:</strong> @ticketDate.ToString("dd/MM/yyyy")</p>
+                            }
+                            else
+                            {
+                                <p><strong>Fecha:</strong> N/A</p>
+                            }
+
+                            <!-- Lugar del incidente y detalles del artículo -->
+                            <p><strong>Lugar del incidente:</strong> @(string.IsNullOrEmpty(multa.IncidentLocation) ? "N/A" : multa.IncidentLocation)</p>
+
+                            <!-- Mostrar el artículo, asegurándote de acceder a la propiedad 'Articulo' -->
+                            <p><strong>Artículo:</strong> @(string.IsNullOrEmpty(multa.Articulo?.ArticleNum) ? "N/A" : multa.Articulo.ArticleNum)</p>
+                            <p><strong>Descripción:</strong> @(string.IsNullOrEmpty(multa.Articulo?.Description) ? "N/A" : multa.Articulo.Description)</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No hay multas pendientes.</p>
+                }
+            </div>
+
+
+
+
+        </div>
+    </div>
+}
+else
+{
+    <p>Cargando datos del usuario...</p>
+}
+
+@code {
+    [Parameter]
+    public string Cedula { get; set; }
+    private List<Ticket> multasPendientes = new List<Ticket>();
+    private List<Ticket> multasPagas = new List<Ticket>();
+    private User usuario;
+
+    private double promedioRating;
+    private int promedioRatingInt;
+
+    private bool smooth = true;
+    private bool showDataLabels = true;
+    private bool showMarkers = true;
+    private bool sharedTooltip = false;
+    bool alertaVisible = false;
+    bool errorVisible = false;
+    private IEnumerable<User> users;
+    private IEnumerable<User> filteredUsers;
+    [Parameter] public string Cedulaa { get; set; }
+
+    private IEnumerable<Ticket> tickets;
+    private IEnumerable<Ticket> filteredTickets;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Cedula))
+        {
+            await CargarMultas();
+            try
+            {
+                // Obtener datos del usuario
+                usuario = await Http.GetFromJsonAsync<User>($"https://localhost:7277/api/User/{Cedula}");
+
+                // Obtener las últimas 3 multas pendientes
+                var responseMultasPendientes = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/Pending/{Cedula}");
+                var multasPendientesResponse = JsonConvert.DeserializeObject<List<Ticket>>(responseMultasPendientes);
+
+                if (multasPendientesResponse != null && multasPendientesResponse.Count > 0)
+                {
+                    multasPendientes = multasPendientesResponse.Take(3).ToList();
+                    Console.WriteLine($"Multas pendientes: {multasPendientes.Count}");
+                }
+                else
+                {
+                    multasPendientes = new List<Ticket>();
+                }
+
+                // Obtener las últimas 3 multas pagas
+                var responseMultasPagas = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/Paid/{Cedula}");
+                var multasPagasResponse = JsonConvert.DeserializeObject<List<Ticket>>(responseMultasPagas);
+
+                if (multasPagasResponse != null && multasPagasResponse.Count > 0)
+                {
+                    multasPagas = multasPagasResponse.Take(3).ToList();
+                    Console.WriteLine($"Multas pagas: {multasPagas.Count}");
+                }
+                else
+                {
+                    multasPagas = new List<Ticket>();
+                }
+
+                // Asegúrate de actualizar filteredTickets con los datos correctos
+                filteredTickets = tickets;
+                Console.WriteLine($"Filtered Tickets: {filteredTickets?.Count()}");
+
+                // Llama a StateHasChanged para actualizar la UI
+                StateHasChanged();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error al obtener datos: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error inesperado: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task CargarMultas()
+    {
+        try
+        {
+            var response = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/FilterOrGetTicket?Cedula={Cedula}");
+
+            // Verifica si la respuesta es válida antes de deserializarla
+            if (!string.IsNullOrEmpty(response))
+            {
+                tickets = JsonConvert.DeserializeObject<List<Ticket>>(response);
+                filteredTickets = tickets;
+                Console.WriteLine($"Tickets cargados: {tickets?.Count()}");
+            }
+            else
+            {
+                Console.WriteLine("La respuesta está vacía.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar las multas: {ex.Message}");
+        }
+    }
+
+
+
+  
+    public class TicketResponse
+    {
+        public List<Ticket> Values { get; set; }
+    }
+
+
+
+    public class TicketData
+    {
+        public string Day { get; set; } = string.Empty;
+        public int Tickets { get; set; }
+    }
+
+    public class Ticket
+    {
+        public int TicketId { get; set; }
+        public string Zone { get; set; }
+        public string Name { get; set; }
+        public DateTime ticketDate { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+        public string Identification { get; set; }
+        public VehicleType VehicleType { get; set; }
+        public string LicensePlate { get; set; }
+        public string Brand { get; set; }
+        public string Model { get; set; }
+        public string Status { get; set; }
+        public string IncidentLocation { get; set; }
+        public string Observations { get; set; }
+        public string AgentNumber { get; set; }
+        public Article Articulo { get; set; } = new Article();  // Inicializar aquí
+        public Agent Agent { get; set; }
+    }
+
+    public class VehicleType
+    {
+        public string Name { get; set; }
+    }
+
+    public class Article
+    {
+        public string ArticleNum { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class Agent
+    {
+        public string Name { get; set; }
+        public string LastName { get; set; }
+    }
+
+
+    // Método para mostrar el diálogo de confirmación
+    void ConfirmarEliminacion(User usuario)
+    {
+        DialogService.Confirm("¿Estás seguro de que deseas eliminar este usuario?", "Confirmar Eliminación", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" })
+            .ContinueWith(async task =>
+            {
+                if (task.Result == true)
+                {
+                    await EliminarUsuario(usuario.Cedula);
+                }
+            });
+    }
+
+    async Task EliminarUsuario(string cedula)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{cedula}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Actualiza la lista local de usuarios eliminando al usuario eliminado
+                users = users.Where(u => u.Cedula != cedula).ToList();
+                filteredUsers = users;
+
+                // Notifica a la UI que hubo cambios
+                StateHasChanged();
+
+                // Muestra la alerta de éxito y la oculta después de 2 segundos
+                await MostrarAlerta(true);
+
+                // Redirige a la página de la lista de usuarios, al final para asegurarte que la UI esté actualizada
+                NavigationManager.NavigateTo("/Usuarios"); // Cambia esta ruta según sea necesario
+            }
+            else
+            {
+                Console.WriteLine($"Error al eliminar usuario: {response.ReasonPhrase}");
+
+                // Muestra la alerta de error y la oculta después de 2 segundos
+                await MostrarAlerta(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error en la eliminación: {ex.Message}");
+
+            // Muestra la alerta de error y la oculta después de 2 segundos
+            await MostrarAlerta(false);
+        }
+    }
+
+
+    async Task MostrarAlerta(bool exito)
+    {
+        if (exito)
+        {
+            alertaVisible = true;
+            errorVisible = false;  // Asegúrate de que errorVisible esté en false cuando es un éxito
+        }
+        else
+        {
+            alertaVisible = false;
+            errorVisible = true;   // Y errorVisible en true cuando es un error
+        }
+
+        StateHasChanged(); // Actualiza la UI inmediatamente
+
+        await Task.Delay(2000); // Muestra la alerta durante 2 segundos
+        NavigationManager.NavigateTo("/Usuarios");
+        // Después de 2 segundos, ocultamos las alertas
+        alertaVisible = false;
+        errorVisible = false;
+
+        StateHasChanged(); // Vuelve a actualizar la UI para reflejar el cambio
+    }
+
+
+
+
+}
+
+

@@ -3,6 +3,8 @@
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 @inject Radzen.DialogService DialogService
+@using System.Text.RegularExpressions;
+
 
 <PageTitle>Administrador Digesett - Crear Usuario</PageTitle>
 @page "/CreateUser"
@@ -119,7 +121,20 @@
                 <span class="error-message">@passwordError</span>
             }
         </div>
+        <div class="input-group">
+            <label for="inputSexo">Sexo</label>
+            <select id="inputSexo" class="form-select" @bind="genderId" disabled="@IsDisabled("genderId")">
+                <option value="" selected disabled>Seleccionar</option>
+                <option value="1">Masculino</option>
+                <option value="2">Femenino</option>
+                <option value="3">Otros</option>
+            </select>
+        </div>
 
+        <div class="input-group">
+            <label for="inputEmail">Email</label>
+            <input id="inputEmail" type="email" class="form-input" @bind="email" disabled="@IsDisabled("email")" />
+        </div>
 
         <div class="input-group">
             <label for="inputNoAgente">No. Agente</label>
@@ -127,10 +142,6 @@
         </div>
 
 
-        <div class="input-group">
-            <label for="inputEmail">Email</label>
-            <input id="inputEmail" type="email" class="form-input" @bind="email" disabled="@IsDisabled("email")" />
-        </div>
 
         <div class="input-group">
             <label for="inputEstatura">Estatura (metros)</label>
@@ -145,15 +156,7 @@
                 <span class="error-message">@birthdateError</span>
             }
         </div>
-        <div class="input-group">
-            <label for="inputSexo">Sexo</label>
-            <select id="inputSexo" class="form-select" @bind="genderId" disabled="@IsDisabled("genderId")">
-                <option value="" selected disabled>Seleccionar</option>
-                <option value="1">Masculino</option>
-                <option value="2">Femenino</option>
-                <option value="3">Otros</option>
-            </select>
-        </div>
+
         <div class="input-group">
             <label for="inputTipoSangre">Tipo de Sangre</label>
             <select id="inputTipoSangre" class="form-select" @bind="bloodTypeId" disabled="@IsDisabled("bloodTypeId")">
@@ -273,6 +276,7 @@
     private string phoneError { get; set; }
     private string passwordError { get; set; }
     private string birthdateError { get; set; }
+    private string emailError { get; set; }
 
     // Función que cambia la visibilidad de la contraseña
     private void TogglePasswordField()
@@ -309,6 +313,7 @@
             DisabledFields["phone"] = false;
             DisabledFields["password"] = false;
             DisabledFields["email"] = false;
+            DisabledFields["genderId"] = false;
         }
         else if (rolId == 1 || rolId == 2) // Administrador o Agente
         {
@@ -323,6 +328,7 @@
     {
         // Validaciones
         bool isValid = true;
+        string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -394,6 +400,21 @@
             birthdateError = null;
         }
 
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            emailError = "El correo electrónico es obligatorio.";
+            isValid = false;
+        }
+        else if (!Regex.IsMatch(email, emailPattern))
+        {
+            emailError = "El correo electrónico no tiene un formato válido.";
+            isValid = false;
+        }
+        else
+        {
+            emailError = null;
+        }
+
         if (!isValid)
         {
             return;
@@ -431,7 +452,6 @@
             }
             else
             {
-
                 await MostrarAlerta(false);
             }
         }
@@ -441,6 +461,7 @@
             Console.WriteLine($"Error al crear usuario: {ex}");
         }
     }
+
 
     private void Cancelar()
     {

@@ -163,11 +163,7 @@
     }
 
 </div>
-@* <RadzenAlert Title="Usuario eliminado correctamente"
-             AlertStyle="AlertStyle.Success"
-             Shade="Shade.Lighter"
-             Visible="@showAlert"
-             Close="()=>showAlert = false" /> *@
+
 
 
 
@@ -241,11 +237,26 @@
         NavigationManager.NavigateTo("/UsuarioAdministrador");
     }
 
-    private void VerUsuario(User user)
+    void VerUsuario(User usuario)
     {
-        // Asumiendo que "user" tiene una propiedad llamada "Cedula" o algo único como su identificador
-        NavigationManager.NavigateTo($"/perfilAgente/{user.Cedula}");
+        if (usuario.Role == "Agente")
+        {
+            NavigationManager.NavigateTo($"/perfilAgente/{usuario.Cedula}");
+        }
+        else if (usuario.Role == "Administrador")
+        {
+            NavigationManager.NavigateTo($"/perfilAdministrador/{usuario.Cedula}");
+        }
+        else if (usuario.Role == "Ciudadano")
+        {
+            NavigationManager.NavigateTo($"/perfilCiudadano/{usuario.Cedula}");
+        }
+        else
+        {
+            Console.WriteLine("Tipo de usuario no reconocido.");
+        }
     }
+
 
   
 

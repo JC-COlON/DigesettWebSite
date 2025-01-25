@@ -1,4 +1,5 @@
-﻿@page "/perfilAgente/{cedula}"
+﻿@page "/perfilAdministrador/{cedula}"
+
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -7,29 +8,14 @@
 @using Radzen
 @using System.Globalization
 @inject Radzen.DialogService DialogService
-@inject NavigationManager NavigationManager
 
-<PageTitle>Perfil del Agente</PageTitle>
+<PageTitle>Perfil del Administrador</PageTitle>
 
 <!-- Fuentes -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 
-<h1 class="title">Perfil del Agente</h1>
-
-@if (alertaVisible)
-{
-    <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
-        No se pudo Eliminar el Agente
-    </RadzenAlert>
-}
-
-@if (errorVisible)
-{
-    <RadzenAlert Title="Error" AlertStyle="AlertStyle.Info" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
-        Agente Eliminado Correctamente.
-    </RadzenAlert>
-}
+<h1 class="title">Perfil del Administrador</h1>
 
 @if (usuario != null)
 {
@@ -39,7 +25,7 @@
                 <div class="icons">
                     <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar">
                     <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
-                    <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion(usuario)" />
+                    <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion()" />
                 </div>
                 <div class="agent-info">
                     <div class="photo-section">
@@ -80,6 +66,10 @@
                     </div>
                 </div>
             </div>
+        
+
+        
+
 
             <h3>Multas por Día</h3>
             <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
@@ -117,65 +107,50 @@
                         <RadzenAxisTitle Text="Cantidad de Multas" />
                     </RadzenValueAxis>
                 </RadzenChart>
-
-
             </RadzenStack>
-
-
-         
         </div>
 
         <div class="right-column">
-
             <div class="container">
                 <h3>Promedio de Calificaciones</h3>
                 <div class="rz-p-12 rz-text-align-center custom-rating">
                     <!-- Verificar si el agente tiene calificación, si no, mostrar estrellas vacías -->
-                    <RadzenRating Value="@promedioRatingInt" ReadOnly="true" Max="5"
-                                  Style="font-size: 52px; color:#fd8402  " />
+                    <RadzenRating Value="@promedioRatingInt" ReadOnly="true" Max="5" Style="font-size: 52px; color:#fd8402  " />
                 </div>
                 <!-- Mostrar mensaje si no hay calificación -->
                 @if (promedioRatingInt == 0 || promedioRatingInt == null)
                 {
                     <p>Este agente no ha sido calificado</p>
-                    
-                }
-                else
-                {
-                   @*  <span>@promedioRating / 5</span> *@
                 }
             </div>
 
-
-
-                <div class="container">
-                    <h3>Últimas Reseñas</h3>
-                    @if (reseñas != null && reseñas.Count > 0)
+            <div class="container">
+                <h3>Últimas Reseñas</h3>
+                @if (reseñas != null && reseñas.Count > 0)
+                {
+                    @for (int i = 0; i < 3; i++)
                     {
-                        @for (int i = 0; i < 3; i++)
+                        if (i < reseñas.Count)
                         {
-                            if (i < reseñas.Count)
-                            {
-                                <div class="review">
-                                    <p><strong>Comentario:</strong> @reseñas[i].Comment</p>
-                                    <p><strong>Rating:</strong> @reseñas[i].Rating</p>
-                                    <p><strong>Fecha:</strong> @reseñas[i].CreatedAt.ToString("dd/MM/yyyy")</p>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="review">
-                                    <p><strong>Comentario:</strong> Sin comentarios</p>
-                                </div>
-                            }
+                            <div class="review">
+                                <p><strong>Comentario:</strong> @reseñas[i]?.Comment ?? "Sin comentarios"</p>
+                                <p><strong>Rating:</strong> @reseñas[i]?.Rating ?? 0</p>
+                                <p><strong>Fecha:</strong> @reseñas[i]?.CreatedAt.ToString("dd/MM/yyyy") ?? "N/A"</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="review">
+                                <p><strong>Comentario:</strong> Sin comentarios</p>
+                            </div>
                         }
                     }
-                    else
-                    {
-                        <p>No hay comentarios disponibles para este agente.</p>
-                    }
-                </div>
-
+                }
+                else
+                {
+                    <p>No hay comentarios disponibles para este agente.</p>
+                }
+            </div>
         </div>
     </div>
 }
@@ -183,6 +158,7 @@ else
 {
     <p>Cargando datos del usuario...</p>
 }
+
 
 @code {
     [Parameter]
@@ -193,7 +169,7 @@ else
     private double promedioRating;
     private int promedioRatingInt;
     private List<MultasPorDia> multasPorDia = new List<MultasPorDia>();
-    private string[] diasSemana = { "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo" };
+    private string[] diasSemana = { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
     private List<DataItem> datosGrafico = new List<DataItem>();
     private bool smooth = true;
     private bool showDataLabels = true;
@@ -309,18 +285,19 @@ else
         public int Tickets { get; set; }
     }
 
+
     // Método para mostrar el diálogo de confirmación
-    void ConfirmarEliminacion(User usuario)
+    async Task ConfirmarEliminacion()
     {
-        DialogService.Confirm("¿Estás seguro de que deseas eliminar este usuario?", "Confirmar Eliminación", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" })
-            .ContinueWith(async task =>
-            {
-                if (task.Result == true)
-                {
-                    await EliminarUsuario(usuario.Cedula);
-                }
-            });
+        var result = await DialogService.Confirm("¿Estás seguro de que deseas eliminar este usuario?", "Confirmar Eliminación", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        // Llamar al método para eliminar, utilizando el valor del usuario seleccionado
+        if (result ?? false)  // Si result es true (confirmación) o false (cancelación), se ejecuta
+        {
+            await EliminarUsuario(usuario.Cedula);
+        }
     }
+
 
     async Task EliminarUsuario(string cedula)
     {
@@ -337,17 +314,14 @@ else
                 // Notifica a la UI que hubo cambios
                 StateHasChanged();
 
-                // Muestra la alerta de éxito y la oculta después de 2 segundos
+                // Muestra la alerta de éxito y la oculta después de 3 segundos
                 await MostrarAlerta(true);
-
-                // Redirige a la página de la lista de usuarios, al final para asegurarte que la UI esté actualizada
-                NavigationManager.NavigateTo("/Usuarios"); // Cambia esta ruta según sea necesario
             }
             else
             {
                 Console.WriteLine($"Error al eliminar usuario: {response.ReasonPhrase}");
 
-                // Muestra la alerta de error y la oculta después de 2 segundos
+                // Muestra la alerta de error y la oculta después de 3 segundos
                 await MostrarAlerta(false);
             }
         }
@@ -355,7 +329,7 @@ else
         {
             Console.WriteLine($"Error en la eliminación: {ex.Message}");
 
-            // Muestra la alerta de error y la oculta después de 2 segundos
+            // Muestra la alerta de error y la oculta después de 3 segundos
             await MostrarAlerta(false);
         }
     }
@@ -366,26 +340,23 @@ else
         if (exito)
         {
             alertaVisible = true;
-            errorVisible = false;  // Asegúrate de que errorVisible esté en false cuando es un éxito
+            errorVisible = false;
         }
         else
         {
             alertaVisible = false;
-            errorVisible = true;   // Y errorVisible en true cuando es un error
+            errorVisible = true;
         }
 
-        StateHasChanged(); // Actualiza la UI inmediatamente
+        StateHasChanged(); // Actualiza la UI inmediatamente para que la alerta sea visible
 
-        await Task.Delay(2000); // Muestra la alerta durante 2 segundos
-        NavigationManager.NavigateTo("/Usuarios");
-        // Después de 2 segundos, ocultamos las alertas
+        await Task.Delay(2000); // Muestra la alerta durante 3 segundos
+
         alertaVisible = false;
         errorVisible = false;
 
-        StateHasChanged(); // Vuelve a actualizar la UI para reflejar el cambio
+        StateHasChanged(); // Vuelve a actualizar la UI
     }
-
-
 
 
 }

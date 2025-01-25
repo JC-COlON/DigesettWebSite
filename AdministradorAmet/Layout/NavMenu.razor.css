@@ -1,14 +1,17 @@
+/* Estilo para el contenedor superior */
 .top-row {
     height: 8rem;
     background-color: white;
     display: flex;
     align-items: center;
     justify-content: center; /* Centrado de los elementos */
-    gap: 10px; /* Espacio entre logo y texto */
+    gap: 15px; /* Espacio entre logo y texto */
     margin-left: 0;
     margin-right: 0;
+    margin-bottom: 20px; /* Agregado margen inferior para mover hacia abajo */
 }
 
+/* Estilo para el título */
 .title-Digesett {
     color: black;
     font-weight: bold;
@@ -17,20 +20,21 @@
     text-decoration: none;
 }
 
+/* Estilo para el logo */
 .logoarriba {
     width: 125px; /* Tamaño ajustado del logo */
     height: auto;
 }
 
+/* Estilo para la barra de navegación oscura */
 .navbar-dark {
     padding: 0;
 }
 
-
 /* Ajuste común de tamaño para los iconos */
 .nav-icon {
-    width: 1.25rem; /* 20px */
-    height: 1.25rem; /* 20px */
+    width: 1.5rem; /* Aumenté el tamaño a 24px */
+    height: 1.5rem; /* Aumenté el tamaño a 24px */
     margin-right: 0.75rem;
     object-fit: contain;
 }
@@ -39,11 +43,15 @@
 .nav-link .bi,
 .nav-link img {
     color: black; /* Cambiar el color de los iconos a negro */
+    font-size: 1.25rem; /* Aumenté el tamaño de los iconos */
 }
 
 /* Estilo de las letras en negrita */
 .nav-link {
     font-weight: bold; /* Negrita en el texto de las opciones */
+    color: black; /* Cambiar el color de los textos a negro */
+    font-size: 1.25rem; /* Aumenté el tamaño del texto */
+    margin-bottom: 20px; /* Agregado margen inferior para más espacio entre los elementos */
 }
 
 /* Estilo de los iconos activos */
@@ -60,9 +68,9 @@
 
 /* Ajustes para los enlaces y alineación */
 .nav-item {
-    margin-top: 8px; /* Reducir el margen superior */
-    font-size: 1rem; /* Tamaño de letra ligeramente mayor */
-    padding-bottom: 0.8rem; /* Ajustar el padding inferior para menos espacio en blanco */
+    margin-top: 20px; /* Aumentar el margen superior para más espacio */
+    font-size: 1.25rem; /* Tamaño de letra ligeramente mayor */
+    padding-bottom: 1rem; /* Ajustar el padding inferior para menos espacio en blanco */
 }
 
     .nav-item:first-of-type {
@@ -74,7 +82,7 @@
     }
 
     .nav-item ::deep a {
-        color: #707070;
+        color: black; /* Cambié el color a negro */
         border-radius: 4px;
         height: 3rem;
         display: flex;
@@ -82,6 +90,7 @@
         line-height: 3rem;
     }
 
+/* Ajustes para pantallas más grandes */
 @media (min-width: 641px) {
     .collapse {
         display: block;
@@ -95,8 +104,6 @@
 
 /* Ajustes para el botón de salir (si lo habilitas en el futuro) */
 
-
-
 /* Estilo para el submenú */
 .sub-menu {
     margin-left: 1.5rem;
@@ -106,10 +113,11 @@
 }
 
 .sub-menu-link {
-    font-size: 0.9rem;
-    color: #707070;
+    font-size: 1.25rem; /* Tamaño de fuente más grande */
+    color: black; /* Cambié el color a negro */
     text-decoration: none;
     margin-bottom: 0.5rem;
+    font-weight: bold; /* Negrita para el texto */
 }
 
     .sub-menu-link:hover {
@@ -136,20 +144,12 @@
 /* Estilo para el guion del submenú */
 .sub-menu-dash {
     color: #009C40; /* Color del guion */
-    font-size: 1rem; /* Tamaño del guion */
+    font-size: 1.25rem; /* Tamaño del guion más grande */
     font-weight: bold; /* Negrita para el guion */
 }
 
-/* Estilo para los enlaces del submenú */
-.sub-menu-link {
-    font-size: 0.9rem; /* Tamaño de fuente más pequeño */
-    color: #707070; /* Color inicial */
-    text-decoration: none; /* Quitar subrayado */
-    font-weight: bold; /* Negrita para el texto */
+/* Hover y enfoque para los enlaces del submenú */
+.sub-menu-link:hover,
+.sub-menu-link:focus {
+    color: #009C40; /* Cambiar color en hover */
 }
-
-    /* Hover y enfoque para los enlaces del submenú */
-    .sub-menu-link:hover,
-    .sub-menu-link:focus {
-        color: #009C40; /* Cambiar color en hover */
-    }

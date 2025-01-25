@@ -103,6 +103,24 @@
                         </Template>
                     </RadzenDataGridColumn>
 
+                    <RadzenDataGridColumn TItem="User" Property="Gender" Width="65px">
+                        <HeaderTemplate>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Sexo</span>
+                        </HeaderTemplate>
+                        <Template Context="usuario">
+                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Gender</span>
+                        </Template>
+                        <Template Context="usuario">
+                            @if (string.IsNullOrWhiteSpace(usuario.Gender))
+                            {
+                                <span style="display: block; text-align:justify; width: 100%;font-size:large">-</span>  <!-- Muestra un guion si no hay valor -->
+                            }
+                            else
+                            {
+                                <span style="font-family: 'Roboto', sans-serif; font-size: medium;">@usuario.Gender</span>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
 
                     <RadzenDataGridColumn TItem="User" Property="Phone" Width="70px">
                         <HeaderTemplate>
@@ -231,7 +249,7 @@
 
     private void VerUsuario(User user)
     {
-        NavigationManager.NavigateTo($"/perfilAgente");
+        NavigationManager.NavigateTo($"/perfilCiudadano/{user.Cedula}");
     }
 
   
