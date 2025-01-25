@@ -147,11 +147,11 @@
                         <Template Context="usuario">
                             <!-- Icono de ojo para "Ver" -->
                             <span style="cursor: pointer; margin-right: 10px;" @onclick="() => VerUsuario(usuario)">
-                                <i class="material-icons" style="font-size: 20px; color: #009C40;">visibility</i>
+                                <i class="material-icons" title="Ver Perfil" style="font-size: 20px; color: #009C40;">visibility</i>
                             </span>
                             <!-- Icono de papelera para "Eliminar" -->
                             <span style="cursor: pointer;" @onclick="() => ConfirmarEliminacion(usuario)">
-                                <i class="material-icons" style="font-size: 20px; color: #d32f2f;">delete</i>
+                                <i class="material-icons" title="Eliminar" style="font-size: 20px; color: #d32f2f;">delete</i>
                             </span>
                         </Template>
                     </RadzenDataGridColumn>

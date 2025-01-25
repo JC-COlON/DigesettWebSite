@@ -129,8 +129,8 @@
     margin: auto;
 }
 
-/*.ratingstar {
-    color: #fd8402;*/  /*Cambia el color de las estrellas */
-    /*font-size: 54px;*/  /*Cambia el tamaño de las estrellas*/ 
-/*}*/
+.rz-category-axis text {
+    transform: translateY(10px); /* Ajusta el valor según sea necesario */
+}
+
 

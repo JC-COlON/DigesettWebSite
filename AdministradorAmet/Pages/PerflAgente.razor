@@ -5,6 +5,8 @@
 @using AdministradorAmet.Models
 @using Newtonsoft.Json
 @using Radzen
+@using System.Globalization
+
 
 <PageTitle>Perfil del Agente</PageTitle>
 
@@ -49,43 +51,52 @@
                 </div>
             </div>
 
-            <div class="container">
-                <h3>Últimas Reseñas</h3>
-                @if (reseñas != null && reseñas.Count > 0)
-                {
-                    @for (int i = 0; i < 3; i++)
-                    {
-                        if (i < reseñas.Count)
-                        {
-                            <div class="review">
-                                <p><strong>Comentario:</strong> @reseñas[i].Comment</p>
-                                <p><strong>Rating:</strong> @reseñas[i].Rating</p>
-                                <p><strong>Fecha:</strong> @reseñas[i].CreatedAt.ToString("dd/MM/yyyy")</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="review">
-                                <p><strong>Comentario:</strong> Sin comentarios</p>
-                            </div>
-                        }
-                    }
-                }
-                else
-                {
-                    <p>No hay comentarios disponibles para este agente.</p>
-                }
-            </div>
+            <h3>Multas por Día</h3>
+            <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+                <RadzenCard Variant="Radzen.Variant.Outlined">
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="FlexWrap.Wrap">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                            <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                            <RadzenLabel Text="Smooth" Component="smooth" />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                            <RadzenCheckBox @bind-Value="@showMarkers" Name="markers"></RadzenCheckBox>
+                            <RadzenLabel Text="Show Markers" Component="markers" />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                            <RadzenCheckBox @bind-Value="@sharedTooltip" Name="sharedTooltip"></RadzenCheckBox>
+                            <RadzenLabel Text="Shared Tooltip" Component="sharedTooltip" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+                <RadzenChart>
+                    <RadzenChartTooltipOptions Shared="@sharedTooltip" />
+                    <RadzenLineSeries Smooth="@smooth" Data="@datosGrafico" CategoryProperty="Day" Title="Multas por Día" ValueProperty="Tickets">
+                        <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenLineSeries>
+                    <RadzenCategoryAxis Padding="20">
+                        <RadzenAxisTitle Text="Días de la Semana" />
+                    </RadzenCategoryAxis>
+                    <RadzenValueAxis Min="2" Max="20" Step="2">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Cantidad de Multas" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+
+
+            </RadzenStack>
+
+
+         
         </div>
 
         <div class="right-column">
-            <div class="container">
-                <h3>Porcentaje de Multas</h3>
-                <div class="progress-bar">
-                    <div class="progress" style="width: 80%;"></div>
-                </div>
-                <span>80%</span>
-            </div>
+
             <div class="container">
                 <h3>Promedio de Calificaciones</h3>
                 <div class="rz-p-12 rz-text-align-center custom-rating">
@@ -101,15 +112,40 @@
                 }
                 else
                 {
-                    <span>@promedioRating / 5</span>
+                   @*  <span>@promedioRating / 5</span> *@
                 }
             </div>
 
 
-            <div class="container">
-                <h3>Multas por Artículo</h3>
-                <img src="imagenes/grafico.png" alt="Gráfico de Multas" class="chart" />
-            </div>
+
+                <div class="container">
+                    <h3>Últimas Reseñas</h3>
+                    @if (reseñas != null && reseñas.Count > 0)
+                    {
+                        @for (int i = 0; i < 3; i++)
+                        {
+                            if (i < reseñas.Count)
+                            {
+                                <div class="review">
+                                    <p><strong>Comentario:</strong> @reseñas[i].Comment</p>
+                                    <p><strong>Rating:</strong> @reseñas[i].Rating</p>
+                                    <p><strong>Fecha:</strong> @reseñas[i].CreatedAt.ToString("dd/MM/yyyy")</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="review">
+                                    <p><strong>Comentario:</strong> Sin comentarios</p>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <p>No hay comentarios disponibles para este agente.</p>
+                    }
+                </div>
+
         </div>
     </div>
 }
@@ -126,6 +162,13 @@ else
     private List<Review> reseñas = new List<Review>();
     private double promedioRating;
     private int promedioRatingInt;
+    private List<MultasPorDia> multasPorDia = new List<MultasPorDia>();
+    private string[] diasSemana = { "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo" };
+    private List<DataItem> datosGrafico = new List<DataItem>();
+    private bool smooth = true;
+    private bool showDataLabels = true;
+    private bool showMarkers = true;
+    private bool sharedTooltip = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,8 +176,10 @@ else
         {
             try
             {
+                // Obtener datos del usuario
                 usuario = await Http.GetFromJsonAsync<User>($"https://localhost:7277/api/User/{Cedula}");
 
+                // Obtener reseñas del agente
                 var responseReviews = await Http.GetStringAsync($"https://localhost:7277/api/Reviews/GetLatestReviewsForAgentByCedula/{Cedula}");
                 var reviewsResponse = JsonConvert.DeserializeObject<ReviewsResponse>(responseReviews);
 
@@ -147,18 +192,41 @@ else
                     reseñas = new List<Review>();
                 }
 
+                // Obtener rating promedio
                 var responseRating = await Http.GetStringAsync($"https://localhost:7277/api/Reviews/GetAgentRatingAverage?cedula={Cedula}");
                 var ratingResponse = JsonConvert.DeserializeObject<RatingResponse>(responseRating);
 
                 if (ratingResponse != null)
                 {
                     promedioRating = ratingResponse.PromedioRating;
-                    promedioRatingInt = (int)promedioRating; // Conversion
+                    promedioRatingInt = (int)promedioRating; // Conversión a entero
                 }
                 else
                 {
                     promedioRating = 0;
                     promedioRatingInt = 0;
+                }
+
+                // Obtener multas por día
+                var responseMultas = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/GetHistorialMultas/{Cedula}");
+                var multasResponse = JsonConvert.DeserializeObject<Dictionary<string, int>>(responseMultas);
+
+                if (multasResponse != null)
+                {
+                    // Convertir los datos de la API en una lista ordenada para el gráfico
+                    datosGrafico = diasSemana.Select(dia =>
+                    {
+                        var cantidad = multasResponse.ContainsKey(dia) ? multasResponse[dia] : 0;
+                        return new DataItem
+                            {
+                                Day = dia,
+                                Tickets = cantidad
+                            };
+                    }).ToList();
+                }
+                else
+                {
+                    datosGrafico = diasSemana.Select(dia => new DataItem { Day = dia, Tickets = 0 }).ToList();
                 }
             }
             catch (HttpRequestException ex)
@@ -188,4 +256,26 @@ else
     {
         public double PromedioRating { get; set; }
     }
+
+    public class MultasPorDia
+    {
+        public string Dia { get; set; } // Lunes, Martes, etc.
+        public int Cantidad { get; set; }
+    }
+
+    public class DataItem
+    {
+        public string Day { get; set; } // Día de la semana (Lun, Mar, etc.)
+        public int Tickets { get; set; } // Cantidad de multas
+    }
+
+    public class TicketData
+    {
+        public string Day { get; set; } = string.Empty;
+        public int Tickets { get; set; }
+    }
+
+
 }
+
+
