@@ -1,77 +1,284 @@
-﻿@* @layout ParaRecuperarPassword1 *@ 
+﻿@page "/editarCiudadano"
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
-<PageTitle>Administrador Digesett</PageTitle>
+@inject IJSRuntime JSRuntime
+@inject Radzen.DialogService DialogService
+@using System.Text.RegularExpressions;
 
-@page "/editados"
+
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-
-
+<CascadingBlazoredModal Size="ModalSize.Large"/>
 <div class="container">
-    <!-- Parte Superior -->
     <div class="header">
-        <h1 class="title">Notificaciones</h1>
-        <div class="text-links">
-            <span class="text-link" @onclick="IraTodos" id="todos">Todos</span>
-            <span class="text-link"  id="editados">Editados</span>
-            <span class="text-link" @onclick="IraEliminados" id="eliminados">Eliminados</span>
+        <h1 class="title">Editar Usuario</h1>
+    </div>
+    <!-- Foto de Perfil Centralizada -->
+    <div class="central-section">
+        <div class="image-section">
+            <div class="profile-image-container">
+                <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" />
+            </div>
+            <div class="image-input">
+                <InputFile OnChange="ImagenPerfilSeleccionada" disabled="@IsDisabled("profileImg")" />
+            </div>
         </div>
     </div>
 
-    <!-- Cuadro big  -->
-    <div class="agents-section">
-
-        <h2 class="FechaNotificacion">10 Dic</h2>
-
-        <!-- Cuadro central -->
-        <div class="main-table">
-            <table>
-
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>  James Hulton</th>
-                        <th>ID:</th>
-                        <th>Status:</th>
-                        <th>Creado:</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td> o</td>
-                        <td>Solicitud de un cambio de mi contraseña</td>
-                        <td>12345</td>
-                        <td>Activo</td>
-                        <td>01/12/2024</td>
-                         <td>
-                            <img src="imagenes/edit-icon.svg" alt="Editar" class="action-icon">
-                            <img src="imagenes/eyesee.png" alt="Editar" class="action-icon">
-                        </td> 
-                    </tr>
-                    
-                </tbody>
-
-     
-
-            </table>
+    <!-- Campos de entrada -->
+    <div class="inputs-grid-single-column">
+        <div class="input-group">
+            <label for="inputNombre">Nombre</label>
+            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name" />
+            @if (!string.IsNullOrEmpty(nameError))
+            {
+                <span class="error-message">@nameError</span>
+            }
         </div>
 
+        <div class="input-group">
+            <label for="inputApellido">Apellido</label>
+            <input id="inputApellido" type="text" class="form-input same-size-input" @bind="lastname" />
+            @if (!string.IsNullOrEmpty(lastnameError))
+            {
+                <span class="error-message">@lastnameError</span>
+            }
+        </div>
 
+        <div class="input-group">
+            <label for="inputCedula">Cédula</label>
+            <input id="inputCedula" type="text" class="form-input same-size-input" maxlength="11" @bind="Cedula" />
+            @if (!string.IsNullOrEmpty(cedulaError))
+            {
+                <span class="error-message">@cedulaError</span>
+            }
+        </div>
+
+        <div class="input-group">
+            <label for="inputTelefono">Teléfono</label>
+            <input id="inputTelefono" type="text" class="form-input same-size-input" maxlength="10" @bind="phone" />
+            @if (!string.IsNullOrEmpty(phoneError))
+            {
+                <span class="error-message">@phoneError</span>
+            }
+        </div>
+
+        <div class="input-group">
+            <label for="inputEmail">Email</label>
+            <input id="inputEmail" type="email" class="form-input same-size-input" @bind="email" />
+            @if (!string.IsNullOrEmpty(emailError))
+            {
+                <span class="error-message">@emailError</span>
+            }
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="cancel-button" @onclick="Cancelar">Cancelar</button>
+        <button class="create-button" @onclick="ActualizarUsuario">Actualizar</button>
     </div>
 </div>
 
+
+
 @code {
-    private void IraEliminados()
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    private const string ApiUrl = "https://localhost:7277/api/User/cedula/"; // URL de la API para actualizar
+    private int? rolId { get; set; } // Guardará el tipo de usuario seleccionado (1, 2, 3)
+    private string profileImgPreview { get; set; } = string.Empty; // Guardará el dataUrl para la vista previa
+    private string name { get; set; } = string.Empty;
+    private string lastname { get; set; } = string.Empty;
+    private string Cedula { get; set; } = string.Empty;
+    private string phone { get; set; } = string.Empty;
+    private string email { get; set; } = string.Empty;
+    private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
+    bool alertaVisible = false;
+    bool errorVisible = false;
+
+    // Validación de errores
+    private string nameError { get; set; }
+    private string lastnameError { get; set; }
+    private string cedulaError { get; set; }
+    private string phoneError { get; set; }
+    private string emailError { get; set; }
+
+    private bool IsDisabled(string fieldName) => DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName];
+    private Dictionary<string, bool> DisabledFields = new()
     {
-        NavigationManager.NavigateTo("eliminados");
+        { "name", true },
+        { "lastname", true },
+        { "Cedula", true },
+        { "phone", true },
+        { "email", true },
+        { "profileImg", true }
+    };
+
+    // Función para manejar la selección de la imagen
+    private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is not null)
+        {
+            // Solo almacenamos el nombre del archivo
+            profileImg = file.Name;
+
+            // Generar el dataUrl para la vista previa
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            var base64 = Convert.ToBase64String(memoryStream.ToArray());
+            profileImgPreview = $"data:{file.ContentType};base64,{base64}";
+
+            // Llamar a la función JavaScript para actualizar la vista previa de la imagen
+            await JSRuntime.InvokeVoidAsync("setImagePreview", "#previewImagenPerfil", profileImgPreview);
+        }
     }
 
-    private void IraTodos()
+    private void ConfirmarActualizacion()
     {
-        NavigationManager.NavigateTo("notificaciones");
+        DialogService.Confirm("¿Estás seguro de que deseas actualizar este usuario?", "Confirmar Actualización", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" })
+            .ContinueWith(async task =>
+            {
+                if (task.Result == true)
+                {
+                    await ActualizarUsuario();
+                }
+            });
     }
 
+    private async Task ActualizarUsuario()
+    {
+        // Validaciones
+        bool isValid = true;
+        string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            nameError = "El nombre es obligatorio.";
+            isValid = false;
+        }
+        else
+        {
+            nameError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(lastname))
+        {
+            lastnameError = "El apellido es obligatorio.";
+            isValid = false;
+        }
+        else
+        {
+            lastnameError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(Cedula))
+        {
+            cedulaError = "La cédula es obligatoria.";
+            isValid = false;
+        }
+        else if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
+        {
+            cedulaError = "Cédula inválida. Debe tener 11 números.";
+            isValid = false;
+        }
+        else
+        {
+            cedulaError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            phoneError = "El teléfono es obligatorio.";
+            isValid = false;
+        }
+        else if (phone.Length != 10 || !phone.All(char.IsDigit))
+        {
+            phoneError = "Número de teléfono inválido. Debe tener 10 números.";
+            isValid = false;
+        }
+        else
+        {
+            phoneError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            emailError = "El correo electrónico es obligatorio.";
+            isValid = false;
+        }
+        else if (!Regex.IsMatch(email, emailPattern))
+        {
+            emailError = "El correo electrónico no tiene un formato válido.";
+            isValid = false;
+        }
+        else
+        {
+            emailError = null;
+        }
+
+        if (!isValid)
+        {
+            return;
+        }
+
+        var usuario = new
+        {
+            cedula = Cedula,
+            name = name,
+            lastname = lastname,
+            email = string.IsNullOrWhiteSpace(email) ? null : email,
+            phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
+            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg // Enviar solo el nombre del archivo de la imagen
+        };
+
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"{ApiUrl}{Cedula}", usuario);
+            Console.WriteLine(response); // Agrega esto para ver la respuesta del servidor
+            if (response.IsSuccessStatusCode)
+            {
+                await MostrarAlerta(true);
+                NavigationManager.NavigateTo($"/Usuarios/{Cedula}");
+            }
+            else
+            {
+                await MostrarAlerta(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al actualizar usuario: {ex.Message}");
+            Console.WriteLine($"Error al actualizar usuario: {ex}");
+        }
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/usuarios");
+    }
+
+    async Task MostrarAlerta(bool exito)
+    {
+        if (exito)
+        {
+            alertaVisible = true;
+            errorVisible = false;
+        }
+        else
+        {
+            alertaVisible = false;
+            errorVisible = true;
+        }
+
+        StateHasChanged(); // Actualiza la UI inmediatamente para que la alerta sea visible
+
+        await Task.Delay(2000); // Muestra la alerta durante 3 segundos
+
+        alertaVisible = false;
+        errorVisible = false;
+
+        StateHasChanged(); // Vuelve a actualizar la UI
+    }
 }

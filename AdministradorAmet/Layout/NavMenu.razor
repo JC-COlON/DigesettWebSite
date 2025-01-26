@@ -30,43 +30,13 @@
             </NavLink>
         </div>
 
-       @*  <div class="nav-item px-3">
-            <NavLink class="nav-link" @onclick="() => ToggleSubMenu()">
-                <img src="imagenes/search-normal-1.svg" alt="Logo DIGESETT" class="nav-icon" />
-                <span class="bi bi-search" aria-hidden="true"></span> Buscar
-            </NavLink>
 
-            @if (isSubMenuVisible)
-            {
-                <div class="sub-menu">
-                    <div class="sub-menu-item">
-                        <span class="sub-menu-dash">-</span>
-                        <NavLink class="sub-menu-link" href="Buscar">
-                            Multa
-                        </NavLink>
-                    </div>
-                    <div class="sub-menu-item">
-                        <span class="sub-menu-dash">-</span>
-                        <NavLink class="sub-menu-link" href="BuscarAgentes">
-                            Agente
-                        </NavLink>
-                    </div>
-                </div>
-            }
-        </div> *@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Buscar" @onclick="() => CloseSubMenu()">
+            <NavLink class="nav-link" href="editarUsuario" @onclick="() => CloseSubMenu()">
                 <img src="imagenes/reportes.png" alt="Logo DIGESETT" class="nav-icon" />
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Reportes
             </NavLink>
         </div>
-@* 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="notificaciones" @onclick="() => CloseSubMenu()">
-                <img src="imagenes/notification.svg" alt="Logo DIGESETT" class="nav-icon" />
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Notificaciones
-            </NavLink>
-        </div> *@
     </nav>
 </div>
 

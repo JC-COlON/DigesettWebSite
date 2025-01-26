@@ -14,7 +14,6 @@ body {
     border-radius: 0px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual */
 }
-
 /* Header */
 .header {
     display: flex;
@@ -34,20 +33,19 @@ body {
     margin-bottom: 20px;
 }
 
-/* SECCIÓN CENTRALIZADA */
-.central-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
 /* SECCIÓN DE IMAGEN */
 .image-section {
-    text-align: center; /* Centrar el contenido */
+    text-align: left;
     margin-bottom: 20px;
     font-family: 'Poppins', sans-serif;
 }
+
+    .image-section h2 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
 
 .profile-image-container {
     display: flex;
@@ -98,9 +96,9 @@ body {
 }
 
 /* GRID DE INPUTS */
-.inputs-grid-single-column {
+.inputs-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     justify-content: center;
     max-width: 700px;
@@ -113,37 +111,41 @@ body {
     flex-direction: column;
 }
 
-.same-size-input {
-    height: 40px;
-    width: 100%;
-    border: 3px solid #828282 !important;
-    border-radius: 5px !important;
-    padding: 5px 10px;
-    box-sizing: border-box;
-    font-size: 14px;
-    font-weight: bold;
-    background-color: #fff;
-    color: #333;
-}
+    .input-group input,
+    .input-group select {
+        height: 40px;
+        width: 100%;
+        border: 3px solid #828282 !important; /* Borde de 5px */
+        border-radius: 5px !important;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+        font-weight: bold; /* Establecer el texto en negrita */
+        background-color: #fff;
+        color: #333;
+    }
 
-.input-group label {
-    margin-bottom: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #333;
-}
+    .input-group label {
+        margin-bottom: 5px;
+        font-size: 14px; /* Aumentar el tamaño de la fuente */
+        font-weight: bold; /* Hacer las etiquetas en negrita */
+        color: #333; /* Puedes cambiar el color si lo prefieres más llamativo, por ejemplo, un color más oscuro */
+    }
 
-/* ESTILO PARA CAMPOS DESHABILITADOS */
-.input-group input:disabled,
-.input-group select:disabled {
-    background-color: #f0f0f0; /* Fondo más claro */
-    border: 3px solid #d0d0d0; /* Borde de 5px */
-    color: #a0a0a0; /* Texto deshabilitado */
-    cursor: not-allowed; /* Cursor de no permitido */
-    opacity: 0.6; /* Reducir opacidad */
-    box-sizing: border-box; /* Asegurar consistencia en el tamaño */
-    border-radius: 5px; /* Sin bordes redondeados */
-}
+
+    /* ESTILO PARA CAMPOS DESHABILITADOS */
+    .input-group input:disabled,
+    .input-group select:disabled {
+        background-color: #f0f0f0; /* Fondo más claro */
+        border: 3px solid #d0d0d0; /* Borde de 5px */
+        color: #a0a0a0; /* Texto deshabilitado */
+        cursor: not-allowed; /* Cursor de no permitido */
+        opacity: 0.6; /* Reducir opacidad */
+        box-sizing: border-box; /* Asegurar consistencia en el tamaño */
+        border-radius: 5px; /* Sin bordes redondeados */
+    }
+
+
 
 /* SECCIÓN DE BOTONES */
 .buttons {
@@ -185,8 +187,7 @@ body {
         color: #990101;
         border-color: #990101;
     }
-
-/* SECCIÓN DE CONTRASEÑA CON VISUALIZACIÓN */
+<!-- SECCIÓN DE CONTRASEÑA CON VISUALIZACIÓN -->
 .password-container {
     position: relative;
     display: flex;

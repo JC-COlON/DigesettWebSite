@@ -8,6 +8,8 @@
 @using System.Globalization
 @inject Radzen.DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject IModalService Modal
+@inject Radzen.DialogService Modal
 
 <PageTitle>Perfil del Agente</PageTitle>
 
@@ -19,14 +21,14 @@
 
 @if (alertaVisible)
 {
-    <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
+    <RadzenAlert Title="Error" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
         No se pudo Eliminar el Agente
     </RadzenAlert>
 }
 
 @if (errorVisible)
 {
-    <RadzenAlert Title="Error" AlertStyle="AlertStyle.Info" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
+    <RadzenAlert Title="Exito" AlertStyle="AlertStyle.Info" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
         Agente Eliminado Correctamente.
     </RadzenAlert>
 }
@@ -37,7 +39,7 @@
         <div class="left-column">
             <div class="container large-container">
                 <div class="icons">
-                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar">
+                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar" @onclick="IrAEditarUsuario" />
                     <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
                     <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion(usuario)" />
                 </div>
@@ -358,6 +360,12 @@ else
             // Muestra la alerta de error y la oculta después de 2 segundos
             await MostrarAlerta(false);
         }
+    }
+    private void IrAEditarUsuario()
+    {
+       
+
+        Modal.Open<EditarUsuario>("");
     }
 
 
