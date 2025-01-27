@@ -1,0 +1,250 @@
+﻿/* ESTILO GENERAL DE LA PÁGINA */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 35%;
+    margin: 20px auto; /* Centrar la página horizontalmente */
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual */
+    margin-top: 20px
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    max-width: 97%;
+    margin-top: -20px;
+}
+
+.title {
+    font-size: 35px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 25px
+}
+
+.image-container {
+    margin-left: 170px;
+    margin-bottom: 30px;
+}
+
+/* SECCIÓN DE IMAGEN */
+.image-section {
+    text-align: left;
+    margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+    .image-section h2 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+.profile-image-container {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    margin-bottom: 10px;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #828282;
+    object-fit: cover; /* Asegurar que la imagen se ajuste */
+}
+
+.image-input {
+    text-align: center;
+}
+
+    .image-input input[type="file"] {
+        display: block;
+        margin: 0 auto;
+    }
+
+/* LÍNEA DIVISORA */
+.divider {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 20px 0;
+}
+
+    .divider.spaced {
+        margin: 30px 0; /* Espaciado adicional */
+    }
+
+/* TÍTULOS Y ENCABEZADOS */
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+}
+
+.left-aligned {
+    text-align: left;
+}
+
+/* GRID DE INPUTS */
+.inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Esto centra los elementos hijos (inputs) horizontalmente */
+    justify-content: center; /* Esto puede ser útil si quieres centrar los inputs verticalmente también */
+    width: 100%; /* Para que el contenedor ocupe todo el ancho disponible */
+}
+
+    .input-group input,
+    .input-group select {
+        height: 40px;
+        width: 50%;
+        border: 3px solid #828282 !important; /* Borde de 5px */
+        border-radius: 5px !important;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+        font-weight: bold; /* Establecer el texto en negrita */
+        background-color: #fff;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .input-group label {
+        margin-bottom: 5px;
+        font-size: 14px; /* Aumentar el tamaño de la fuente */
+        font-weight: bold; /* Hacer las etiquetas en negrita */
+        color: #333; /* Puedes cambiar el color si lo prefieres más llamativo, por ejemplo, un color más oscuro */
+    }
+
+    /* ESTILO PARA CAMPOS DESHABILITADOS */
+    .input-group input:disabled,
+    .input-group select:disabled {
+        background-color: #f0f0f0; /* Fondo más claro */
+        border: 3px solid #d0d0d0; /* Borde de 5px */
+        color: #a0a0a0; /* Texto deshabilitado */
+        cursor: not-allowed; /* Cursor de no permitido */
+        opacity: 0.6; /* Reducir opacidad */
+        box-sizing: border-box; /* Asegurar consistencia en el tamaño */
+        border-radius: 5px; /* Sin bordes redondeados */
+    }
+
+/* SECCIÓN DE BOTONES */
+.buttons {
+    display: flex;
+    justify-content: right;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: center; /* Esto centra los elementos hijos (inputs) horizontalmente */
+    justify-content: center; /* Esto puede ser útil si quieres centrar los inputs verticalmente también */
+}
+
+.create-button,
+.cancel-button {
+    width: 140px;
+    height: 40px;
+    border: 3px solid #828282;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.create-button {
+    background-color: #009C40;
+    color: white;
+    border-color: #009C40;
+}
+
+    .create-button:hover {
+        background-color: #007A30;
+    }
+
+.cancel-button {
+    background-color: white;
+    color: #ff0000;
+    border-color: #ff0000;
+}
+
+    .cancel-button:hover {
+        background-color: #ffe5e5;
+        color: #990101;
+        border-color: #990101;
+    }
+
+/* SECCIÓN DE CONTRASEÑA CON VISUALIZACIÓN */
+.password-container {
+    position: relative;
+    width: 100%; /* Asegura que el contenedor ocupe todo el ancho disponible */
+    display: flex;
+    justify-content: center; /* Centra el campo de texto horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+}
+
+.password-input {
+    width: 100%; /* El campo de entrada ocupa el 100% */
+    max-width: 350px; /* Limita el ancho máximo para que no se expanda demasiado */
+    height: 40px;
+    padding: 5px 10px;
+    padding-right: 40px; /* Deja espacio para el icono */
+    border: 3px solid #828282;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #fff;
+    color: #333;
+    margin: 0 auto; /* Asegura que el input esté centrado */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 125px; /* Ubica el icono a la derecha del input */
+    top: 30%;
+    transform: translateY(-50%); /* Centra el icono verticalmente */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 30px;
+    outline: none;
+    transition: color 0.3s ease;
+}
+
+    .password-toggle.toggle-hidden {
+        color: black; /* Negro cuando la contraseña no es visible */
+    }
+
+    .password-toggle.toggle-visible {
+        color: #009c40; /* Verde cuando la contraseña es visible */
+    }
+
+.error-message {
+    color: red;
+    font-size: 0.875em;
+}

@@ -346,7 +346,13 @@ else
         public string AgentNumber { get; set; }
         public Article Articulo { get; set; } = new Article();  // Inicializar aquí
         public Agent Agent { get; set; }
+
     }
+    public class EditarCiudadanoParams
+    {
+        public string Cedula { get; set; }
+    }
+
 
     public class VehicleType
     {
@@ -417,12 +423,17 @@ else
             await MostrarAlerta(false);
         }
     }
+     
+
     private void IrAEditarUsuario()
     {
        
 
-        Modal.Open<EditarCiudadano>("");
+        // Modal.Show<EditarCiudadano>();
     }
+
+
+    
 
 
 

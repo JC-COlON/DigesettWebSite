@@ -12,147 +12,15 @@
     background-color: #009C40;
     height: 100vh;
     width: 50%;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-/* Estilo de la sección de login */
-.login-section {
-    font-family: 'Poppins', sans-serif;
-    width: 80%;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    color: white;
-    margin: auto;
-    margin-top: 10%; /* Mueve todo el formulario más abajo */
-}
-
-.header-login h1 {
-    font-size: 24px;
-    margin-bottom: 43px; /* Aumenta el espacio debajo del título */
-    text-align: center;
-    font-weight: bold;
-}
-
-.header-login p {
-    width: auto;
-    margin-bottom: 40px;
-    font-size: 15px;
-}
-
-.input-field {
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid #ddd; /* Borde gris claro por defecto */
-    border-radius: 5px;
-    background-color: transparent;
-    font-size: 15px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-    /* Cambiar el borde del input a blanco cuando esté en foco */
-    .input-field:focus {
-        border-color: white;
-        border-width: 2px; /* Borde blanco cuando el input tiene el foco */
-        outline: none; /* Elimina el contorno predeterminado del navegador */
-    }
-
-/* Aumentar espacio entre el encabezado "Login" y los inputs */
-.usuario {
-    margin-top: 40px; /* Incrementa el espacio superior */
-    margin-bottom: 30px; /* Espacio inferior */
-}
-
-.password {
-    margin-top: 20px; /* Aumenta el espacio superior */
-}
-
-/* Contraseña con icono */
-.input-wrapper {
-    position: relative;
-}
-
-.eye-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    width: 20px;
-    filter: brightness(0) invert(1);
-}
-
-.usuario label,
-.password label {
-    font-size: 16px;
-    font-weight: bold;
-    font-style: normal;
-}
-
-/* Extras: Recordar y Olvidaste contraseña */
-.extras {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px; /* Aumenta el espacio superior entre la contraseña y los extras */
-    margin-bottom: 8px;
-}
-
-    .extras label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: white;
-        font-size: 14px;
-    }
-
-    .extras input[type="checkbox"] {
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 2px solid white;
-        background-color: transparent;
-        border-radius: 4px;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .extras a {
-        color: black;
-        font-size: 14px;
-    }
-
-/* Botones */
-.btn-primary,
-.btn-google {
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    text-align: center;
-}
-
-.btn-primary {
-    background-color: white;
-    color: #009C40;
-    margin-top: 20px;
-    border-radius: 9px;
-    border: 1px solid #ddd;
-}
-
-/* Registro */
-.register-container {
-    text-align: center;
-}
-
-.register a {
-    color: black;
-    text-decoration: underline;
+.logo {
+    max-width: 500px;
+    height: auto;
 }
 
 /* Contenedor derecho (contenido) */
@@ -160,14 +28,13 @@
     background-color: white;
     height: 100vh;
     width: 50%;
-    margin: auto;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 
-    /* Logo y nombre */
     .content h1 {
         font-size: 70px;
         color: black;
@@ -175,40 +42,158 @@
         margin-top: 7px;
     }
 
-    .content .logo {
-        max-width: 500px;
-        height: auto;
+.login-section {
+    font-family: 'Poppins', sans-serif;
+    width: 80%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    color: black;
+    margin: auto;
+    margin-top: 15%; /* Ajusta el formulario un poco más abajo */
+}
+
+.header-login h1 {
+    font-size: 40px; /* Cambia el tamaño de la palabra Login */
+    margin-bottom: 20px; /* Ajusta el espacio debajo del título */
+    text-align: center;
+    font-weight: bold;
+}
+
+.MudAlert {
+    margin-bottom: 20px; /* Ajusta el espacio debajo del alert */
+    text-align: center;
+    justify-content: center;
+}
+
+.input-field {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: transparent;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .input-field:focus {
+        border-color: black;
+        border-width: 2px;
+        outline: none;
     }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%; /* Asegura que los campos ocupen todo el ancho disponible */
+    margin-top: 20px;
+}
+
+.label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
 
 .input-wrapper {
     position: relative;
+    width: 100%; /* Asegura que el contenedor de la contraseña ocupe todo el ancho disponible */
+}
+
+.password-container {
+    position: relative;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.password-input {
+    padding-right: 40px; /* Espacio para el botón */
 }
 
 .password-toggle {
     position: absolute;
     right: 10px;
-    bottom: 5px;
+    bottom: 8px;
     background: none;
     border: none;
     cursor: pointer;
-    color: white;
-    font-size: 24px;
+    font-size: 25px;
+    outline: none;
+    transition: color 0.3s ease;
 }
 
-    .password-toggle:hover {
-        color: white;
+    .password-toggle.toggle-hidden {
+        color: black; /* Negro cuando la contraseña no es visible */
     }
 
+    .password-toggle.toggle-visible {
+        color: #009c40; /* Verde cuando la contraseña es visible */
+    }
+
+.extras {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.remember {
+    color: #009C40;
+    font-size: 14px;
+}
+
+.extras label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+.mud-alert-error {
+    background-color: #f44336 !important;  /* Rojo */
+    color: white !important;  /* Texto blanco */
+}
+
+
+.extras input[type="checkbox"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid black;
+    background-color: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+}
+
+.extras a {
+    color: black;
+    font-size: 14px;
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    background-color: #009C40;
+    color: white;
+    margin-top: 20px;
+    border-radius: 9px;
+    border: 1px solid #ddd;
+}
 
 .error-message {
-    color: red; /* Color de la letra (rojo) */
+    color: red;
     font-size: 16px;
     margin-top: 5px;
     margin-left: 1px;
-    padding: 5px; /* Espaciado alrededor del texto */
+    padding: 5px;
 }
-
-
-

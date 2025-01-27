@@ -2,7 +2,6 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @using System.IdentityModel.Tokens.Jwt
-@inject NavigationManager NavigationManager
 @using MudBlazor
 <RadzenDialog />
 
@@ -30,7 +29,7 @@
                         <img src="imagenes/user.png" alt="Profile Icon" class="dropdown-icon" />
                         Mi Perfil
                     </a>
-                    <a href="/change-password" class="dropdown-item" @onclick="CloseMenu">
+                    <a  class="dropdown-item" @onclick="cambiarcontraseña">
                         <img src="imagenes/settingIcon.svg" alt="Password Icon" class="dropdown-icon" />
                         Cambiar Contraseña
                     </a>
@@ -87,6 +86,14 @@
     private void CloseMenu()
     {
         isMenuVisible = false;
+    }
+
+
+    private void cambiarcontraseña()
+    {
+        isMenuVisible = false;
+        NavigationManager.NavigateTo("/cambiarContrasena/{Cedula}");
+
     }
 
     private void ShowLogoutConfirmation()

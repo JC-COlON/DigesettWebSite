@@ -1,145 +1,72 @@
-﻿@inject NavigationManager NavigationManager
-@inherits LayoutComponentBase
+﻿@page "/Home"
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
-@page "/Home"
+@inject HttpClient Http
+@using Radzen
+@using MudBlazor
+
+
 <PageTitle>Home</PageTitle>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
+<!-- Contenedor para alinear todo a la izquierda -->
+<div style="display: flex; justify-content: flex-start; align-items: flex-start; flex-direction: column; padding-left: 20px;">
+    <!-- Sección de Inputs y Botón -->
+    <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="10px" class="rz-p-4">
+        <RadzenButton Text="Consultar" Click="OnConsultarClick" Style="background-color: #009C40; color: white; border: 3px solid #009C40; width:175px; font-family: 'Poppins', sans-serif;" />
+        <RadzenDatePicker @bind-Value="startDate" Placeholder="Fecha Inicio" Style="width: 175px; font-family: 'Poppins', sans-serif;" DateFormat="dd/MM/yyyy" />
+        <RadzenDatePicker @bind-Value="endDate" Placeholder="Fecha Fin" Style="width: 175px; font-family: 'Poppins', sans-serif;" DateFormat="dd/MM/yyyy" />
+    </RadzenStack>
 
-<div class="container">
-    <!-- Parte Superior
-    <div class="header">
-        <h1 class="title">ANÁLISIS</h1>
-        <button @onclick="IrAcreateUser" class="btn-create">
-            <span>CREAR USUARIO   + </span>
-    @*  <img src="icono-mas.png" alt="Icono +" class="icon-plus"> *@
-        </button>
-    </div>-->
-    <!-- Cuadro transparente  -->
-    <div class="Cuadro-Grande">
-
-        <h2 class="section-title">AGENTES</h2>
-
-        <div class="top-row">
-
-            <!-- Cuadros de agentes -->
-            <div class="agent-box">
-                <span class="number orange">150</span>
-                <span class="text1">Agentes</span>
-            </div>
-            <div class="agent-box">
-                <span class="number orange">130</span>
-                <span class="text1">Activos</span>
-            </div>
-            <div class="agent-box">
-                <span class="number orange">20</span>
-                <span class="text1">Inactivos</span>
-            </div>
-
-
-
-            <div class="green-box1">
-                <span class="text">6</span>
-                <span class="fecha">Hoy</span>
-            </div>
-
-
-        </div>
-
-        <div class="wrapper">
-            <!-- Cuadro central abajo-->
-            <div class="main-table">
-
-                <!-- Tabla con scroll -->
-                <table>
-                    <thead>
-
-                        <tr>
-                            <th></th>
-                            <th>Provincias</th>
-                            <th>Hoy</th>
-                            <th>1 Semana</th>
-                            <th>2 Semana</th>
-                            <th>3 Semana</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        <tr>
-                            <td><input @onclick="IraVerAgente" type="checkbox" class="row-checkbox" /></td>
-                            <td>Santiago</td>
-                            <td>10</td>
-                            <td>19</td>
-                            <td>32</td>
-                            <td>120</td>
-                        </tr>
-
-
-                        <!-- Más filas -->
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            <!-- Cuadros al lado derecho -->
-            <div class="side-boxes">
-
-
-                <h3 class="second-box-title">Más Multas</h3>
-
-                <div class="green-box">
-                    <span class="text">240</span>
-                    <span class="fecha">Santo Domingo</span>
-                </div>
-
-                <div class="green-box">
-                    <span class="text">129</span>
-                    <span class="fecha">Santiago</span>
-                </div>
-
-                <div class="green-box">
-                    <span class="text">112</span>
-                    <span class="fecha">La Vega</span>
-                </div>
-
-                <div class="green-box">
-                    <span class="text">102</span>
-                    <span class="fecha">San Pedro de Macorís</span>
-                </div>
-            </div>
-
-        </div>
-
-
-
-    </div>
-
+    <!-- Sección de Tarjetas -->
+    <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="10px" class="rz-p-4">
+        <RadzenCard Style="width: 175px; border:3px solid black; font-family: 'Poppins', sans-serif;">
+            <h4>Total</h4>
+            <p>@totalTickets</p>
+        </RadzenCard>
+        <RadzenCard Style="width: 175px; border:3px solid #fc8403; font-family: 'Poppins', sans-serif;">
+            <h4>Pendientes</h4>
+            <p>@pendingTickets</p>
+        </RadzenCard>
+        <RadzenCard Style="width: 175px; border:3px solid #009C40; font-family: 'Poppins', sans-serif;">
+            <h4>Pagadas</h4>
+            <p>@paidTickets</p>
+        </RadzenCard>
+    </RadzenStack>
 </div>
 
 @code {
-    private void IrAcreateUser()
+    DateTime? startDate { get; set; }
+    DateTime? endDate { get; set; }
+
+    int totalTickets { get; set; }
+    int pendingTickets { get; set; }
+    int paidTickets { get; set; }
+
+    async Task OnConsultarClick()
     {
-        NavigationManager.NavigateTo("CreateUser");
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            string startDateStr = startDate.Value.ToString("dd/MM/yyyy");
+            string endDateStr = endDate.Value.ToString("dd/MM/yyyy");
+
+            var response = await Http.GetFromJsonAsync<MultasResponse>($"https://localhost:7277/api/Ticket/MultasPorFecha?startDate={startDateStr}&endDate={endDateStr}");
+
+            if (response != null)
+            {
+                totalTickets = response.TotalTickets;
+                pendingTickets = response.PendingTickets;
+                paidTickets = response.PaidTickets;
+            }
+        }
     }
 
-    private void IraVerAgente()
+    public class MultasResponse
     {
-        NavigationManager.NavigateTo("provinciasAgentes");
-    }
-}
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            NavigationManager.NavigateTo("/");
-        }
+        public int TotalTickets { get; set; }
+        public int PendingTickets { get; set; }
+        public int PaidTickets { get; set; }
     }
 }

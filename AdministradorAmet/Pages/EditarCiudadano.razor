@@ -1,36 +1,32 @@
-﻿@page "/editarCiudadano"
+﻿@page "/editarCiudadano/{cedula}"
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 @inject Radzen.DialogService DialogService
 @using System.Text.RegularExpressions;
+@using AdministradorAmet.Models
+@using Newtonsoft.Json;
+@using static AdministradorAmet.Pages.PerfilCiudadano
 
-
-
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-<CascadingBlazoredModal Size="ModalSize.Large"/>
 <div class="container">
     <div class="header">
         <h1 class="title">Editar Usuario</h1>
     </div>
-    <!-- Foto de Perfil Centralizada -->
     <div class="central-section">
         <div class="image-section">
             <div class="profile-image-container">
                 <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" />
             </div>
             <div class="image-input">
-                <InputFile OnChange="ImagenPerfilSeleccionada" disabled="@IsDisabled("profileImg")" />
+                <InputFile OnChange="ImagenPerfilSeleccionada"  />
             </div>
         </div>
     </div>
 
-    <!-- Campos de entrada -->
     <div class="inputs-grid-single-column">
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
-            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name" />
+            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name" disabled />
             @if (!string.IsNullOrEmpty(nameError))
             {
                 <span class="error-message">@nameError</span>
@@ -48,7 +44,7 @@
 
         <div class="input-group">
             <label for="inputCedula">Cédula</label>
-            <input id="inputCedula" type="text" class="form-input same-size-input" maxlength="11" @bind="Cedula" />
+            <input id="inputCedula" type="text" class="form-input same-size-input" maxlength="11" @bind="Cedula"  />
             @if (!string.IsNullOrEmpty(cedulaError))
             {
                 <span class="error-message">@cedulaError</span>
@@ -76,61 +72,94 @@
 
     <div class="buttons">
         <button class="cancel-button" @onclick="Cancelar">Cancelar</button>
-        <button class="create-button" @onclick="ActualizarUsuario">Actualizar</button>
+        <button class="create-button" @onclick="ConfirmarActualizacion">Actualizar</button>
     </div>
 </div>
 
-
-
 @code {
-    [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter] public EditarCiudadanoParams Parametros { get; set; }
 
-    private const string ApiUrl = "https://localhost:7277/api/User/cedula/"; // URL de la API para actualizar
-    private int? rolId { get; set; } // Guardará el tipo de usuario seleccionado (1, 2, 3)
-    private string profileImgPreview { get; set; } = string.Empty; // Guardará el dataUrl para la vista previa
+    private const string ApiUrl = "https://localhost:7277/api/User/";
+    private string profileImgPreview { get; set; } = string.Empty;
     private string name { get; set; } = string.Empty;
     private string lastname { get; set; } = string.Empty;
     private string Cedula { get; set; } = string.Empty;
     private string phone { get; set; } = string.Empty;
     private string email { get; set; } = string.Empty;
-    private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
+    private string profileImg { get; set; } = string.Empty;
     bool alertaVisible = false;
     bool errorVisible = false;
 
-    // Validación de errores
     private string nameError { get; set; }
     private string lastnameError { get; set; }
     private string cedulaError { get; set; }
     private string phoneError { get; set; }
     private string emailError { get; set; }
 
-    private bool IsDisabled(string fieldName) => DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName];
-    private Dictionary<string, bool> DisabledFields = new()
+    protected override async Task OnInitializedAsync()
     {
-        { "name", true },
-        { "lastname", true },
-        { "Cedula", true },
-        { "phone", true },
-        { "email", true },
-        { "profileImg", true }
-    };
+        if (Parametros != null && !string.IsNullOrEmpty(Parametros.Cedula))
+        {
+            Console.WriteLine($"Inicializando con cédula: {Parametros.Cedula}");
+            Cedula = Parametros.Cedula;  // Asignamos la cédula del parámetro a la propiedad interna
+            await CargarUsuario(Cedula);  // Usamos Cedula aquí para cargar los datos
+        }
+        else
+        {
+            Console.WriteLine("Cédula está vacía o nula");
+            await JSRuntime.InvokeVoidAsync("alert", "Cédula no proporcionada.");
+        }
+    }
 
-    // Función para manejar la selección de la imagen
+    private async Task CargarUsuario(string cedula)
+    {
+        try
+        {
+            string urlCompleta = $"{ApiUrl}{cedula}";
+            Console.WriteLine($"Cargando datos del usuario con cédula: {cedula} desde {urlCompleta}");
+            var usuario = await Http.GetFromJsonAsync<User>(urlCompleta);
+
+            if (usuario != null)
+            {
+                name = usuario.Name;
+                lastname = usuario.LastName;
+                phone = usuario.Phone;
+                email = usuario.email;
+                profileImgPreview = usuario.profileImg ?? string.Empty;
+                Cedula = usuario.Cedula;  // Esto no es necesario, ya que Cedula ya tiene el valor
+                StateHasChanged();
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Usuario no encontrado.");
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error de solicitud HTTP: {httpEx.Message}");
+            Console.WriteLine($"Error de solicitud HTTP: {httpEx}");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al cargar datos del usuario: {ex.Message}");
+            Console.WriteLine($"Error al cargar datos del usuario: {ex}");
+        }
+    }
+
+
+
     private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file is not null)
         {
-            // Solo almacenamos el nombre del archivo
             profileImg = file.Name;
 
-            // Generar el dataUrl para la vista previa
             using var memoryStream = new MemoryStream();
             await file.OpenReadStream().CopyToAsync(memoryStream);
             var base64 = Convert.ToBase64String(memoryStream.ToArray());
             profileImgPreview = $"data:{file.ContentType};base64,{base64}";
 
-            // Llamar a la función JavaScript para actualizar la vista previa de la imagen
             await JSRuntime.InvokeVoidAsync("setImagePreview", "#previewImagenPerfil", profileImgPreview);
         }
     }
@@ -149,7 +178,6 @@
 
     private async Task ActualizarUsuario()
     {
-        // Validaciones
         bool isValid = true;
         string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
@@ -230,13 +258,13 @@
             lastname = lastname,
             email = string.IsNullOrWhiteSpace(email) ? null : email,
             phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
-            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg // Enviar solo el nombre del archivo de la imagen
+            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg
         };
 
         try
         {
             var response = await Http.PutAsJsonAsync($"{ApiUrl}{Cedula}", usuario);
-            Console.WriteLine(response); // Agrega esto para ver la respuesta del servidor
+            Console.WriteLine(response);
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
@@ -272,13 +300,13 @@
             errorVisible = true;
         }
 
-        StateHasChanged(); // Actualiza la UI inmediatamente para que la alerta sea visible
-
-        await Task.Delay(2000); // Muestra la alerta durante 3 segundos
-
+        StateHasChanged();
+        await Task.Delay(2000);
         alertaVisible = false;
         errorVisible = false;
-
-        StateHasChanged(); // Vuelve a actualizar la UI
+        StateHasChanged();
     }
 }
+
+
+

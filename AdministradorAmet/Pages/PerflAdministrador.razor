@@ -81,9 +81,8 @@
                     </div>
                 </div>
             </div>
-        
 
-        
+
 
 
             <h3>Multas por Día</h3>
@@ -122,6 +121,8 @@
                         <RadzenAxisTitle Text="Cantidad de Multas" />
                     </RadzenValueAxis>
                 </RadzenChart>
+
+
             </RadzenStack>
         </div>
 
@@ -184,7 +185,7 @@ else
     private double promedioRating;
     private int promedioRatingInt;
     private List<MultasPorDia> multasPorDia = new List<MultasPorDia>();
-    private string[] diasSemana = { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+    private string[] diasSemana = { "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo" };
     private List<DataItem> datosGrafico = new List<DataItem>();
     private bool smooth = true;
     private bool showDataLabels = true;
@@ -264,6 +265,7 @@ else
             }
         }
     }
+
 
     public class Review
     {

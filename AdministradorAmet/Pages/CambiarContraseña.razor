@@ -1,0 +1,310 @@
+﻿@page "/cambiarContrasena/{Cedula}"
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject Radzen.DialogService DialogService
+@using AdministradorAmet.Models
+@using Newtonsoft.Json
+@using System.IdentityModel.Tokens.Jwt
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+@if (alertaVisible)
+{
+    <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Success" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
+        Contraseña cambiada exitosamente.
+    </RadzenAlert>
+}
+
+@if (errorVisible)
+{
+    <RadzenAlert Title="Error" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
+        @errorMensaje
+    </RadzenAlert>
+}
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Cambiar Contraseña</h1>
+    </div>
+
+    <!-- Imagen entre el título y el formulario -->
+    <div class="image-container">
+        <img src="imagenes/restcontrasena.png" alt="Cambiar Contraseña" class="image-center" height="100" width="100" />
+    </div>
+
+    <!-- Contraseña Actual -->
+    <div class="input-group">
+        <label for="inputCurrentPassword">Contraseña Actual</label>
+        <div class="password-container">
+            <input id="inputCurrentPassword" type="@CurrentPasswordFieldType" class="form-input same-size-input" @bind="currentPassword" />
+            <button type="button" class="password-toggle @CurrentPasswordToggleClass" @onclick="ToggleCurrentPasswordField">
+                👁
+            </button>
+        </div>
+        @if (!string.IsNullOrEmpty(currentPasswordError))
+        {
+            <span class="error-message">@currentPasswordError</span>
+        }
+    </div>
+
+    <!-- Nueva Contraseña -->
+    <div class="input-group">
+        <label for="inputNewPassword">Nueva Contraseña</label>
+        <div class="password-container">
+            <input id="inputNewPassword" type="@NewPasswordFieldType" class="form-input same-size-input" @bind="newPassword" />
+            <button type="button" class="password-toggle @NewPasswordToggleClass" @onclick="ToggleNewPasswordField">
+                👁
+            </button>
+        </div>
+        @if (!string.IsNullOrEmpty(newPasswordError))
+        {
+            <span class="error-message">@newPasswordError</span>
+        }
+    </div>
+
+    <!-- Confirmar Nueva Contraseña -->
+    <div class="input-group">
+        <label for="inputConfirmPassword">Confirmar Nueva Contraseña</label>
+        <div class="password-container">
+            <input id="inputConfirmPassword" type="@ConfirmPasswordFieldType" class="form-input same-size-input" @bind="confirmPassword" />
+            <button type="button" class="password-toggle @ConfirmPasswordToggleClass" @onclick="ToggleConfirmPasswordField">
+                👁
+            </button>
+        </div>
+        @if (!string.IsNullOrEmpty(confirmPasswordError))
+        {
+            <span class="error-message">@confirmPasswordError</span>
+        }
+    </div>
+
+    <div class="buttons">
+        <button class="cancel-button" @onclick="Cancelar">Cancelar</button>
+        <button class="create-button" @onclick="ConfirmarCambio">Aceptar</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Cedula { get; set; }  // Agregado el atributo [Parameter]
+
+    private string currentPassword { get; set; } = string.Empty;
+    private string newPassword { get; set; } = string.Empty;
+    private string confirmPassword { get; set; } = string.Empty;
+
+    private string currentPasswordError { get; set; }
+    private string newPasswordError { get; set; }
+    private string confirmPasswordError { get; set; }
+    private bool alertaVisible { get; set; } = false;
+    private bool errorVisible { get; set; } = false;
+    private string errorMensaje { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cedula = await ObtenerCedulaDelToken();
+        Console.WriteLine($"Cédula obtenida en OnInitializedAsync: {Cedula}");
+
+        if (string.IsNullOrEmpty(Cedula))
+        {
+            Console.WriteLine("Cédula no encontrada, redirigiendo al login.");
+            NavigationManager.NavigateTo("/"); // Redirigir si no hay cédula
+        }
+    }
+
+    private async Task<string> ObtenerCedulaDelToken()
+    {
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            Console.WriteLine("Token no encontrado.");
+            return null;
+        }
+
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
+
+            if (claims.TryGetValue("http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber", out var cedula))
+            {
+                Console.WriteLine($"Cédula obtenida del token: {cedula}");
+                return cedula;
+            }
+            else
+            {
+                Console.WriteLine("Cédula no encontrada en el token.");
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener la cédula del token: {ex.Message}");
+            return null;
+        }
+    }
+
+    private async Task ConfirmarCambio()
+    {
+        bool isValid = true;
+
+        if (string.IsNullOrWhiteSpace(currentPassword))
+        {
+            currentPasswordError = "La contraseña actual es obligatoria.";
+            isValid = false;
+        }
+        else
+        {
+            currentPasswordError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(newPassword))
+        {
+            newPasswordError = "La nueva contraseña es obligatoria.";
+            isValid = false;
+        }
+        else if (newPassword.Length < 6)
+        {
+            newPasswordError = "La nueva contraseña debe tener al menos 6 caracteres.";
+            isValid = false;
+        }
+        else
+        {
+            newPasswordError = null;
+        }
+
+        if (newPassword != confirmPassword)
+        {
+            confirmPasswordError = "Las contraseñas no coinciden.";
+            isValid = false;
+        }
+        else
+        {
+            confirmPasswordError = null;
+        }
+
+        if (!isValid)
+        {
+            return;
+        }
+
+        DialogService.Confirm("¿Estás seguro de que deseas cambiar la contraseña?", "Confirmar Cambio", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" })
+            .ContinueWith(async task =>
+            {
+                if (task.Result == true)
+                {
+                    await RealizarCambioContrasena();
+                }
+            });
+    }
+
+    private async Task RealizarCambioContrasena()
+    {
+        var cambioContrasenaDto = new
+        {
+            identification = Cedula,  // Aquí usamos la cédula pasada en la URL
+            currentPassword = currentPassword,
+            newPassword = newPassword,
+            confirmPassword = confirmPassword
+        };
+
+        try
+        {
+            Console.WriteLine($"Intentando cambiar contraseña para la cédula: {Cedula}");
+            Console.WriteLine($"CurrentPassword: {currentPassword}");
+            Console.WriteLine($"NewPassword: {newPassword}");
+            Console.WriteLine($"ConfirmPassword: {confirmPassword}");
+
+            var response = await Http.PostAsJsonAsync("https://localhost:7277/api/User/change-password", cambioContrasenaDto);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Cambio de contraseña exitoso.");
+                alertaVisible = true;
+                errorVisible = false;
+                StateHasChanged(); // Forzar la actualización de la UI
+                await Task.Delay(2000); // Espera 2 segundos antes de redirigir
+                NavigationManager.NavigateTo("/Home");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error al cambiar la contraseña: {errorContent}");
+                errorMensaje = errorContent;
+                errorVisible = true;
+                alertaVisible = false;
+                StateHasChanged(); // Forzar la actualización de la UI
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            errorMensaje = $"Error: {ex.Message}";
+            errorVisible = true;
+            alertaVisible = false;
+            StateHasChanged(); // Forzar la actualización de la UI
+        }
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/Home");
+    }
+
+
+
+    // Variables para controlar la visibilidad de las contraseñas
+    private string CurrentPasswordFieldType { get; set; } = "password";
+    private string NewPasswordFieldType { get; set; } = "password";
+    private string ConfirmPasswordFieldType { get; set; } = "password";
+
+    // Clases para el ícono del "ojito"
+    private string CurrentPasswordToggleClass { get; set; } = "toggle-hidden";
+    private string NewPasswordToggleClass { get; set; } = "toggle-hidden";
+    private string ConfirmPasswordToggleClass { get; set; } = "toggle-hidden";
+
+    // Funciones para cambiar la visibilidad de las contraseñas
+    private void ToggleCurrentPasswordField()
+    {
+        if (CurrentPasswordFieldType == "password")
+        {
+            CurrentPasswordFieldType = "text";   // Mostrar la contraseña
+            CurrentPasswordToggleClass = "toggle-visible"; // Cambiar clase del ícono
+        }
+        else
+        {
+            CurrentPasswordFieldType = "password"; // Ocultar la contraseña
+            CurrentPasswordToggleClass = "toggle-hidden"; // Cambiar clase del ícono
+        }
+    }
+
+    private void ToggleNewPasswordField()
+    {
+        if (NewPasswordFieldType == "password")
+        {
+            NewPasswordFieldType = "text";   // Mostrar la contraseña
+            NewPasswordToggleClass = "toggle-visible"; // Cambiar clase del ícono
+        }
+        else
+        {
+            NewPasswordFieldType = "password"; // Ocultar la contraseña
+            NewPasswordToggleClass = "toggle-hidden"; // Cambiar clase del ícono
+        }
+    }
+
+    private void ToggleConfirmPasswordField()
+    {
+        if (ConfirmPasswordFieldType == "password")
+        {
+            ConfirmPasswordFieldType = "text";   // Mostrar la contraseña
+            ConfirmPasswordToggleClass = "toggle-visible"; // Cambiar clase del ícono
+        }
+        else
+        {
+            ConfirmPasswordFieldType = "password"; // Ocultar la contraseña
+            ConfirmPasswordToggleClass = "toggle-hidden"; // Cambiar clase del ícono
+        }
+    }
+}
+
+

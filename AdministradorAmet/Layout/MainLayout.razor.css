@@ -1,12 +1,13 @@
-﻿
-.page {
+﻿.page {
     position: relative;
     display: flex;
     flex-direction: column;
+    background-color: #009C40; /* Fondo verde */
 }
 
 main {
     flex: 1;
+    background-color: white; /* Fondo blanco para el contenido principal */
 }
 
 .top-row {
@@ -17,14 +18,12 @@ main {
     gap: 5px;
     border: none;
     height: 3.5rem;
-    /*width: 100%; */
 }
 
 .icon-link {
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    /*text-align: center;*/
 }
 
 .icon {
@@ -33,28 +32,17 @@ main {
     justify-content: flex-end;
 }
 
-
-/*MODIFICAR EL NAVBAR*/
+/* MODIFICAR EL NAVBAR */
 .sidebar {
     background-color: white;
-    border-bottom: 1px solid #d6d5d5; /* L�nea divisoria */
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3); /* Agrega un efecto de sombra para m�s distinci�n */
+    border-bottom: 1px solid #d6d5d5; /* Línea divisoria */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3); /* Agrega un efecto de sombra para más distinción */
 }
 
     .sidebar ::deep a:hover,
     .sidebar::deep .btn-link:hover {
         text-decoration: underline;
     }
-
-
-/*   .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }*/
 
 @media (max-width: 640.98px) {
     .top-row {
@@ -96,7 +84,7 @@ main {
     }
 }
 
-/* Estilo base para el men� desplegable */
+/* Estilo base para el menú desplegable */
 .dropdown-menu {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
@@ -104,7 +92,7 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo para los �tems del dropdown */
+/* Estilo para los ítems del dropdown */
 .dropdown-item {
     display: flex;
     align-items: center;
@@ -112,7 +100,6 @@ main {
     transition: all 0.3s ease;
     text-decoration: none;
     color: #333333;
-    /*cursor:pointer;*/
 }
 
     .dropdown-item:hover {
@@ -120,7 +107,7 @@ main {
         color: green;
     }
 
-/* Estilo para los �conos */
+/* Estilo para los íconos */
 .dropdown-icon {
     width: 20px;
     height: 20px;
@@ -130,7 +117,7 @@ main {
     color: green;
 }
 
-/* Espaciado entre �cono y texto */
+/* Espaciado entre ícono y texto */
 .me-2 {
     margin-right: 8px;
 }
@@ -160,7 +147,6 @@ main {
         color: #333;
         font-weight: 500;
     }
-
 
 .dropdown-menu {
     position: absolute;
@@ -194,7 +180,6 @@ main {
             background-color: #ffe5e5; /* Fondo claro al pasar el cursor */
             color: darkred; /* Cambiar tono al pasar el cursor */
         }
-
 
 .dropdown-icon {
     width: 20px;
@@ -231,14 +216,12 @@ main {
     z-index: 1100; /* Por encima del fondo */
 }
 
-
 /* Botones en el footer del modal */
 .modal-footer {
     display: flex;
     justify-content: space-between;
     margin-top: 15px;
 }
-
 
 /* Título del modal */
 .modal-title {
