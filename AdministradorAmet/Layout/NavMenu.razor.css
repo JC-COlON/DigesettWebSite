@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: center; /* Centrado de los elementos */
-    gap: 15px; /* Espacio entre logo y texto */
+    gap: 20px; /* Espacio entre logo y texto */
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 20px; /* Agregado margen inferior para mover hacia abajo */
@@ -22,8 +22,10 @@
 
 /* Estilo para el logo */
 .logoarriba {
-    width: 125px; /* Tamaño ajustado del logo */
-    height: auto;
+    width: 180px; /* Tamaño ajustado del logo */
+    height: 180px;
+    margin-top: 10px;
+    margin-bottom: 40px;
 }
 
 /* Estilo para la barra de navegación oscura */
@@ -48,7 +50,8 @@
 
 /* Estilo de las letras en negrita */
 .nav-link {
-    font-weight: bold; /* Negrita en el texto de las opciones */
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
     color: black; /* Cambiar el color de los textos a negro */
     font-size: 1.25rem; /* Aumenté el tamaño del texto */
     margin-bottom: 20px; /* Agregado margen inferior para más espacio entre los elementos */
@@ -88,6 +91,7 @@
         display: flex;
         align-items: center;
         line-height: 3rem;
+        font-family: 'Poppins', sans-serif; /* Fuente Poppins */
     }
 
 /* Ajustes para pantallas más grandes */
@@ -102,54 +106,28 @@
     }
 }
 
-/* Ajustes para el botón de salir (si lo habilitas en el futuro) */
-
-/* Estilo para el submenú */
-.sub-menu {
+/* Estilos para el submenú */
+.submenu {
     margin-left: 1.5rem;
-    margin-top: 0.5rem;
-    display: flex;
-    flex-direction: column;
+    transition: all 0.3s ease;
 }
 
-.sub-menu-link {
-    font-size: 1.25rem; /* Tamaño de fuente más grande */
-    color: black; /* Cambié el color a negro */
-    text-decoration: none;
-    margin-bottom: 0.5rem;
-    font-weight: bold; /* Negrita para el texto */
+.submenu-item {
+    padding-left: 2rem !important;
+    font-size: 0.9em;
+    font-family: 'Poppins', sans-serif;
+    color: #e9e9e7 !important; /* Color específico para subitems */
 }
 
-    .sub-menu-link:hover {
-        color: #009C40;
-        text-decoration: underline;
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.submenu-arrow {
+    float: right;
+    transition: transform 0.3s;
+}
+
+    .submenu-arrow.open {
+        transform: rotate(90deg);
     }
-
-/* Estilo para el submenú */
-.sub-menu {
-    margin-left: 1.5rem; /* Margen izquierdo para alinear con el menú principal */
-    margin-top: 0.5rem; /* Separación con el botón principal */
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem; /* Espacio entre las opciones */
-}
-
-/* Estilo para cada elemento del submenú */
-.sub-menu-item {
-    display: flex;
-    align-items: center; /* Alineación vertical del guion y texto */
-    gap: 0.5rem; /* Espacio entre el guion y el texto */
-}
-
-/* Estilo para el guion del submenú */
-.sub-menu-dash {
-    color: #009C40; /* Color del guion */
-    font-size: 1.25rem; /* Tamaño del guion más grande */
-    font-weight: bold; /* Negrita para el guion */
-}
-
-/* Hover y enfoque para los enlaces del submenú */
-.sub-menu-link:hover,
-.sub-menu-link:focus {
-    color: #009C40; /* Cambiar color en hover */
-}

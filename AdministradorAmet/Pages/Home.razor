@@ -4,37 +4,51 @@
 @inject HttpClient Http
 @using Radzen
 @using MudBlazor
-
+@using Newtonsoft.Json
 
 <PageTitle>Home</PageTitle>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
-<!-- Contenedor para alinear todo a la izquierda -->
-<div style="display: flex; justify-content: flex-start; align-items: flex-start; flex-direction: column; padding-left: 20px;">
+<!-- Contenedor principal -->
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px;">
+
     <!-- Sección de Inputs y Botón -->
     <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="10px" class="rz-p-4">
-        <RadzenButton Text="Consultar" Click="OnConsultarClick" Style="background-color: #009C40; color: white; border: 3px solid #009C40; width:175px; font-family: 'Poppins', sans-serif;" />
         <RadzenDatePicker @bind-Value="startDate" Placeholder="Fecha Inicio" Style="width: 175px; font-family: 'Poppins', sans-serif;" DateFormat="dd/MM/yyyy" />
         <RadzenDatePicker @bind-Value="endDate" Placeholder="Fecha Fin" Style="width: 175px; font-family: 'Poppins', sans-serif;" DateFormat="dd/MM/yyyy" />
+        <RadzenButton Text="Consultar" Click="OnConsultarClick" Style="background-color: #009C40; color: white; border: 3px solid #009C40; width:175px; font-family: 'Poppins', sans-serif;" />
     </RadzenStack>
 
-    <!-- Sección de Tarjetas -->
-    <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="10px" class="rz-p-4">
-        <RadzenCard Style="width: 175px; border:3px solid black; font-family: 'Poppins', sans-serif;">
-            <h4>Total</h4>
+    <!-- Sección de Tarjetas con los totales -->
+    <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="20px" class="rz-p-4" style="margin-top: 20px;">
+
+        <!-- Total de Multas -->
+        <RadzenCard Style="width: 300px; border:3px solid black; font-family: 'Poppins', sans-serif;">
+            <h4>Total de Multas</h4>
             <p>@totalTickets</p>
         </RadzenCard>
-        <RadzenCard Style="width: 175px; border:3px solid #fc8403; font-family: 'Poppins', sans-serif;">
-            <h4>Pendientes</h4>
-            <p>@pendingTickets</p>
+
+        <!-- Total de Multas Pendientes -->
+        <RadzenCard Style="width: 300px; border:3px solid #fc8403; font-family: 'Poppins', sans-serif;">
+            <h4>Total de Multas Pendientes</h4>
+            <p>@totalPendingAmount</p>
         </RadzenCard>
-        <RadzenCard Style="width: 175px; border:3px solid #009C40; font-family: 'Poppins', sans-serif;">
-            <h4>Pagadas</h4>
-            <p>@paidTickets</p>
+
+        <!-- Total de Multas Pagas -->
+        <RadzenCard Style="width: 300px; border:3px solid #009C40; font-family: 'Poppins', sans-serif;">
+            <h4>Total de Multas Pagas</h4>
+            <p>@totalPaidAmount</p>
         </RadzenCard>
+
     </RadzenStack>
+
+    <!-- Gráfico de Barras -->
+    <div>
+        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+    </div>
+    <MudText Typo="Typo.h6">Selected portion of the chart: @Index</MudText>
 </div>
 
 @code {
@@ -42,8 +56,12 @@
     DateTime? endDate { get; set; }
 
     int totalTickets { get; set; }
-    int pendingTickets { get; set; }
-    int paidTickets { get; set; }
+    string totalPaidAmount { get; set; }
+    string totalPendingAmount { get; set; }
+
+    private int Index = -1; // default value cannot be 0 -> first selectedindex is 0.
+    public List<ChartSeries> Series = new List<ChartSeries>();
+    public string[] XAxisLabels = { };
 
     async Task OnConsultarClick()
     {
@@ -52,21 +70,45 @@
             string startDateStr = startDate.Value.ToString("dd/MM/yyyy");
             string endDateStr = endDate.Value.ToString("dd/MM/yyyy");
 
-            var response = await Http.GetFromJsonAsync<MultasResponse>($"https://localhost:7277/api/Ticket/MultasPorFecha?startDate={startDateStr}&endDate={endDateStr}");
-
-            if (response != null)
+            // Realizar la solicitud HTTP
+            var response = await Http.GetAsync($"https://localhost:7277/api/Ticket/MultasPorFechaYTopArticulos?startDate={startDateStr}&endDate={endDateStr}");
+            if (response.IsSuccessStatusCode)
             {
-                totalTickets = response.TotalTickets;
-                pendingTickets = response.PendingTickets;
-                paidTickets = response.PaidTickets;
+                var jsonString = await response.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<MultasResponse>(jsonString);
+
+                if (data != null)
+                {
+                    totalTickets = data.MultasResumen.TotalTickets;
+                    totalPaidAmount = data.MultasResumen.TotalPaidAmount;
+                    totalPendingAmount = data.MultasResumen.TotalPendingAmount;
+
+                    Series = new List<ChartSeries>
+                    {
+                        new ChartSeries { Name = "Cantidad de Multas", Data = data.TopArticulos.Select(a => (double)a.CantidadMultas).ToArray() }
+                    };
+                    XAxisLabels = data.TopArticulos.Select(a => a.ArticleNum).ToArray();
+                }
             }
         }
     }
 
     public class MultasResponse
     {
+        public MultasResumenResponse MultasResumen { get; set; }
+        public List<TopArticuloResponse> TopArticulos { get; set; }
+    }
+
+    public class MultasResumenResponse
+    {
         public int TotalTickets { get; set; }
-        public int PendingTickets { get; set; }
-        public int PaidTickets { get; set; }
+        public string TotalPaidAmount { get; set; }
+        public string TotalPendingAmount { get; set; }
+    }
+
+    public class TopArticuloResponse
+    {
+        public string ArticleNum { get; set; }
+        public int CantidadMultas { get; set; }
     }
 }

@@ -1,8 +1,9 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject Radzen.DialogService DialogService
 @using System.IdentityModel.Tokens.Jwt
-@using MudBlazor
+
 <RadzenDialog />
 
 <div class="page" @onclick="CloseMenu">
@@ -13,7 +14,6 @@
 
     <!-- Main Content -->
     <main>
-        <!-- MudPopoverProvider debe estar aquí -->
         <MudPopoverProvider />
 
         <!-- Top Row -->
@@ -25,34 +25,19 @@
                     <span class="user-text">@UserName</span>
                 </button>
                 <div class="dropdown-menu" style="display: @(isMenuVisible ? "block" : "none")">
-                    <a href="perfilAgente" class="dropdown-item" @onclick="CloseMenu">
+                    <a href="javascript:void(0);" class="dropdown-item" @onclick="IrAMiPerfil">
                         <img src="imagenes/user.png" alt="Profile Icon" class="dropdown-icon" />
                         Mi Perfil
                     </a>
-                    <a  class="dropdown-item" @onclick="cambiarcontraseña">
+                    <a class="dropdown-item" @onclick="cambiarcontraseña">
                         <img src="imagenes/settingIcon.svg" alt="Password Icon" class="dropdown-icon" />
                         Cambiar Contraseña
                     </a>
                     <div class="divider"></div>
-                    <a href="" class="dropdown-item logout">
+                    <a href="javascript:void(0);" class="dropdown-item logout" @onclick="ConfirmarCerrarSesion">
                         <img src="imagenes/cerrarsesion.png" alt="Logout Icon" class="dropdown-icon logout-icon" />
                         Cerrar Sesión
                     </a>
-
-                    <!-- Modal de confirmación -->
-                    @if (isLogoutModalVisible)
-                    {
-                        <div class="modal-overlay">
-                            <div class="modal">
-                                <h3 class="modal-title">Confirmación</h3>
-                                <p class="modal-body">¿Estás seguro de que deseas cerrar sesión?</p>
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" @onclick="CancelLogout">Cancelar</button>
-                                    <button class="btn btn-danger" @onclick="ConfirmLogout">Salir</button>
-                                </div>
-                            </div>
-                        </div>
-                    }
                 </div>
             </div>
         </div>
@@ -61,7 +46,7 @@
         <article class="content px-4">
             @if (!string.IsNullOrEmpty(PageTitle))
             {
-                <h1>@PageTitle</h1>  <!-- Muestra el título solo si está definido -->
+                <h1>@PageTitle</h1>
             }
             @Body
         </article>
@@ -70,13 +55,12 @@
 
 @code {
     private bool isMenuVisible = false;
-    private bool isLogoutModalVisible = false;
 
     [CascadingParameter]
     public string UserName { get; set; } = "Usuario: Administrador";
 
     [CascadingParameter]
-    public string PageTitle { get; set; }  // Agregamos esta propiedad para que las páginas puedan pasar el título
+    public string PageTitle { get; set; }
 
     private void ToggleMenu()
     {
@@ -88,29 +72,35 @@
         isMenuVisible = false;
     }
 
-
     private void cambiarcontraseña()
     {
         isMenuVisible = false;
         NavigationManager.NavigateTo("/cambiarContrasena/{Cedula}");
-
     }
 
-    private void ShowLogoutConfirmation()
+    // Función para confirmar el cierre de sesión
+    private async Task ConfirmarCerrarSesion()
     {
-        Console.WriteLine("Se activó el modal.");
-        isLogoutModalVisible = true;
+        // Mostrar el diálogo de confirmación de Radzen
+        var result = await DialogService.Confirm(
+            "¿Estás seguro de que deseas cerrar sesión?",
+            "Confirmar Cierre de Sesión",
+            new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (result == true) // Si el usuario confirma que sí
+        {
+            await CerrarSesion();  // Llamamos a la función para eliminar el token y redirigir al login
+        }
     }
 
-    private void CancelLogout()
+    // Función para cerrar sesión
+    private async Task CerrarSesion()
     {
-        isLogoutModalVisible = false;
-    }
+        // Eliminar el token del localStorage
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
 
-    private void ConfirmLogout()
-    {
-        isLogoutModalVisible = false;
-        NavigationManager.NavigateTo("LoginAdministrador");
+        // Redirigir al usuario a la página de inicio de sesión
+        NavigationManager.NavigateTo("/");
     }
 
     protected override async Task OnInitializedAsync()
@@ -131,5 +121,31 @@
                 UserName = $"Usuario: {name}";
             }
         }
+    }
+
+    private async Task IrAMiPerfil()
+    {
+        // Obtener la cédula del token
+        var cedula = await ObtenerCedulaDelToken();
+        if (!string.IsNullOrEmpty(cedula))
+        {
+            // Navegar a la página de perfil con la cédula
+            NavigationManager.NavigateTo($"/perfilAdministrador/{cedula}");
+        }
+    }
+
+    private async Task<string> ObtenerCedulaDelToken()
+    {
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        if (string.IsNullOrEmpty(token)) return null;
+
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
+            return claims.TryGetValue("http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber", out var cedula) ? cedula : null;
+        }
+        catch (Exception) { return null; }
     }
 }

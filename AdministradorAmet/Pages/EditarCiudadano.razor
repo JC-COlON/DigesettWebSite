@@ -1,4 +1,5 @@
 ﻿@page "/editarCiudadano/{cedula}"
+
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
@@ -15,7 +16,7 @@
     <div class="central-section">
         <div class="image-section">
             <div class="profile-image-container">
-                <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" />
+                <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" disable />
             </div>
             <div class="image-input">
                 <InputFile OnChange="ImagenPerfilSeleccionada"  />
@@ -26,7 +27,7 @@
     <div class="inputs-grid-single-column">
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
-            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name" disabled />
+            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name"  />
             @if (!string.IsNullOrEmpty(nameError))
             {
                 <span class="error-message">@nameError</span>
@@ -78,12 +79,13 @@
 
 @code {
     [Parameter] public EditarCiudadanoParams Parametros { get; set; }
+    [Parameter] public string Cedula { get; set; }
 
     private const string ApiUrl = "https://localhost:7277/api/User/";
     private string profileImgPreview { get; set; } = string.Empty;
     private string name { get; set; } = string.Empty;
     private string lastname { get; set; } = string.Empty;
-    private string Cedula { get; set; } = string.Empty;
+    // private string Cedula { get; set; } = string.Empty;
     private string phone { get; set; } = string.Empty;
     private string email { get; set; } = string.Empty;
     private string profileImg { get; set; } = string.Empty;
@@ -98,10 +100,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Parametros != null && !string.IsNullOrEmpty(Parametros.Cedula))
+        if (!string.IsNullOrEmpty(Cedula))
         {
-            Console.WriteLine($"Inicializando con cédula: {Parametros.Cedula}");
-            Cedula = Parametros.Cedula;  // Asignamos la cédula del parámetro a la propiedad interna
+            Console.WriteLine($"Inicializando con cédula: {Cedula}");
             await CargarUsuario(Cedula);  // Usamos Cedula aquí para cargar los datos
         }
         else
@@ -111,11 +112,14 @@
         }
     }
 
+
+
+
     private async Task CargarUsuario(string cedula)
     {
         try
         {
-            string urlCompleta = $"{ApiUrl}{cedula}";
+            string urlCompleta = $"https://localhost:7277/api/User/{cedula}";
             Console.WriteLine($"Cargando datos del usuario con cédula: {cedula} desde {urlCompleta}");
             var usuario = await Http.GetFromJsonAsync<User>(urlCompleta);
 
@@ -145,6 +149,9 @@
             Console.WriteLine($"Error al cargar datos del usuario: {ex}");
         }
     }
+
+
+
 
 
 
@@ -181,6 +188,7 @@
         bool isValid = true;
         string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
+        // Validar los campos
         if (string.IsNullOrWhiteSpace(name))
         {
             nameError = "El nombre es obligatorio.";
@@ -264,7 +272,6 @@
         try
         {
             var response = await Http.PutAsJsonAsync($"{ApiUrl}{Cedula}", usuario);
-            Console.WriteLine(response);
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
@@ -281,6 +288,9 @@
             Console.WriteLine($"Error al actualizar usuario: {ex}");
         }
     }
+
+
+
 
     private void Cancelar()
     {
