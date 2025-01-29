@@ -1,4 +1,4 @@
-﻿@page "/editarCiudadano/{cedula}"
+﻿@page "/editarCiudadano/{Cedula}"
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -7,19 +7,31 @@
 @using System.Text.RegularExpressions;
 @using AdministradorAmet.Models
 @using Newtonsoft.Json;
-@using static AdministradorAmet.Pages.PerfilCiudadano
 
 <div class="container">
     <div class="header">
         <h1 class="title">Editar Usuario</h1>
     </div>
+    @if (alertaVisible)
+    {
+        <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Success" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
+            Usuario Actualizado correctamente.
+        </RadzenAlert>
+    }
+
+    @if (errorVisible)
+    {
+        <RadzenAlert Title="Error" AlertStyle="AlertStyle.Danger" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="error">
+            No se pudo Actualizar el usuario.
+        </RadzenAlert>
+    }
     <div class="central-section">
         <div class="image-section">
             <div class="profile-image-container">
                 <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" disable />
             </div>
             <div class="image-input">
-                <InputFile OnChange="ImagenPerfilSeleccionada"  />
+                <InputFile OnChange="ImagenPerfilSeleccionada" />
             </div>
         </div>
     </div>
@@ -27,7 +39,7 @@
     <div class="inputs-grid-single-column">
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
-            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name"  />
+            <input id="inputNombre" type="text" class="form-input same-size-input" @bind="name" />
             @if (!string.IsNullOrEmpty(nameError))
             {
                 <span class="error-message">@nameError</span>
@@ -44,11 +56,16 @@
         </div>
 
         <div class="input-group">
-            <label for="inputCedula">Cédula</label>
-            <input id="inputCedula" type="text" class="form-input same-size-input" maxlength="11" @bind="Cedula"  />
-            @if (!string.IsNullOrEmpty(cedulaError))
+            <label for="inputPassword">Contraseña</label>
+            <div class="password-container">
+                <input id="inputPassword" type="@PasswordFieldType" class="form-input" @bind="password" disabled="@isPasswordDisabled" />
+                <button type="button" class="password-toggle @PasswordToggleClass" @onclick="TogglePasswordField" disabled="@isPasswordDisabled">
+                    👁
+                </button>
+            </div>
+            @if (!string.IsNullOrEmpty(passwordError))
             {
-                <span class="error-message">@cedulaError</span>
+                <span class="error-message">@passwordError</span>
             }
         </div>
 
@@ -78,41 +95,43 @@
 </div>
 
 @code {
-    [Parameter] public EditarCiudadanoParams Parametros { get; set; }
-    [Parameter] public string Cedula { get; set; }
+    [Parameter] 
+    public string Cedula { get; set; }
 
-    private const string ApiUrl = "https://localhost:7277/api/User/";
     private string profileImgPreview { get; set; } = string.Empty;
     private string name { get; set; } = string.Empty;
     private string lastname { get; set; } = string.Empty;
-    // private string Cedula { get; set; } = string.Empty;
     private string phone { get; set; } = string.Empty;
     private string email { get; set; } = string.Empty;
     private string profileImg { get; set; } = string.Empty;
-    bool alertaVisible = false;
-    bool errorVisible = false;
+    private string password { get; set; } = string.Empty;
 
     private string nameError { get; set; }
     private string lastnameError { get; set; }
     private string cedulaError { get; set; }
     private string phoneError { get; set; }
     private string emailError { get; set; }
+    private string passwordError { get; set; }
+    bool alertaVisible = false;
+    bool errorVisible = false;
+
+    private string PasswordFieldType { get; set; } = "password";
+    private string PasswordToggleClass { get; set; } = "toggle-hidden";
+    private bool isPasswordDisabled { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
         if (!string.IsNullOrEmpty(Cedula))
         {
-            Console.WriteLine($"Inicializando con cédula: {Cedula}");
-            await CargarUsuario(Cedula);  // Usamos Cedula aquí para cargar los datos
+            await CargarUsuario(Cedula);
         }
         else
         {
-            Console.WriteLine("Cédula está vacía o nula");
             await JSRuntime.InvokeVoidAsync("alert", "Cédula no proporcionada.");
         }
+        Console.WriteLine($"Cédula enviada para actualización: {Cedula}");
+
     }
-
-
 
 
     private async Task CargarUsuario(string cedula)
@@ -120,7 +139,6 @@
         try
         {
             string urlCompleta = $"https://localhost:7277/api/User/{cedula}";
-            Console.WriteLine($"Cargando datos del usuario con cédula: {cedula} desde {urlCompleta}");
             var usuario = await Http.GetFromJsonAsync<User>(urlCompleta);
 
             if (usuario != null)
@@ -130,7 +148,6 @@
                 phone = usuario.Phone;
                 email = usuario.email;
                 profileImgPreview = usuario.profileImg ?? string.Empty;
-                Cedula = usuario.Cedula;  // Esto no es necesario, ya que Cedula ya tiene el valor
                 StateHasChanged();
             }
             else
@@ -141,46 +158,54 @@
         catch (HttpRequestException httpEx)
         {
             await JSRuntime.InvokeVoidAsync("alert", $"Error de solicitud HTTP: {httpEx.Message}");
-            Console.WriteLine($"Error de solicitud HTTP: {httpEx}");
         }
         catch (Exception ex)
         {
             await JSRuntime.InvokeVoidAsync("alert", $"Error al cargar datos del usuario: {ex.Message}");
-            Console.WriteLine($"Error al cargar datos del usuario: {ex}");
         }
     }
-
-
-
-
-
 
     private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
     {
         var file = e.File;
-        if (file is not null)
+        if (file != null)
         {
             profileImg = file.Name;
-
             using var memoryStream = new MemoryStream();
             await file.OpenReadStream().CopyToAsync(memoryStream);
             var base64 = Convert.ToBase64String(memoryStream.ToArray());
             profileImgPreview = $"data:{file.ContentType};base64,{base64}";
-
-            await JSRuntime.InvokeVoidAsync("setImagePreview", "#previewImagenPerfil", profileImgPreview);
         }
     }
 
-    private void ConfirmarActualizacion()
+    private void TogglePasswordField()
     {
-        DialogService.Confirm("¿Estás seguro de que deseas actualizar este usuario?", "Confirmar Actualización", new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" })
-            .ContinueWith(async task =>
-            {
-                if (task.Result == true)
-                {
-                    await ActualizarUsuario();
-                }
-            });
+        if (PasswordFieldType == "password")
+        {
+            PasswordFieldType = "text";   // La contraseña se hace visible
+            PasswordToggleClass = "toggle-visible"; // Cambia la clase a verde
+        }
+        else
+        {
+            PasswordFieldType = "password"; // La contraseña se oculta
+            PasswordToggleClass = "toggle-hidden"; // Vuelve a la clase negra
+        }
+    }
+
+    private async Task ConfirmarActualizacion()
+    {
+        // Usar await directamente y obtener el resultado nullable
+        bool? confirmar = await DialogService.Confirm(
+            "¿Estás seguro de que deseas actualizar este usuario?",
+            "Confirmar Actualización",
+            new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" }
+        );
+
+        // Convertir el nullable a bool (si es null se considera false)
+        if (confirmar ?? false)
+        {
+            await ActualizarUsuario();
+        }
     }
 
     private async Task ActualizarUsuario()
@@ -188,57 +213,27 @@
         bool isValid = true;
         string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
-        // Validar los campos
+        // Validar los campos con mensajes más detallados
         if (string.IsNullOrWhiteSpace(name))
         {
             nameError = "El nombre es obligatorio.";
             isValid = false;
         }
-        else
-        {
-            nameError = null;
-        }
-
         if (string.IsNullOrWhiteSpace(lastname))
         {
             lastnameError = "El apellido es obligatorio.";
             isValid = false;
         }
-        else
-        {
-            lastnameError = null;
-        }
-
-        if (string.IsNullOrWhiteSpace(Cedula))
-        {
-            cedulaError = "La cédula es obligatoria.";
-            isValid = false;
-        }
-        else if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
-        {
-            cedulaError = "Cédula inválida. Debe tener 11 números.";
-            isValid = false;
-        }
-        else
-        {
-            cedulaError = null;
-        }
-
         if (string.IsNullOrWhiteSpace(phone))
         {
-            phoneError = "El teléfono es obligatorio.";
+            phoneError = "El número de teléfono es obligatorio.";
             isValid = false;
         }
         else if (phone.Length != 10 || !phone.All(char.IsDigit))
         {
-            phoneError = "Número de teléfono inválido. Debe tener 10 números.";
+            phoneError = "El número de teléfono debe tener 10 dígitos y solo contener números.";
             isValid = false;
         }
-        else
-        {
-            phoneError = null;
-        }
-
         if (string.IsNullOrWhiteSpace(email))
         {
             emailError = "El correo electrónico es obligatorio.";
@@ -246,77 +241,84 @@
         }
         else if (!Regex.IsMatch(email, emailPattern))
         {
-            emailError = "El correo electrónico no tiene un formato válido.";
+            emailError = "El correo electrónico no tiene un formato válido. Ejemplo: usuario@dominio.com";
             isValid = false;
         }
-        else
+        // Dentro de ActualizarUsuario()
+        if (!isPasswordDisabled) // Solo validar si el campo está habilitado
         {
-            emailError = null;
+            if (string.IsNullOrWhiteSpace(password) || password.Length <= 6)
+            {
+                passwordError = "La contraseña debe tener más de 6 caracteres.";
+                isValid = false;
+            }
         }
 
-        if (!isValid)
-        {
-            return;
-        }
+        if (!isValid) return;
 
         var usuario = new
         {
-            cedula = Cedula,
-            name = name,
-            lastname = lastname,
-            email = string.IsNullOrWhiteSpace(email) ? null : email,
-            phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
-            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg
+            Cedula = Cedula,
+            Name = name,
+            LastName = lastname,
+            Email = email,
+            Phone = phone,
+            ProfileImg = profileImg,
+            Password = password // Solo si el API lo requiere
         };
+
+        Console.WriteLine($"Usuario a enviar: {JsonConvert.SerializeObject(usuario)}");
+
 
         try
         {
-            var response = await Http.PutAsJsonAsync($"{ApiUrl}{Cedula}", usuario);
+            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateCiudadano/{Cedula}", usuario);
+
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
-                NavigationManager.NavigateTo($"/Usuarios/{Cedula}");
+                NavigationManager.NavigateTo($"/perfilCiudadano/{Cedula}");
             }
             else
             {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                // Puedes agregar más detalles en el alert o consola para depurar
+                Console.WriteLine($"Error en la actualización: {errorMessage}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error al actualizar usuario. Código: {response.StatusCode}, Mensaje: {errorMessage}");
                 await MostrarAlerta(false);
             }
         }
+        catch (HttpRequestException httpEx)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error de solicitud HTTP: {httpEx.Message}");
+            await MostrarAlerta(false);
+        }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Error al actualizar usuario: {ex.Message}");
-            Console.WriteLine($"Error al actualizar usuario: {ex}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al actualizar el usuario: {ex.Message}");
+            await MostrarAlerta(false);
         }
+
     }
-
-
 
 
     private void Cancelar()
     {
-        NavigationManager.NavigateTo("/usuarios");
+        NavigationManager.NavigateTo("/Usuarios");
     }
 
-    async Task MostrarAlerta(bool exito)
+    private async Task MostrarAlerta(bool exito)
     {
-        if (exito)
-        {
-            alertaVisible = true;
-            errorVisible = false;
-        }
-        else
-        {
-            alertaVisible = false;
-            errorVisible = true;
-        }
+        alertaVisible = exito;
+        errorVisible = !exito;
 
-        StateHasChanged();
-        await Task.Delay(2000);
+        StateHasChanged(); // Forzar actualización
+
+        await Task.Delay(3000); // Mostrar durante 2 segundos
+
         alertaVisible = false;
         errorVisible = false;
+
         StateHasChanged();
     }
 }
-
-
-

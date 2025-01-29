@@ -39,7 +39,9 @@
         <div class="left-column">
             <div class="container large-container">
                 <div class="icons">
-                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar" @onclick="IrAEditarUsuario" />
+
+                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar" @onclick=" () => IrAEditarUsuario()" />
+
                     <img src="imagenes/exportar.png" alt="Exportar" class="icon" title="Exportar">
                     <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion(usuario)" />
                 </div>
@@ -208,8 +210,7 @@ else
 }
 
 @code {
-    [Parameter]
-    public string Cedula { get; set; }
+    [Parameter] public string Cedula { get; set; }
     private List<Ticket> multasPendientes = new List<Ticket>();
     private List<Ticket> multasPagas = new List<Ticket>();
     private User usuario;
@@ -423,18 +424,24 @@ else
             await MostrarAlerta(false);
         }
     }
-     
+
+
+    // private void IrAEditarUsuario()
+    // {
+    //     var parametros = new Dictionary<string, object>
+    // {
+    //     { "Cedula", Cedula }  // Pasamos la cédula como parámetro
+    // };
+
+    //     Modal.Open<EditarCiudadano>("Editar Usuario", parametros);  // Abre el modal con los parámetros
+    // }
 
     private void IrAEditarUsuario()
     {
-       
 
-        Modal.Open<EditarCiudadano>("");
+
+        NavigationManager.NavigateTo($"/editarCiudadano/{Cedula}");
     }
-
-
-    
-
 
 
 

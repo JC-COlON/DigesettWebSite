@@ -23,7 +23,7 @@ body {
     margin-bottom: 20px;
     max-width: 97%;
     margin-top: 20px;
-    margin-left:10px
+    margin-left: 10px
 }
 
 .title {
@@ -191,10 +191,11 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%; /* Asegura que ocupe el mismo ancho que los otros inputs */
 }
 
 .password-input {
-    padding-right: 60px; /* Espacio para el botón */
+    width: 100%; /* Asegura que el campo ocupe todo el espacio */
 }
 
 .password-toggle {
@@ -215,6 +216,20 @@ body {
     .password-toggle.toggle-visible {
         color: #009c40; /* Verde cuando la contraseña es visible */
     }
+
+.input-group input[type="password"],
+.password-input {
+    height: 40px; /* Asegura que tenga la misma altura que los demás inputs */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    border: 3px solid #828282;
+    border-radius: 5px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #fff;
+    color: #333;
+}
 
 .error-message {
     color: red;
