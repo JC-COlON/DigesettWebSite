@@ -1,47 +1,23 @@
-﻿@inject NavigationManager NavigationManager
+﻿@page "/editarUsuario/{Cedula}"
+
+@inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 @inject Radzen.DialogService DialogService
 @using System.Text.RegularExpressions;
 @inject IModalService Modal
-
-<PageTitle>Administrador Digesett - Crear Usuario</PageTitle>
-@page "/editarUsuario"
-
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-
-
-
-
-
-
+@using Newtonsoft.Json;
+@using AdministradorAmet.Models
 
 <div class="container">
     <div class="header">
         <h1 class="title">Editar Usuario</h1>
     </div>
-  
-    <hr class="divider" />
-    <!-- Sección de imagen -->
-    <div class="image-section">
-        <!-- Vista previa de la imagen -->
-        <div class="profile-image-container">
-            <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" />
-        </div>
 
-        <!-- Entrada para subir imagen -->
-        <div class="image-input">
-            <InputFile OnChange="ImagenPerfilSeleccionada"  />
-        </div>
-    </div>
-
-
-
-
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
     <hr class="divider" />
-
 
     @if (alertaVisible)
     {
@@ -57,17 +33,26 @@
         </RadzenAlert>
     }
 
+    <div class="central-section">
+        <div class="image-section">
+            <div class="profile-image-container">
+                <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" disable />
+            </div>
+            <div class="image-input">
+                <InputFile OnChange="ImagenPerfilSeleccionada" />
+            </div>
+        </div>
+    </div>
+
+
+    <hr class="divider" />
+    <!-- Información Personal -->
 
 
     <div class="inputs-grid">
-       
-
-
-
-        <!-- Campos de entrada -->
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
-            <input id="inputNombre" type="text" class="form-input" @bind="name"  />
+            <input id="inputNombre" type="text" class="form-input" @bind="name" />
             @if (!string.IsNullOrEmpty(nameError))
             {
                 <span class="error-message">@nameError</span>
@@ -76,7 +61,7 @@
 
         <div class="input-group">
             <label for="inputApellido">Apellido</label>
-            <input id="inputApellido" type="text" class="form-input" @bind="lastname"  />
+            <input id="inputApellido" type="text" class="form-input" @bind="lastname" />
             @if (!string.IsNullOrEmpty(lastnameError))
             {
                 <span class="error-message">@lastnameError</span>
@@ -84,26 +69,28 @@
         </div>
 
         <div class="input-group">
-            <label for="inputCedula">Cédula</label>
-            <input id="inputCedula" type="text" class="form-input" maxlength="11" @bind="Cedula"  />
-            @if (!string.IsNullOrEmpty(cedulaError))
-            {
-                <span class="error-message">@cedulaError</span>
-            }
-        </div>
-
-        <div class="input-group">
             <label for="inputTelefono">Teléfono</label>
-            <input id="inputTelefono" type="text" class="form-input" maxlength="10" @bind="phone"  />
+            <input id="inputTelefono" type="text" class="form-input" maxlength="10" @bind="phone" />
             @if (!string.IsNullOrEmpty(phoneError))
             {
                 <span class="error-message">@phoneError</span>
             }
         </div>
-    
+
+        <div class="input-group">
+            <label for="inputPassword">Contraseña</label>
+            <div class="password-container">
+                <input id="inputPassword"  class="form-input"  disabled/>
+                <button type="button" class="password-toggle " >
+                    👁
+                </button>
+            </div>
+
+        </div>
+
         <div class="input-group">
             <label for="inputSexo">Sexo</label>
-            <select id="inputSexo" class="form-select" @bind="genderId" >
+            <select id="inputSexo" class="form-select" @bind="genderId">
                 <option value="" selected disabled>Seleccionar</option>
                 <option value="1">Masculino</option>
                 <option value="2">Femenino</option>
@@ -117,7 +104,7 @@
 
         <div class="input-group">
             <label for="inputEmail">Email</label>
-            <input id="inputEmail" type="email" class="form-input" @bind="email"  />
+            <input id="inputEmail" type="email" class="form-input" @bind="email" />
             @if (!string.IsNullOrEmpty(emailError))
             {
                 <span class="error-message">@emailError</span>
@@ -126,23 +113,17 @@
 
         <div class="input-group">
             <label for="inputNoAgente">No. Agente</label>
-            <input id="inputNoAgente" type="text" class="form-input" @bind="noAgente"  />
-            @if (!string.IsNullOrEmpty(noAgenteError))
-            {
-                <span class="error-message">@noAgenteError</span>
-            }
+            <input id="inputNoAgente" type="text" class="form-input" @bind="noAgente" />
         </div>
-
-
 
         <div class="input-group">
             <label for="inputEstatura">Estatura (metros)</label>
-            <input id="inputEstatura" type="number" step="0.01" class="form-input" @bind="height"  />
+            <input id="inputEstatura" type="number" step="0.01" class="form-input" @bind="height" />
         </div>
 
         <div class="input-group">
             <label for="inputFechaNacimiento">Fecha de Nacimiento</label>
-            <input id="inputFechaNacimiento" type="date" class="form-input" @bind="birthdate"  />
+            <input id="inputFechaNacimiento" type="date" class="form-input" @bind="birthdate" />
             @if (!string.IsNullOrEmpty(birthdateError))
             {
                 <span class="error-message">@birthdateError</span>
@@ -151,7 +132,7 @@
 
         <div class="input-group">
             <label for="inputTipoSangre">Tipo de Sangre</label>
-            <select id="inputTipoSangre" class="form-select" @bind="bloodTypeId" >
+            <select id="inputTipoSangre" class="form-select" @bind="bloodTypeId">
                 <option value="" selected disabled>Seleccionar</option>
                 <option value="1">A+</option>
                 <option value="2">A-</option>
@@ -163,9 +144,12 @@
                 <option value="8">AB-</option>
             </select>
         </div>
+
+
+
         <div class="input-group">
             <label for="inputEstadoCivil">Estado Civil</label>
-            <select id="inputEstadoCivil" class="form-select" @bind="civilStatusId" >
+            <select id="inputEstadoCivil" class="form-select" @bind="civilStatusId">
                 <option value="" selected disabled>Seleccionar</option>
                 <option value="1">Soltero</option>
                 <option value="2">Casado</option>
@@ -174,9 +158,10 @@
             </select>
         </div>
 
+
         <div class="input-group">
             <label for="inputLugarTrabajo">Lugar de Trabajo</label>
-            <select id="inputLugarTrabajo" class="form-select" @bind="workLocationId" >
+            <select id="inputLugarTrabajo" class="form-select" @bind="workLocationId">
                 <option value="" selected disabled>Seleccionar</option>
                 <option value="1">Azua</option>
                 <option value="2">Bahoruco</option>
@@ -216,19 +201,20 @@
 
     <div class="buttons">
         <button class="cancel-button" @onclick="Cancelar">Cancelar</button>
-        <button class="create-button" @onclick="CrearUsuario">Crear</button>
+        <button class="create-button" @onclick="ConfirmarActualizacion">Guardar</button>
     </div>
 </div>
 
+
+
 @code {
-    private const string ApiUrl = "https://localhost:7277/api/UserAccess/Create"; // URL de la API
+    [Parameter]
+    public string Cedula { get; set; }
     private string profileImgPreview { get; set; } = string.Empty; // Guardará el dataUrl para la vista previa
     private string name { get; set; } = string.Empty;
     private string lastname { get; set; } = string.Empty;
-    private string Cedula { get; set; } = string.Empty;
     private string phone { get; set; } = string.Empty;
     private string noAgente { get; set; } = string.Empty;
-    private string password { get; set; } = string.Empty;
     private string email { get; set; } = string.Empty;
     private decimal? height { get; set; }
     private DateTime? birthdate { get; set; }
@@ -239,122 +225,203 @@
     private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
     bool alertaVisible = false;
     bool errorVisible = false;
-    private string PasswordFieldType { get; set; } = "password";
-    private string PasswordToggleClass { get; set; } = "toggle-hidden";
-
+    private int rolId;
     private string nameError { get; set; }
     private string lastnameError { get; set; }
     private string cedulaError { get; set; }
     private string phoneError { get; set; }
     private string noAgenteError { get; set; }
     private string genderError { get; set; }
-    private string passwordError { get; set; }
     private string birthdateError { get; set; }
     private string emailError { get; set; }
+    // Declaración de las variables necesarias
+    private string gender = string.Empty;
+    private string bloodType = string.Empty;
+    private string civilStatus = string.Empty;
+    private string workLocation = string.Empty;
 
-    // Función que cambia la visibilidad de la contraseña
-    private void TogglePasswordField()
+
+    protected override async Task OnInitializedAsync()
     {
-        if (PasswordFieldType == "password")
+        if (!string.IsNullOrEmpty(Cedula))
         {
-            PasswordFieldType = "text";   // La contraseña se hace visible
-            PasswordToggleClass = "toggle-visible"; // Cambia la clase a verde
+            await CargarUsuarioParaEdicion(Cedula);
         }
         else
         {
-            PasswordFieldType = "password"; // La contraseña se oculta
-            PasswordToggleClass = "toggle-hidden"; // Vuelve a la clase negra
+            await JSRuntime.InvokeVoidAsync("alert", "Cédula no proporcionada.");
+        }
+        Console.WriteLine($"Cédula enviada para actualización: {Cedula}");
+
+    }
+
+
+    private async Task CargarUsuarioParaEdicion(string cedula)
+    {
+        try
+        {
+            string urlCompleta = $"https://localhost:7277/api/User/{cedula}";
+            var usuario = await Http.GetFromJsonAsync<User>(urlCompleta);
+
+            if (usuario != null)
+            {
+                // Asignar los valores del usuario a las variables del formulario
+                name = usuario.Name;
+                lastname = usuario.LastName;
+                Cedula = usuario.Cedula;
+                phone = usuario.Phone ?? string.Empty;
+                email = usuario.email ?? string.Empty;
+                noAgente = usuario.NoAgente ?? string.Empty;
+                height = usuario.height.HasValue ? (decimal?)usuario.height.Value : null;
+
+                // Convertir birthdate de string a DateTime?
+                if (DateTime.TryParse(usuario.birthdate, out DateTime parsedDate))
+                {
+                    birthdate = parsedDate;
+                }
+                else
+                {
+                    birthdate = null; // O puedes asignar una fecha predeterminada si lo prefieres
+                }
+
+                // Asignar los valores de las relaciones directamente sin conversión
+                gender = usuario.Gender ?? string.Empty;
+                bloodType = usuario.bloodType ?? string.Empty;
+                civilStatus = usuario.CivilStatus ?? string.Empty;
+                workLocation = usuario.workLocation ?? string.Empty;
+
+                // Imagen de perfil si existe
+                profileImgPreview = usuario.profileImg ?? string.Empty;
+
+                // Asignación de ID según las relaciones
+                genderId = usuario.Gender switch
+                {
+                    "Masculino" => 1,
+                    "Femenino" => 2,
+                    "Otros" => 3,
+                    _ => null
+                };
+
+                bloodTypeId = usuario.bloodType switch
+                {
+                    "A+" => 1,
+                    "A-" => 2,
+                    "B+" => 3,
+                    "B-" => 4,
+                    "O+" => 5,
+                    "O-" => 6,
+                    "AB+" => 7,
+                    "AB-" => 8,
+                    _ => null
+                };
+
+                civilStatusId = usuario.CivilStatus switch
+                {
+                    "soltero" => 1,
+                    "casado" => 2,
+                    "divorciado" => 3,
+                    "viudo" => 4,
+                    _ => null // En caso de que no sea un valor conocido, se deja como null
+                };
+
+                workLocationId = workLocation switch
+                {
+                    "Azua" => 1,
+                    "Bahoruco" => 2,
+                    "Barahona" => 3,
+                    "Dajabon" => 4,
+                    "Distrito Nacional" => 5,
+                    "Duarte" => 6,
+                    "El Seybo" => 7,
+                    "Elias Piña" => 8,
+                    "Espaillat" => 9,
+                    "Hato Mayor" => 10,
+                    "Hermanas Mirabal" => 11,
+                    "Independencia" => 12,
+                    "La Altagracia" => 13,
+                    "La Romana" => 14,
+                    "La Vega" => 15,
+                    "Maria Trinidad Sanchez" => 16,
+                    "Monseñor Nouel" => 17,
+                    "Monte Plata" => 18,
+                    "Montecristi" => 19,
+                    "Pedernales" => 20,
+                    "Peravia" => 21,
+                    "Puerto Plata" => 22,
+                    "Samana" => 23,
+                    "San Cristobal" => 24,
+                    "San Jose de Ocoa" => 25,
+                    "San Juan" => 26,
+                    "San Pedro de Macoris" => 27,
+                    "Sanchez Ramirez" => 28,
+                    "Santiago" => 29,
+                    "Santiago Rodriguez" => 30,
+                    "Santo Domingo" => 31,
+                    "Valverde" => 32,
+                    _ => null
+                };
+
+                // Actualizar la vista
+                StateHasChanged();
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Usuario no encontrado.");
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error de solicitud HTTP: {httpEx.Message}");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al cargar datos del usuario: {ex.Message}");
         }
     }
 
-    private string GetToggleClass() => PasswordFieldType == "password" ? "toggle-off" : "toggle-on";
 
-    private async Task CrearUsuario()
+    private async Task ConfirmarActualizacion()
     {
-        // Validaciones
+        // Usar await directamente y obtener el resultado nullable
+        bool? confirmar = await DialogService.Confirm(
+            "¿Estás seguro de que deseas actualizar este usuario?",
+            "Confirmar Actualización",
+            new ConfirmOptions() { OkButtonText = "Sí", CancelButtonText = "No" }
+        );
+
+        // Convertir el nullable a bool (si es null se considera false)
+        if (confirmar ?? false)
+        {
+            await ActualizarUsuario();
+        }
+    }
+
+    private async Task ActualizarUsuario()
+    {
         bool isValid = true;
         string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
+        // Validar los campos con mensajes más detallados
         if (string.IsNullOrWhiteSpace(name))
         {
             nameError = "El nombre es obligatorio.";
             isValid = false;
         }
-        else
-        {
-            nameError = null;
-        }
-
         if (string.IsNullOrWhiteSpace(lastname))
         {
             lastnameError = "El apellido es obligatorio.";
             isValid = false;
         }
-        else
-        {
-            lastnameError = null;
-        }
-
-        if (string.IsNullOrWhiteSpace(Cedula))
-        {
-            cedulaError = "La cédula es obligatoria.";
-            isValid = false;
-        }
-        else if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
-        {
-            cedulaError = "Cédula inválida.";
-            isValid = false;
-        }
-        else
-        {
-            cedulaError = null;
-        }
-
         if (string.IsNullOrWhiteSpace(phone))
         {
-            phoneError = "El teléfono es obligatorio.";
+            phoneError = "El número de teléfono es obligatorio.";
             isValid = false;
         }
         else if (phone.Length != 10 || !phone.All(char.IsDigit))
         {
-            phoneError = "Número de teléfono inválido.";
+            phoneError = "El número de teléfono inválido.";
             isValid = false;
         }
-        else
-        {
-            phoneError = null;
-        }
-
-        if (string.IsNullOrWhiteSpace(noAgente))
-        {
-            noAgenteError = "El número de agente es obligatorio.";
-            isValid = false;
-        }
-        else
-        {
-            noAgenteError = null;
-        }
-
-        if (!genderId.HasValue)
-        {
-            genderError = "El sexo es obligatorio.";
-            isValid = false;
-        }
-        else
-        {
-            genderError = null;
-        }
-
-        if (birthdate.HasValue && (DateTime.Now.Year - birthdate.Value.Year) < 18)
-        {
-            birthdateError = "El usuario debe ser mayor de 18 años.";
-            isValid = false;
-        }
-        else
-        {
-            birthdateError = null;
-        }
-
         if (string.IsNullOrWhiteSpace(email))
         {
             emailError = "El correo electrónico es obligatorio.";
@@ -362,57 +429,56 @@
         }
         else if (!Regex.IsMatch(email, emailPattern))
         {
-            emailError = "El correo electrónico no tiene un formato válido.";
+            emailError = "El correo electrónico no tiene un formato válido. Ejemplo: usuario@dominio.com";
             isValid = false;
         }
-        else
-        {
-            emailError = null;
-        }
 
-        if (!isValid)
-        {
-            return;
-        }
+        if (!isValid) return;
 
-        var usuario = new
-        {
-            cedula = Cedula,
-            name = name,
-            lastname = lastname,
-            password = string.IsNullOrWhiteSpace(password) ? null : password,
-            email = string.IsNullOrWhiteSpace(email) ? null : email,
-            phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
-            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg, // Enviar solo el nombre del archivo de la imagen
-            nacionalityId = (int?)null,
-            birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null, // Formato de fecha esperado en la API
-            genderId = genderId, // Debería ser un valor numérico (1, 2, 3)
-            bloodTypeId = bloodTypeId, // Debería ser un valor numérico (1-8)
-            height = height.HasValue ? height.Value : (decimal?)null, // Si está vacío, enviar null
-            workLocationId = workLocationId, // Este también debería ser un valor numérico
-            civilStatusId = civilStatusId, // Lo mismo para el estado civil
-            noAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente, // Si es un campo vacío, enviarlo como null
-            statusId = 1 // Este siempre será 1 según lo especificado
-        };
+        // Crear el objeto usuario sin la contraseña
+        var usuario = new User
+            {
+                Cedula = Cedula,
+                Name = name,
+                LastName = lastname,
+                email = email,
+                Phone = phone,
+                profileImg = profileImg,
+                Gender = genderId?.ToString(),
+                bloodType = bloodTypeId?.ToString(),
+                CivilStatus = civilStatusId?.ToString(),
+                workLocation = workLocationId?.ToString(),
+                Password = null // No se enviará la contraseña
+            };
+
+        Console.WriteLine($"Usuario a enviar: {JsonConvert.SerializeObject(usuario)}");
 
         try
         {
-            var response = await Http.PostAsJsonAsync(ApiUrl, usuario);
-            Console.WriteLine(response); // Agrega esto para ver la respuesta del servidor
+            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateCiudadano/{Cedula}", usuario);
+
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
-                NavigationManager.NavigateTo("/Usuarios");
+                NavigationManager.NavigateTo($"/perfilAdministrador/{Cedula}");
             }
             else
             {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error en la actualización: {errorMessage}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error al actualizar usuario. Código: {response.StatusCode}, Mensaje: {errorMessage}");
                 await MostrarAlerta(false);
             }
         }
+        catch (HttpRequestException httpEx)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error de solicitud HTTP: {httpEx.Message}");
+            await MostrarAlerta(false);
+        }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Error al crear usuario: {ex.Message}");
-            Console.WriteLine($"Error al crear usuario: {ex}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al actualizar el usuario: {ex.Message}");
+            await MostrarAlerta(false);
         }
     }
 

@@ -38,7 +38,7 @@
         <div class="left-column">
             <div class="container large-container">
                 <div class="icons">
-                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar" @onclick="IrAEditarUsuario" />
+                    <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar" @onclick=" () => IrAEditarUsuario()" />
                     <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
                     <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion()" />
                 </div>
@@ -74,7 +74,7 @@
                             }
 
                             <p><strong>Tipo de Sangre:</strong> @(string.IsNullOrEmpty(usuario?.bloodType) ? "N/A" : usuario.bloodType)</p>
-                            <p><strong>Estado Civil:</strong> @(string.IsNullOrEmpty(usuario?.civilStatus) ? "N/A" : usuario.civilStatus)</p>
+                            <p><strong>Estado Civil:</strong> @(string.IsNullOrEmpty(usuario?.CivilStatus) ? "N/A" : usuario.CivilStatus)</p>
                             <p><strong>Fecha de Nacimiento:</strong> @(birthdate.HasValue ? birthdate.Value.ToString("dd/MM/yyyy") : "N/A")</p>
                             <p><strong>Altura:</strong> @(height.HasValue ? height.Value.ToString() : "N/A")</p>
                         </div>
@@ -177,8 +177,7 @@ else
 
 
 @code {
-    [Parameter]
-    public string Cedula { get; set; }
+    [Parameter] public string Cedula { get; set; }
 
     private User usuario;
     private List<Review> reseñas = new List<Review>();
@@ -352,10 +351,11 @@ else
     }
     private void IrAEditarUsuario()
     {
-        
 
-        Modal.Open<EditarUsuario>("");
+
+        NavigationManager.NavigateTo($"/editarUsuario/{Cedula}");
     }
+
 
     async Task MostrarAlerta(bool exito)
     {

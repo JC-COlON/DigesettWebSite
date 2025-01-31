@@ -75,7 +75,7 @@
                             }
 
                             <p><strong>Tipo de Sangre:</strong> @(string.IsNullOrEmpty(usuario?.bloodType) ? "N/A" : usuario.bloodType)</p>
-                            <p><strong>Estado Civil:</strong> @(string.IsNullOrEmpty(usuario?.civilStatus) ? "N/A" : usuario.civilStatus)</p>
+                            <p><strong>Estado Civil:</strong> @(string.IsNullOrEmpty(usuario?.CivilStatus) ? "N/A" : usuario.CivilStatus)</p>
                             <p><strong>Fecha de Nacimiento:</strong> @(birthdate.HasValue ? birthdate.Value.ToString("dd/MM/yyyy") : "N/A")</p>
                             <p><strong>Altura:</strong> @(height.HasValue ? height.Value.ToString() : "N/A")</p>
                         </div>
@@ -361,22 +361,26 @@ else
             await MostrarAlerta(false);
         }
     }
+  
+
     // private void IrAEditarUsuario()
     // {
-       
+    //     var parametros = new Dictionary<string, object>
+    // {
+    //     { "Cedula", Cedula }  // Aquí pasas la cédula como parámetro
+    // };
 
-    //     Modal.Open<EditarUsuario>("");
+    //     Modal.Open<EditarUsuario>(" ", parametros);  // Abres el modal pasando el diccionario
     // }
+
 
     private void IrAEditarUsuario()
     {
-        var parametros = new Dictionary<string, object>
-    {
-        { "Cedula", Cedula }  // Aquí pasas la cédula como parámetro
-    };
 
-        Modal.Open<EditarUsuario>(" ", parametros);  // Abres el modal pasando el diccionario
+
+        NavigationManager.NavigateTo($"/editarUsuario/{Cedula}");
     }
+
 
 
 

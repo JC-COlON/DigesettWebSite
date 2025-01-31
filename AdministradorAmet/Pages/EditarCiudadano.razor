@@ -7,6 +7,7 @@
 @using System.Text.RegularExpressions;
 @using AdministradorAmet.Models
 @using Newtonsoft.Json;
+@inject IJSRuntime JSRuntime
 
 <div class="container">
     <div class="header">
@@ -165,33 +166,6 @@
         }
     }
 
-    private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            profileImg = file.Name;
-            using var memoryStream = new MemoryStream();
-            await file.OpenReadStream().CopyToAsync(memoryStream);
-            var base64 = Convert.ToBase64String(memoryStream.ToArray());
-            profileImgPreview = $"data:{file.ContentType};base64,{base64}";
-        }
-    }
-
-    private void TogglePasswordField()
-    {
-        if (PasswordFieldType == "password")
-        {
-            PasswordFieldType = "text";   // La contraseña se hace visible
-            PasswordToggleClass = "toggle-visible"; // Cambia la clase a verde
-        }
-        else
-        {
-            PasswordFieldType = "password"; // La contraseña se oculta
-            PasswordToggleClass = "toggle-hidden"; // Vuelve a la clase negra
-        }
-    }
-
     private async Task ConfirmarActualizacion()
     {
         // Usar await directamente y obtener el resultado nullable
@@ -207,6 +181,7 @@
             await ActualizarUsuario();
         }
     }
+
 
     private async Task ActualizarUsuario()
     {
@@ -231,7 +206,7 @@
         }
         else if (phone.Length != 10 || !phone.All(char.IsDigit))
         {
-            phoneError = "El número de teléfono debe tener 10 dígitos y solo contener números.";
+            phoneError = "El número de teléfono invalido.";
             isValid = false;
         }
         if (string.IsNullOrWhiteSpace(email))
@@ -244,8 +219,8 @@
             emailError = "El correo electrónico no tiene un formato válido. Ejemplo: usuario@dominio.com";
             isValid = false;
         }
-        // Dentro de ActualizarUsuario()
-        if (!isPasswordDisabled) // Solo validar si el campo está habilitado
+        // Validación de la contraseña solo si está habilitada
+        if (!isPasswordDisabled)
         {
             if (string.IsNullOrWhiteSpace(password) || password.Length <= 6)
             {
@@ -277,7 +252,7 @@
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
-                NavigationManager.NavigateTo($"/perfilCiudadano/{Cedula}");
+                NavigationManager.NavigateTo($"/perfilAdministrador/{Cedula}");
             }
             else
             {
@@ -302,10 +277,40 @@
     }
 
 
-    private void Cancelar()
+    private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
     {
-        NavigationManager.NavigateTo("/Usuarios");
+        var file = e.File;
+        if (file != null)
+        {
+            profileImg = file.Name;
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            var base64 = Convert.ToBase64String(memoryStream.ToArray());
+            profileImgPreview = $"data:{file.ContentType};base64,{base64}";
+        }
     }
+
+    private void TogglePasswordField()
+    {
+        if (PasswordFieldType == "password")
+        {
+            PasswordFieldType = "text";   // La contraseña se hace visible
+            PasswordToggleClass = "toggle-visible"; // Cambia la clase a verde
+        }
+        else
+        {
+            PasswordFieldType = "password"; // La contraseña se oculta
+            PasswordToggleClass = "toggle-hidden"; // Vuelve a la clase negra
+        }
+    }
+
+
+
+    private async Task Cancelar()
+    {
+        await JSRuntime.InvokeVoidAsync("window.history.back");
+    }
+
 
     private async Task MostrarAlerta(bool exito)
     {
