@@ -33,7 +33,7 @@
                     <DataAnnotationsValidator />
 
                     <div class="form-group">
-                        <label for="usuario" class="label">Cedula</label>
+                        <label for="usuario" class="label">Usuario</label>
                         <input type="text" id="usuario" class="input-field" @bind="userInput.Usuario" />
                         <ValidationMessage For="@(() => userInput.Usuario)" />
                     </div>
@@ -51,7 +51,7 @@
                         <label class="remember">
                             <input type="checkbox" /> Recordar
                         </label>
-                        <a @onclick="irAOlvideContrasenna" href="#">Olvidaste la contraseña?</a>
+                        <a @onclick="irAOlvideContrasenna" href="enviarAlCorreo">Olvidaste la contraseña?</a>
                     </div>
 
                     <button type="submit" class="btn-primary" disabled="@Loading">

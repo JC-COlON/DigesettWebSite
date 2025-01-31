@@ -39,6 +39,7 @@
         <div class="left-column">
             <div class="container large-container">
                 <div class="icons">
+                    <img src="imagenes/restcontrasena.png" alt="CambiarContrasena" class="icon" title="Cambiar Contraseña" @onclick="() => changepassword()" />
                     <img src="imagenes/edit-icon.svg" alt="Editar" class="icon" title="Editar" @onclick="IrAEditarUsuario" />
                     <img src="imagenes/exportar.png" alt="Notas" class="icon" title="Exportar">
                     <img src="imagenes/delete-icon.svg" alt="Eliminar" class="icon" title="Eliminar" @onclick="() => ConfirmarEliminacion(usuario)" />
@@ -381,6 +382,12 @@ else
         NavigationManager.NavigateTo($"/editarUsuario/{Cedula}");
     }
 
+    private void changepassword()
+    {
+
+
+        NavigationManager.NavigateTo($"/cambiarContrasena/{Cedula}");
+    }
 
 
 

@@ -1,10 +1,10 @@
-﻿ @layout EmtyLayout
+﻿@inject IJSRuntime JSRuntime
+@layout EmtyLayout
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+
 <PageTitle>Recuperar Contraseña</PageTitle>
 @page "/enviarAlCorreo"
-
-
 
 <div class="web-sen-codigo-1">
     <div class="header">
@@ -15,28 +15,51 @@
     <div class="rectangle">
         <img src="imagenes/email.svg" class="email" alt="undraw" />
         <p class="text-1">Verifica tu email</p>
-        <p class="text-2">Ingresa los 6 dígitos</p>
+        <p class="text-2">Ingresa tu correo electrónico</p>
 
-        <div class="SeisCuadros">
-            <input type="text" maxlength="1" class="input-box" />
-            <input type="text" maxlength="1" class="input-box" />
-            <input type="text" maxlength="1" class="input-box" />
-            <input type="text" maxlength="1" class="input-box" />
-            <input type="text" maxlength="1" class="input-box" />
-            <input type="text" maxlength="1" class="input-box" />
+        <div class="email-input">
+            <input type="email" @bind="emailAddress" placeholder="Introduce tu correo electrónico" class="input-box" required />
         </div>
 
-        <button @onclick="IrAEnviarcode" class="btn">Verificar</button>
+        <button @onclick="EnviarCorreoRecuperacion" class="btn">Enviar</button>
 
         <div class="EnviarCodigo-DeNuevo">
-            <p class="register">¿No reciviste ningun codigo? <a href="#">Enviar</a></p>
+            <p class="register">¿No recibiste ningún correo? <a href="#">Reenviar</a></p>
         </div>
     </div>
 </div>
 
-@code{
-   private void IrAEnviarcode(){
-        NavigationManager.NavigateTo("ChangePaswaordPage");
+@code {
+    private string emailAddress;
+
+    private string clientURL = "https://localhost:7294";
+
+    private async Task EnviarCorreoRecuperacion()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7277/api/User/forgot-password", new { EmailAddress = emailAddress, ClientURL = clientURL });
+            if (response.IsSuccessStatusCode)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Correo de recuperación enviado. Por favor, revisa tu bandeja de entrada.");
+                NavigationManager.NavigateTo("/");
+            }
+
+
+           
+
+            else
+            {
+                // Leer el contenido de la respuesta de error
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error al enviar el correo de recuperación: {errorContent}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error al enviar el correo de recuperación: {errorContent}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Excepción al enviar el correo de recuperación: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Excepción al enviar el correo de recuperación: {ex.Message}");
+        }
     }
 }
-

@@ -124,7 +124,10 @@
     }
 
     private async Task IrAMiPerfil()
+
+    
     {
+        isMenuVisible = false;
         // Obtener la cédula del token
         var cedula = await ObtenerCedulaDelToken();
         if (!string.IsNullOrEmpty(cedula))

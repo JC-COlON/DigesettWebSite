@@ -225,7 +225,7 @@
     private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
     bool alertaVisible = false;
     bool errorVisible = false;
-    private int rolId;
+    private string Role { get; set; }
     private string nameError { get; set; }
     private string lastnameError { get; set; }
     private string cedulaError { get; set; }
@@ -460,7 +460,31 @@
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
-                NavigationManager.NavigateTo($"/perfilAdministrador/{Cedula}");
+                Console.WriteLine("Actualización exitosa");
+
+                // Obtener los datos del usuario para determinar el rol
+                var userResponse = await Http.GetAsync($"https://localhost:7277/api/User/{Cedula}");
+                if (userResponse.IsSuccessStatusCode)
+                {
+                    var userData = await userResponse.Content.ReadFromJsonAsync<User>();
+                    var userRole = userData?.Role;
+
+                    if (userRole == "Administrador")
+                    {
+                        Console.WriteLine("Redirigiendo al perfil del administrador");
+                        NavigationManager.NavigateTo($"/perfilAdministrador/{Cedula}");
+                    }
+                    else if (userRole == "Agente")
+                    {
+                        Console.WriteLine("Redirigiendo al perfil del agente");
+                        NavigationManager.NavigateTo($"/perfilAgente/{Cedula}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error al obtener los datos del usuario");
+                    await MostrarAlerta(false);
+                }
             }
             else
             {
@@ -482,11 +506,12 @@
         }
     }
 
-    private void Cancelar()
-    {
-        NavigationManager.NavigateTo("/usuarios");
-    }
 
+
+    private async Task Cancelar()
+    {
+        await JSRuntime.InvokeVoidAsync("window.history.back");
+    }
     // Función para manejar la selección de la imagen
     private async Task ImagenPerfilSeleccionada(InputFileChangeEventArgs e)
     {

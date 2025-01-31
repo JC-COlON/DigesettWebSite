@@ -1,0 +1,72 @@
+﻿@inject IJSRuntime JSRuntime
+@page "/reset-password"
+@inject NavigationManager NavigationManager
+@layout EmtyLayout
+@inject HttpClient Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Restablecer Contraseña</PageTitle>
+
+<div class="web-sen-codigo-1">
+   
+
+    <div class="rectangle">
+        <img src="imagenes/candado.png" class="password" alt="undraw" />
+        <p class="text-1">Restablecer Contraseña</p>
+        <p class="text-2">Ingresa tu nueva contraseña</p>
+
+        <div class="password-input">
+            <input type="password" @bind="newPassword" placeholder="Nueva contraseña" class="input-box" required />
+            <input type="password" @bind="confirmPassword" placeholder="Confirmar nueva contraseña" class="input-box" required />
+        </div>
+
+        <button @onclick="RestablecerContrasena" class="btn">Restablecer</button>
+
+        <div class="cancelar">
+            <p class="register"><a href="#" @onclick="Cancelar">Cancelar</a></p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string token { get; set; }
+    private string newPassword;
+    private string confirmPassword;
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("token", out var tokenValues))
+        {
+            token = tokenValues.First();
+        }
+    }
+
+
+    private async Task RestablecerContrasena()
+    {
+        if (newPassword != confirmPassword)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Las contraseñas no coinciden.");
+            return;
+        }
+
+        var response = await Http.PostAsJsonAsync("https://localhost:7277/api/User/reset-password", new { Token = token, NewPassword = newPassword });
+        if (response.IsSuccessStatusCode)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Contraseña restablecida con éxito.");
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            await JSRuntime.InvokeVoidAsync("alert", $"Error al restablecer la contraseña: {errorContent}");
+        }
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}

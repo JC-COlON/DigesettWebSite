@@ -246,9 +246,9 @@
         }
     }
 
-    private void Cancelar()
+    private async Task Cancelar()
     {
-        NavigationManager.NavigateTo("/Home");
+        await JSRuntime.InvokeVoidAsync("window.history.back");
     }
 
 
