@@ -16,9 +16,11 @@
 
 .header {
     text-align: center;
-    background-color: #008000;
-    color: white;
+    background-color: white;
+    color: #009C40;
     padding: 10px;
+    border-color: #009C40;
+    border:2px solid
 }
 
     .header img {
@@ -37,16 +39,22 @@ table {
 
 th, td {
     border: 1px solid black;
-    padding: 8px;
+    padding: 10px;
     text-align: left;
 }
 
 th {
     background-color: #f2f2f2;
+    width: 25%; /* Establece el mismo ancho para todas las celdas de encabezado */
 }
 
-.datosconductotext{
-margin-top:10px
+/* Alineación de la segunda celda en todas las filas */
+td:nth-child(2) {
+    width: 25%; /* Ancho específico para la segunda celda */
+}
+
+.datosconductotext {
+    margin-top: 10px;
 }
 
 .checkbox-group {
@@ -58,4 +66,10 @@ margin-top:10px
     text-align: center;
     margin-top: 20px;
     font-size: 12px;
+}
+
+/* Ajuste específico para la tabla .tabla-multa2 */
+.tabla-multa2 th,
+.tabla-multa2 td {
+    width: 25%; /* Ajusta el ancho de las celdas de la tabla .tabla-multa2 */
 }

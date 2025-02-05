@@ -1,11 +1,15 @@
 ﻿@page "/detallemulta/{ticketId:int}"
 @using AdministradorAmet.Models
 @inject TicketService TicketService
+@inject IJSRuntime JSRuntime
 
-
-<div class="container">
-
-<div class="header">
+<div class="container" id="resultadomulta">
+    <div style="margin-bottom: 20px; margin-left:77%">
+        <span style="margin-right: 10px;">Formato a exportar:</span>
+        <button @onclick="export" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer;">PDF</button>
+        <button @onclick="PrintMulta" style="background-color: #fc8403; color: white; padding: 5px 10px; border: none; cursor: pointer; margin-left: 10px;">Print</button>
+    </div>
+<div class="header" >
     <img src="logo.png" alt="Logo DIGESETT">
     <h1>DIRECCIÓN GENERAL DE SEGURIDAD DE TRÁNSITO</h1>
     <h2>REPÚBLICA DOMINICANA</h2>
@@ -39,7 +43,7 @@
             </tr>
         </table>
 
-        <h3>Datos del Conductor</h3>
+            <h3 class="datosconductotext">Datos del Conductor</h3>
         <table>
             <tr>
                 <th>Nombre y Apellido</th>
@@ -79,25 +83,21 @@
             </tr>
         </table>
 
-        <h3 class="datosconductotext">Sobre la Infracción Jurídica</h3>
-        <table>
-         <tr>
+            <h3 class="datosconductotext">Sobre la Infracción Jurídica</h3>
+            <table class="tabla-multa">
+                <tr>
                     <th>Artículo</th>
                     <td>@Ticket.Articulo.ArticleNum</td>
-                    <th>Monto</th>
+                    <th >Monto</th>
                     <td>@Ticket.Articulo.Price.ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("es-DO"))</td>
-
-                <tr>
+                </tr>
+                <tr class="descripcion-row">
                     <th>Descripción</th>
                     <td colspan="3">@Ticket.Articulo.Description</td>
                 </tr>
-         </tr>
+            </table>
 
-                
-                
-          
-        </table>
-        <table>
+            <table class="tabla-multa2">
             <tr>
                 <th>Lugar del Hecho</th>
                 <td colspan="3">@Ticket.IncidentLocation</td>
@@ -122,7 +122,11 @@ else
 </div>
 
 </div>
-@code {
+
+
+
+
+    @code {
     [Parameter]
     public int TicketId { get; set; }
 
@@ -136,5 +140,16 @@ else
     private bool IsChecked(string vehicleType)
     {
         return Ticket?.VehicleType?.Name == vehicleType;
+    }
+
+    private async Task export()
+    {
+        // Llamamos a la función JavaScript para exportar el contenido como PDF
+        await JSRuntime.InvokeVoidAsync("generatemultaPDF", "#ticketContent");
+    }
+
+    private async Task PrintMulta()
+    {
+        await JSRuntime.InvokeVoidAsync("PrintMulta");
     }
 }

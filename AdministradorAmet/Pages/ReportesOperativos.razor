@@ -25,6 +25,8 @@
 </div>
 <hr class="divider" />
 
+
+
 <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
     <!-- Cédula -->
     <div class="form-group slideup-placeholder">
@@ -53,7 +55,7 @@
 
     <!-- Infracción -->
     <div class="form-group slideup-placeholder">
-        <RadzenDropDown @bind-Value="filterModel.Infraccion" Data=@infracciones TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:175px; font-weight:bold;" />
+        <RadzenDropDown @bind-Value="filterModel.Infraccion" Data=@infracciones TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px; font-weight:bold;" />
         <label class="@(string.IsNullOrEmpty(filterModel.Infraccion?.ToString()) ? "" : "active")">Infracción</label>
     </div>
 
@@ -63,7 +65,27 @@
         <label class="@(string.IsNullOrEmpty(filterModel.NoAgente) ? "" : "active")">No. Agente</label>
     </div>
 
+    <div class="form-group slideup-placeholder">
+        <RadzenDropDown @bind-Value="filterModel.TipoDeVehiculo" Data=@tipoVehiculos TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:180px;font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.TipoDeVehiculo) ? "" : "active")">Tipo de Vehiculo</label>
+    </div>
 
+
+    <div class="form-group slideup-placeholder">
+        <RadzenTextBox @bind-Value="filterModel.Zona" Placeholder=" " Style="width:150px;font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
+    </div>
+
+
+    <div class="form-group slideup-placeholder">
+        <RadzenTextBox @bind-Value="filterModel.Placavehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.Placavehiculo) ? "" : "active")">Placa</label>
+    </div>
+
+    <div class="form-group slideup-placeholder">
+        <RadzenTextBox @bind-Value="filterModel.MarcaVehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.MarcaVehiculo) ? "" : "active")">Marca</label>
+    </div>
 
     <!-- Estado -->
     <div class="form-group slideup-placeholder">
@@ -87,11 +109,19 @@
 
 
 </div>
-<div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")">
+<div class="container">
+<div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")" id="resultadoreporte">
     @if (filteredTickets != null && filteredTickets.Any())
     {
-        <button class="btn btn-outline-success" data-toggle="tooltip" title="Exportar" @onclick="(()=> export())">Generar PDF</button>
-        <table class="table" style="margin-top:100px; width: 100%; border-collapse: collapse; background-color: white;">
+
+
+            <div style="margin-bottom: 20px; margin-left:77%" >
+                <span style="margin-right: 10px;">Formato a exportar:</span>
+                <button @onclick="export" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer;">PDF</button>
+                <button @onclick="Print" style="background-color: #fc8403; color: white; padding: 5px 10px; border: none; cursor: pointer; margin-left: 10px;">Print</button>
+            </div>
+
+        <table class="table" style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
             <thead>
                 <tr>
                     <th style="font-weight: bold; width: 220px; white-space: nowrap;">Nombre Completo</th>
@@ -102,7 +132,7 @@
                     <th style="font-weight: bold; width: 220px; white-space: nowrap;">Infracción (Artículo)</th>
                     <th style="font-weight: bold; width: 150px; white-space: nowrap;">Número de Agente</th>
                     <th style="font-weight: bold; width: 200px; white-space: nowrap;">Agente</th>
-                    <th style="font-weight: bold; width: 100px; text-align: center; white-space: nowrap;">Acción</th> <!-- Nueva columna Acción -->
+                        <th style="font-weight: bold; width: 100px; text-align: center; white-space: nowrap; " >Acción</th> <!-- Nueva columna Acción -->
                 </tr>
             </thead>
             <tbody>
@@ -147,9 +177,7 @@
         </div>
     }
 </div>
-
-
-
+</div>
 
 
 
@@ -214,6 +242,16 @@
         new Estado { Text = "Pagada", Value = "paid" }
     };
 
+    private List<TipoVehiculo> tipoVehiculos = new List<TipoVehiculo>
+    {
+        new TipoVehiculo { Text = "-- Limpiar selección --", Value = null },
+        new TipoVehiculo { Text = "Motocicleta", Value = "1" },
+        new TipoVehiculo { Text = "Automóvil", Value = "2" },
+        new TipoVehiculo { Text = "Camioneta", Value = "3" },
+        new TipoVehiculo { Text = "Autobús", Value = "4" },
+         new TipoVehiculo { Text = "Otros", Value = "5" }
+    };
+
     private async Task OnFilter()
     {
         mostrarResultados = true; // Esto hará que el DataGrid se muestre
@@ -236,19 +274,9 @@
             string ticketIdStr = filterModel.NoMulta.Trim();  // Eliminar espacios al inicio y final
             if (int.TryParse(ticketIdStr, out var ticketId))
             {
-                Console.WriteLine($"TicketId parseado: {ticketId}"); // ✅ Verifica esto en la consola
                 queryParams.Add($"ticketId={ticketId}");
             }
-            else
-            {
-                Console.WriteLine($"NoMulta no es un número válido: {filterModel.NoMulta}"); // ❌ Posible error
-            }
         }
-        else
-        {
-            Console.WriteLine("NoMulta está vacío o nulo.");
-        }
-
 
         if (filterModel.FechaInicio.HasValue)
             queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:yyyy-MM-dd}");
@@ -265,13 +293,23 @@
         if (!string.IsNullOrEmpty(filterModel.Estado))
             queryParams.Add($"Estado={filterModel.Estado}");
 
+        // Nuevos campos añadidos al filtro
+        if (!string.IsNullOrEmpty(filterModel.Zona))
+            queryParams.Add($"Zona={filterModel.Zona}");
+
+        if (!string.IsNullOrEmpty(filterModel.TipoDeVehiculo))
+            queryParams.Add($"TipoVehiculoId={filterModel.TipoDeVehiculo}");
+
+        if (!string.IsNullOrEmpty(filterModel.Placavehiculo))
+            queryParams.Add($"PlacaVehiculo={filterModel.Placavehiculo}");
+
+        if (!string.IsNullOrEmpty(filterModel.MarcaVehiculo))
+            queryParams.Add($"Marca={filterModel.MarcaVehiculo}");
         // Si hay parámetros, los agregamos a la URL
         if (queryParams.Any())
         {
             url += string.Join("&", queryParams);
         }
-
-        Console.WriteLine("URL Generada: " + url);  // Esto mostrará la URL generada en la consola
 
         try
         {
@@ -298,6 +336,7 @@
         }
     }
 
+
     private void OnFilterr()
     {
         Console.WriteLine("Filtros aplicados:");
@@ -308,7 +347,12 @@
         Console.WriteLine($"Infracción: {filterModel.Infraccion}");
         Console.WriteLine($"No. de Agente: {filterModel.NoAgente}");
         Console.WriteLine($"Estado: {filterModel.Estado}");
+        Console.WriteLine($"Zona: {filterModel.Zona}");
+        Console.WriteLine($"Tipo de Vehículo: {filterModel.TipoDeVehiculo}");
+        Console.WriteLine($"Placa: {filterModel.Placavehiculo}");
+        Console.WriteLine($"Marca: {filterModel.MarcaVehiculo}");
     }
+
 
     private void OnDateChange(DateTime? value)
     {
@@ -326,6 +370,10 @@
         public int? Infraccion { get; set; }
         public string NoAgente { get; set; }
         public string Estado { get; set; }
+        public string Zona { get; set; }
+        public string TipoDeVehiculo { get; set; }
+        public string Placavehiculo { get; set; }
+        public string MarcaVehiculo { get; set; }
     }
 
     public class Infraccion
@@ -335,6 +383,12 @@
     }
 
     public class Estado
+    {
+        public string Text { get; set; }
+        public string? Value { get; set; }
+    }
+
+    public class TipoVehiculo
     {
         public string Text { get; set; }
         public string? Value { get; set; }
@@ -412,6 +466,15 @@
 
             await JSRuntime.InvokeVoidAsync("GenerarPDF", tickets);
         }
+
+
+        private async Task Print()
+        {
+            await JSRuntime.InvokeVoidAsync("Print");
+   
+        }
+
+
     }
 
 

@@ -7,7 +7,15 @@
     margin-top: -30px;
 }
 
-
+.container {
+    width: 99%;
+    margin: 20px auto; /* Centrar la página horizontalmente */
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual */
+}
 .title {
     font-size: 35px;
     font-family: 'Poppins', sans-serif;
@@ -67,6 +75,10 @@
     position: relative;
 }
 
+.icon{
+    width:25px;
+    height:25px
+}
     .date-picker-container .rz-input {
         height: 15px; /* Mantener coherencia con los otros inputs */
         padding: 4px 8px;
@@ -129,4 +141,5 @@
     height:45px
 }
 
-       
+
+
