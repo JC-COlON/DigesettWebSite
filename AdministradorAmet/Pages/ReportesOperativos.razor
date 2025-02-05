@@ -131,8 +131,7 @@
                         <td>@ticket.AgentNumber</td>
                         <td>@ticket.Agente.Name @ticket.Agente.LastName</td>
                         <td style="text-align: center;">
-                            <a href="detallesMultas" title="Ver multa">
-
+                            <a href="/detallemulta/@ticket.TicketId" title="Ver multa">
                                 <img src="imagenes/trespuntos.png" class="lupa" alt="Ver detalles" style="width: 20px; height: 20px; cursor: pointer;" />
                             </a>
                         </td>
@@ -144,10 +143,11 @@
     else
     {
         <div class="no-results-message" style="margin-top: 20px; text-align: center; font-size: 16px; color: #ff0000;">
-            <p>No se encontraron resultado.</p>
+            <p>No se encontraron resultados.</p>
         </div>
     }
 </div>
+
 
 
 
@@ -231,8 +231,24 @@
         }
 
         // Agregar otros parámetros opcionales
-        if (!string.IsNullOrEmpty(filterModel.NoMulta) && int.TryParse(filterModel.NoMulta, out var ticketId))
-            queryParams.Add($"ticketId={ticketId}");
+        if (!string.IsNullOrEmpty(filterModel.NoMulta))
+        {
+            string ticketIdStr = filterModel.NoMulta.Trim();  // Eliminar espacios al inicio y final
+            if (int.TryParse(ticketIdStr, out var ticketId))
+            {
+                Console.WriteLine($"TicketId parseado: {ticketId}"); // ✅ Verifica esto en la consola
+                queryParams.Add($"ticketId={ticketId}");
+            }
+            else
+            {
+                Console.WriteLine($"NoMulta no es un número válido: {filterModel.NoMulta}"); // ❌ Posible error
+            }
+        }
+        else
+        {
+            Console.WriteLine("NoMulta está vacío o nulo.");
+        }
+
 
         if (filterModel.FechaInicio.HasValue)
             queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:yyyy-MM-dd}");

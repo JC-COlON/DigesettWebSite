@@ -1,111 +1,140 @@
-﻿@page "/detallesMultas"
-
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-
+﻿@page "/detallemulta/{ticketId:int}"
+@using AdministradorAmet.Models
+@inject TicketService TicketService
 
 
 <div class="container">
 
 <div class="header">
-    <img src="imagenes/ametlogo.png" alt="Logo DIGESETT">
+    <img src="logo.png" alt="Logo DIGESETT">
     <h1>DIRECCIÓN GENERAL DE SEGURIDAD DE TRÁNSITO</h1>
     <h2>REPÚBLICA DOMINICANA</h2>
 </div>
 
-<div class="content">
-    <h3>Detalles de la Multa</h3>
+@if (Ticket != null)
+{
+    <div class="content">
+        <h3 class="datosconductotext">Detalles de la Multa</h3>
 
-    <table>
-        <tr>
-            <th>Agente No.</th>
-            <td>12345</td>
-            <th>Nombre del Agente</th>
-            <td>Pedro Gómez</td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <th>Número de Multa</th>
-            <td>000001</td>
-            <th>Zona</th>
-            <td>Santo Domingo</td>
-        </tr>
-        <tr>
-            <th>Fecha</th>
-            <td>12/12/2024</td>
-            <th>Hora</th>
-            <td>14:30</td>
-        </tr>
-    </table>
+        <table>
+            <tr>
+                <th>Agente No.</th>
+                <td>@Ticket.AgentNumber</td>
+                <th>Nombre del Agente</th>
+                <td>@Ticket.Agente.Name @Ticket.Agente.LastName</td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Número de Multa</th>
+                <td>@Ticket.TicketId</td>
+                <th>Zona</th>
+                <td>@Ticket.Zone</td>
+            </tr>
+            <tr>
+                <th>Fecha</th>
+                <td>@Ticket.TicketDate.ToString("dd/MM/yyyy")</td>
+                <th>Hora</th>
+                <td>@Ticket.TicketDate.ToString("HH:mm")</td>
+            </tr>
+        </table>
 
-    <h3 class="datosconductotext">Datos del Conductor</h3>
-    <table>
-        <tr>
-            <th>Nombre y Apellido</th>
-            <td>Juan Pérez</td>
-            <th>Cédula</th>
-            <td>123-4567890-1</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>juan.perez@example.com</td>
-            <th>Teléfono</th>
-            <td>809-123-4567</td>
-        </tr>
-        <tr>
-            <th>País</th>
-            <td>República Dominicana</td>
-            <th>Placa del Vehículo</th>
-            <td>A123456</td>
-        </tr>
-        <tr>
-            <th>Modelo</th>
-            <td>Civic</td>
-            <th>Marca</th>
-            <td>Honda</td>
-        </tr>
-        <tr>
-            <th>Tipo de Vehículo</th>
-            <td colspan="3">
-                <div class="checkbox-group">
-                    <label><input type="checkbox" name="vehiculo" value="motocicleta"> Motocicleta</label>
-                    <label><input type="checkbox" name="vehiculo" value="automovil"> Automóvil</label>
-                    <label><input type="checkbox" name="vehiculo" value="camioneta"> Camioneta</label>
-                    <label><input type="checkbox" name="vehiculo" value="autobus"> Autobús</label>
-                    <label><input type="checkbox" name="vehiculo" value="otros"> Otros</label>
-                </div>
-            </td>
-        </tr>
-    </table>
+        <h3>Datos del Conductor</h3>
+        <table>
+            <tr>
+                <th>Nombre y Apellido</th>
+                <td>@Ticket.Name @Ticket.LastName</td>
+                <th>Cédula</th>
+                <td>@Ticket.Identification</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>@Ticket.Email</td>
+                <th>Teléfono</th>
+                <td>@Ticket.Phone</td>
+            </tr>
+            <tr>
+                <th>País</th>
+                <td>República Dominicana</td>
+                <th>Placa del Vehículo</th>
+                <td>@Ticket.LicensePlate</td>
+            </tr>
+            <tr>
+                <th>Modelo</th>
+                <td>@Ticket.Model</td>
+                <th>Marca</th>
+                <td>@Ticket.Brand</td>
+            </tr>
+            <tr>
+                <th>Tipo de Vehículo</th>
+                <td colspan="3">
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" checked="@IsChecked("Motocicleta")" /> Motocicleta</label>
+                        <label><input type="checkbox" checked="@IsChecked("Automóvil")" /> Automóvil</label>
+                        <label><input type="checkbox" checked="@IsChecked("Camioneta")" /> Camioneta</label>
+                        <label><input type="checkbox" checked="@IsChecked("Autobús")" /> Autobús</label>
+                        <label><input type="checkbox" checked="@IsChecked("Otros")" /> Otros</label>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
-        <h3 class="datosconductotext">Sobre la Infracción Jurídica </h3>
-    <table>
-        <tr>
-            <th>Artículo</th>
-            <td>145</td>
-            <th>Monto</th>
-            <td>RD$2,000.00</td>
-        <tr>
-            <th>Descripción</th>
-            <td colspan="3">No respetar el semáforo en rojo</td>
-        </tr>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <th>Lugar del Hecho</th>
-            <td colspan="3">Avenida Independencia</td>
-        </tr>
-        <tr>
-            <th>Observaciones</th>
-            <td colspan="3">Ninguna</td>
-        </tr>
-    </table>
-</div>
+        <h3 class="datosconductotext">Sobre la Infracción Jurídica</h3>
+        <table>
+         <tr>
+                    <th>Artículo</th>
+                    <td>@Ticket.Articulo.ArticleNum</td>
+                    <th>Monto</th>
+                    <td>@Ticket.Articulo.Price.ToString("C", System.Globalization.CultureInfo.CreateSpecificCulture("es-DO"))</td>
+
+                <tr>
+                    <th>Descripción</th>
+                    <td colspan="3">@Ticket.Articulo.Description</td>
+                </tr>
+         </tr>
+
+                
+                
+          
+        </table>
+        <table>
+            <tr>
+                <th>Lugar del Hecho</th>
+                <td colspan="3">@Ticket.IncidentLocation</td>
+            </tr>
+            <tr>
+                <th>Observaciones</th>
+                <td colspan="3">@Ticket.Observations</td>
+            </tr>
+        </table>
+    </div>
+}
+else
+{
+    <div class="content">
+        <p>Cargando...</p>
+    </div>
+}
 
 <div class="footer">
     <p>Dirección General de Seguridad de Tránsito y Transporte Terrestre - DIGESETT</p>
     <p>Este documento es oficial y no debe ser alterado.</p>
 </div>
+
 </div>
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+
+    private Ticket Ticket { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ticket = await TicketService.GetTicketByIdAsync(TicketId);
+    }
+
+    private bool IsChecked(string vehicleType)
+    {
+        return Ticket?.VehicleType?.Name == vehicleType;
+    }
+}

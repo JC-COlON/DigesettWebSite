@@ -22,6 +22,8 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
+builder.Services.AddScoped<TicketService>();
+
 
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredModal();
