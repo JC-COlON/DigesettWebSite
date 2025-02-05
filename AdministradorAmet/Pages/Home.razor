@@ -2,9 +2,14 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
+@using System.IO;
+@using AdministradorAmet.Models
+@using Tewr.Blazor.FileReader
+@inject IFileReaderService filereader
 @using Radzen
 @using MudBlazor
 @using Newtonsoft.Json
+
 
 <PageTitle>Home</PageTitle>
 
@@ -13,6 +18,31 @@
 
 <!-- Contenedor principal -->
 <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px;">
+
+
+
+    @*   <input type="file" @ref="elementReference" @onchange="async () => await OpenFileAsync()" />
+    <ul>
+        <li>File Name: @fileName  </li>
+        <li>File Size: @size  </li>
+        <li>File Type: @type  </li>
+    </ul>
+
+    <br />
+
+
+    <button class="btn btn-block btn-success" @onclick="async ()=> await UploadFileAsync()"> Upload File </button>
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <div class="alert alert pri">
+            Upload SuccesFully
+        </div>
+    }
+    @if (imagePath != null)
+    {
+        <img style="width:150px" src="@imagePath" />
+    } *@
 
     <!-- Sección de Inputs y Botón -->
     <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="10px" class="rz-p-4">
@@ -49,7 +79,9 @@
         <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
     </div>
     <MudText Typo="Typo.h6">Selected portion of the chart: @Index</MudText>
+
 </div>
+
 
 @code {
     DateTime? startDate { get; set; }
@@ -93,6 +125,8 @@
         }
     }
 
+
+
     public class MultasResponse
     {
         public MultasResumenResponse MultasResumen { get; set; }
@@ -111,4 +145,15 @@
         public string ArticleNum { get; set; }
         public int CantidadMultas { get; set; }
     }
+
+
+
+
 }
+
+
+
+
+
+
+

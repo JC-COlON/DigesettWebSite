@@ -1,0 +1,132 @@
+﻿.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    max-width: 97%;
+    margin-top: -30px;
+}
+
+
+.title {
+    font-size: 35px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.divider{
+
+    margin-bottom:35px
+}
+
+.form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px; /* Menos espacio entre inputs */
+}
+
+    /* Estilo general para los inputs */
+    .form-group .rz-input,
+    .form-group input,
+    .date-picker-container .rz-input {
+        height: 30px; /* Reducir la altura */
+        font-size: 14px; /* Reducir el tamaño de fuente */
+        padding: 4px 8px; /* Ajustar el padding */
+        border-radius: 5px; /* Bordes redondeados */
+    }
+
+    /* Ajustes para los labels */
+    .form-group label {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        color: #666;
+        background: white;
+        padding: 0 5px;
+        pointer-events: none;
+        font-weight:bold
+    }
+
+        /* Cuando el input está enfocado o tiene contenido, el label sube */
+        .form-group .rz-input:focus + label,
+        .form-group input:focus + label,
+        .form-group label.active {
+            top: -8px;
+            left: 8px;
+            font-size: 11px;
+            color: #007bff;
+        }
+
+/* Ajuste especial para DatePicker */
+.date-picker-container {
+    position: relative;
+}
+
+    .date-picker-container .rz-input {
+        height: 15px; /* Mantener coherencia con los otros inputs */
+        padding: 4px 8px;
+        font-weight:bold;
+    }
+
+    .date-picker-container .floating-label {
+        top: 8px;
+        left: 10px;
+    }
+
+        .date-picker-container .floating-label.active {
+            top: -8px;
+            left: 8px;
+            font-size: 11px;
+            color: #007bff;
+        }
+/* Contenedor principal para centrar todo en la pantalla */
+.containerdebajo {
+    display: flex;
+    flex-direction: column; /* Elementos en columna */
+    align-items: center; /* Centrar horizontalmente */
+    justify-content: center; /* Centrar verticalmente */
+    margin-left:210px;
+    margin-top:90px;
+    text-align: center; /* Centrar texto */
+
+}
+
+/* Estilo del logo */
+.logo {
+    height: 300px;
+    width: 300px;
+    opacity: 0.3; /* 30% de transparencia */
+}
+
+/* Texto debajo del logo */
+.info-text {
+    font-size: 20px; /* Tamaño del texto */
+    color: #a0a0a0; /* Gris claro */
+    margin-top: 10px; /* Espacio entre el logo y el texto */
+    font-family: 'Poppins', sans-serif;
+}
+.data-grid-hidden {
+    display: none;
+}
+
+.data-grid-visible {
+    display: block;
+}
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+
+    white-space: nowrap; /* Previene el salto de línea */
+}
+
+.lupa{
+    width:45px;
+    height:45px
+}
+
+       

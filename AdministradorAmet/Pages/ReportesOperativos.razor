@@ -1,6 +1,404 @@
 ﻿@page "/ReportesOperativos"
-<h3>ReportesOperativos</h3>
+@using Microsoft.AspNetCore.Http
+@using Radzen
+
+@using AdministradorAmet.Models
+@using System.Text.Json.Serialization
+@using System.IO
+@inject IHttpContextAccessor HttpContextAccessor
+@using AdministradorAmet.Models
+@using iTextSharp.text
+@using iTextSharp.text.pdf
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+
+
+<div class="header-container">
+    <h1 class="title">Reportes Sobre Multas</h1>
+</div>
+<hr class="divider" />
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+    <!-- Cédula -->
+    <div class="form-group slideup-placeholder">
+        <RadzenTextBox @bind-Value="filterModel.Cedula" Placeholder=" " Style="width:150px; font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.Cedula) ? "" : "active")">Cédula</label>
+    </div>
+
+    <!-- No. Multa -->
+    <div class="form-group slideup-placeholder">
+        <RadzenTextBox @bind-Value="filterModel.NoMulta" Placeholder=" " Style="width:150px ;font-weight:bold; " />
+        <label class="@(string.IsNullOrEmpty(filterModel.NoMulta) ? "" : "active")">No. Multa</label>
+    </div>
+
+    <!-- Fecha Inicio -->
+    <div class="form-group slideup-placeholder date-picker-container">
+        <RadzenDatePicker @bind-Value="filterModel.FechaInicio" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+        <label class="@(IsFechaInicioSet ? "active" : "")">Fecha Inicio</label>
+    </div>
+
+    <!-- Fecha Fin -->
+    <div class="form-group slideup-placeholder date-picker-container">
+        <RadzenDatePicker @bind-Value="filterModel.FechaFin" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+        <label class="@(IsFechaFinSet ? "active" : "")">Fecha Fin</label>
+    </div>
+
+
+    <!-- Infracción -->
+    <div class="form-group slideup-placeholder">
+        <RadzenDropDown @bind-Value="filterModel.Infraccion" Data=@infracciones TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:175px; font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.Infraccion?.ToString()) ? "" : "active")">Infracción</label>
+    </div>
+
+    <!-- No. Agente -->
+    <div class="form-group slideup-placeholder">
+        <RadzenTextBox @bind-Value="filterModel.NoAgente" Placeholder=" " Style="width:150px;font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.NoAgente) ? "" : "active")">No. Agente</label>
+    </div>
+
+
+
+    <!-- Estado -->
+    <div class="form-group slideup-placeholder">
+        <RadzenDropDown @bind-Value="filterModel.Estado" Data=@estados TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px;font-weight:bold;" />
+        <label class="@(string.IsNullOrEmpty(filterModel.Estado) ? "" : "active")">Estado</label>
+    </div>
+
+    <!-- Botón Generar -->
+    <div class="form-group">
+        <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
+    </div>
+    @if (!mostrarResultados)
+    {
+        <div class="containerdebajo">
+            <img src="imagenes/ametlogo.png" class="logo @(mostrarResultados ? "reducido" : "")" />
+            <h3 class="info-text">
+                Para generar el reporte, elige opciones con los filtros y luego haz clic en el botón "Generar"
+            </h3>
+        </div>
+    }
+
+
+</div>
+<div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")">
+    @if (filteredTickets != null && filteredTickets.Any())
+    {
+        <button class="btn btn-outline-success" data-toggle="tooltip" title="Exportar" @onclick="(()=> export())">Generar PDF</button>
+        <table class="table" style="margin-top:100px; width: 100%; border-collapse: collapse; background-color: white;">
+            <thead>
+                <tr>
+                    <th style="font-weight: bold; width: 220px; white-space: nowrap;">Nombre Completo</th>
+                    <th style="font-weight: bold; width: 120px; white-space: nowrap;">Cédula</th>
+                    <th style="font-weight: bold; width: 120px; white-space: nowrap;">Fecha</th>
+                    <th style="font-weight: bold; width: 120px; white-space: nowrap;">No. Multa</th>
+                    <th style="font-weight: bold; width: 120px; white-space: nowrap;">Estado</th>
+                    <th style="font-weight: bold; width: 220px; white-space: nowrap;">Infracción (Artículo)</th>
+                    <th style="font-weight: bold; width: 150px; white-space: nowrap;">Número de Agente</th>
+                    <th style="font-weight: bold; width: 200px; white-space: nowrap;">Agente</th>
+                    <th style="font-weight: bold; width: 100px; text-align: center; white-space: nowrap;">Acción</th> <!-- Nueva columna Acción -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in filteredTickets)
+                {
+                    <tr>
+                        <td>@ticket.Name @ticket.LastName</td>
+                        <td>@ticket.Identification</td>
+                        <td>@ticket.TicketDate.ToString("dd/MM/yyyy")</td>
+                        <td>@ticket.TicketId</td>
+                        <td>
+                            @if (ticket.Status == "Paid")
+                            {
+                                <span>Pagada</span>
+                            }
+                            else if (ticket.Status == "pending")
+                            {
+                                <span>Pendiente</span>
+                            }
+                            else
+                            {
+                                <span>@ticket.Status</span>
+                            }
+                        </td>
+                        <td>@ticket.Articulo.ArticleNum</td>
+                        <td>@ticket.AgentNumber</td>
+                        <td>@ticket.Agente.Name @ticket.Agente.LastName</td>
+                        <td style="text-align: center;">
+                            <a href="detallesMultas" title="Ver multa">
+
+                                <img src="imagenes/trespuntos.png" class="lupa" alt="Ver detalles" style="width: 20px; height: 20px; cursor: pointer;" />
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="no-results-message" style="margin-top: 20px; text-align: center; font-size: 16px; color: #ff0000;">
+            <p>No se encontraron resultado.</p>
+        </div>
+    }
+</div>
+
+
+
+
 
 @code {
+    private FilterModel filterModel = new FilterModel();
+    private bool IsFechaInicioSet => filterModel.FechaInicio.HasValue;
+    private bool IsFechaFinSet => filterModel.FechaFin.HasValue;
+    private bool mostrarResultados = false;
+    private IEnumerable<Ticket> tickets;
+    private IEnumerable<Ticket> filteredTickets;
+
+
+    private List<Infraccion> infracciones = new List<Infraccion>
+    {
+        new Infraccion { Text = "-- Limpiar selección --", Value = null },
+        new Infraccion { Text = "ART 29", Value = 1 },
+        new Infraccion { Text = "ART 40-41", Value = 2 },
+        new Infraccion { Text = "ART 47-7", Value = 3 },
+        new Infraccion { Text = "ART 146/02", Value = 4 },
+        new Infraccion { Text = "ART 27-3", Value = 5 },
+        new Infraccion { Text = "ART 27-4", Value = 6 },
+        new Infraccion { Text = "ART 110", Value = 7 },
+        new Infraccion { Text = "ART 1 LEY513", Value = 8 },
+        new Infraccion { Text = "ART 135C", Value = 9 },
+        new Infraccion { Text = "ART 33-77", Value = 10 },
+        new Infraccion { Text = "ART 88", Value = 11 },
+        new Infraccion { Text = "ART 81", Value = 12 },
+        new Infraccion { Text = "ART 97", Value = 13 },
+        new Infraccion { Text = "ART 97-A", Value = 14 },
+        new Infraccion { Text = "ART 76-C", Value = 15 },
+        new Infraccion { Text = "ART 27-22", Value = 16 },
+        new Infraccion { Text = "ART 27-2", Value = 17 },
+        new Infraccion { Text = "ART 27-27", Value = 18 },
+        new Infraccion { Text = "ART 174", Value = 19 },
+        new Infraccion { Text = "ART 162", Value = 20 },
+        new Infraccion { Text = "ART 74-H", Value = 21 },
+        new Infraccion { Text = "ART 27-4", Value = 22 },
+        new Infraccion { Text = "ART 144", Value = 23 },
+        new Infraccion { Text = "ART 145", Value = 24 },
+        new Infraccion { Text = "ART 158", Value = 25 },
+        new Infraccion { Text = "ART 164-B", Value = 26 },
+        new Infraccion { Text = "ART 164 AP 200", Value = 27 },
+        new Infraccion { Text = "ART 171 A-3", Value = 28 },
+        new Infraccion { Text = "ART 173-G", Value = 29 },
+        new Infraccion { Text = "ART 173-D", Value = 30 },
+        new Infraccion { Text = "ART 164-D", Value = 31 },
+        new Infraccion { Text = "ART 130 LEY 241", Value = 32 },
+        new Infraccion { Text = "ART 130", Value = 33 },
+        new Infraccion { Text = "ART 62", Value = 34 },
+        new Infraccion { Text = "ART 5", Value = 35 },
+        new Infraccion { Text = "ART 27 Y 47", Value = 36 },
+        new Infraccion { Text = "ART 161", Value = 37 },
+        new Infraccion { Text = "ART 96-B-1", Value = 38 },
+        new Infraccion { Text = "ART 1 LEY 143-01", Value = 39 },
+        new Infraccion { Text = "ART 106", Value = 40 }
+    };
+
+    private List<Estado> estados = new List<Estado>
+    {
+        new Estado { Text = "-- Limpiar selección --", Value = null },
+        new Estado { Text = "Pendiente", Value = "pending" },
+        new Estado { Text = "Pagada", Value = "paid" }
+    };
+
+    private async Task OnFilter()
+    {
+        mostrarResultados = true; // Esto hará que el DataGrid se muestre
+
+        // Comenzamos la URL vacía
+        var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
+
+        // Creamos una lista para agregar los parámetros de la consulta
+        var queryParams = new List<string>();
+
+        // Solo agregar cédula si tiene un valor
+        if (!string.IsNullOrEmpty(filterModel.Cedula))
+        {
+            queryParams.Add($"Cedula={filterModel.Cedula}");
+        }
+
+        // Agregar otros parámetros opcionales
+        if (!string.IsNullOrEmpty(filterModel.NoMulta) && int.TryParse(filterModel.NoMulta, out var ticketId))
+            queryParams.Add($"ticketId={ticketId}");
+
+        if (filterModel.FechaInicio.HasValue)
+            queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:yyyy-MM-dd}");
+
+        if (filterModel.FechaFin.HasValue)
+            queryParams.Add($"FechaFin={filterModel.FechaFin.Value:yyyy-MM-dd}");
+
+        if (filterModel.Infraccion.HasValue)
+            queryParams.Add($"ArticuloInfringidoId={filterModel.Infraccion}");
+
+        if (!string.IsNullOrEmpty(filterModel.NoAgente))
+            queryParams.Add($"NoAgente={filterModel.NoAgente}");
+
+        if (!string.IsNullOrEmpty(filterModel.Estado))
+            queryParams.Add($"Estado={filterModel.Estado}");
+
+        // Si hay parámetros, los agregamos a la URL
+        if (queryParams.Any())
+        {
+            url += string.Join("&", queryParams);
+        }
+
+        Console.WriteLine("URL Generada: " + url);  // Esto mostrará la URL generada en la consola
+
+        try
+        {
+            var response = await Http.GetFromJsonAsync<ApiResponse>(url);
+
+            if (response == null || response.Tickets == null || !response.Tickets.Any())
+            {
+                filteredTickets = new List<Ticket>(); // No hay resultados
+                mostrarResultados = false; // Cambiar esto si quieres mostrar un mensaje de "No hay resultados"
+                StateHasChanged(); // Forzar la actualización de la UI
+            }
+            else
+            {
+                filteredTickets = response.Tickets;
+                mostrarResultados = true; // Mostrar los resultados si existen
+                StateHasChanged(); // Forzar la actualización de la UI
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            mostrarResultados = false; // En caso de error, ocultar los resultados y manejar el error
+            StateHasChanged();
+        }
+    }
+
+    private void OnFilterr()
+    {
+        Console.WriteLine("Filtros aplicados:");
+        Console.WriteLine($"Cédula: {filterModel.Cedula}");
+        Console.WriteLine($"No. de Multa: {filterModel.NoMulta}");
+        Console.WriteLine($"Fecha Inicio: {filterModel.FechaInicio}");
+        Console.WriteLine($"Fecha Fin: {filterModel.FechaFin}");
+        Console.WriteLine($"Infracción: {filterModel.Infraccion}");
+        Console.WriteLine($"No. de Agente: {filterModel.NoAgente}");
+        Console.WriteLine($"Estado: {filterModel.Estado}");
+    }
+
+    private void OnDateChange(DateTime? value)
+    {
+        StateHasChanged(); // Forzar la actualización de la UI
+    }
+
+
+
+    public class FilterModel
+    {
+        public string Cedula { get; set; }
+        public string NoMulta { get; set; }
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
+        public int? Infraccion { get; set; }
+        public string NoAgente { get; set; }
+        public string Estado { get; set; }
+    }
+
+    public class Infraccion
+    {
+        public string Text { get; set; }
+        public int? Value { get; set; }
+    }
+
+    public class Estado
+    {
+        public string Text { get; set; }
+        public string? Value { get; set; }
+    }
+
+    public class Tickett
+    {
+        public int TicketId { get; set; }
+        public string Zone { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+        public string Identification { get; set; }
+        public VehicleType VehicleType { get; set; }
+        public string LicensePlate { get; set; }
+        public string Brand { get; set; }
+        public string Model { get; set; }
+        public string IncidentLocation { get; set; }
+        public string Observations { get; set; }
+        public string AgentNumber { get; set; }
+        public DateTime TicketDate { get; set; }
+        public Article Articulo { get; set; }  // Asegúrate de tener la propiedad Articulo aquí
+        public Agent Agente { get; set; }
+        public int Hidden { get; set; }
+        public string Status { get; set; }
+    }
+
+
+    public class VehicleType
+    {
+        public string Name { get; set; }
+    }
+
+    public class Article
+    {
+        public string ArticleNum { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class Agent
+    {
+        public string Name { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class ApiResponse
+    {
+        [JsonPropertyName("$values")]
+        public List<Ticket> Tickets { get; set; }
+    }
+
+
+
+
+
+
+
+    @code {
+    private async Task export()
+        {
+            var tickets = filteredTickets.Select(ticket => new
+            {
+                ticket.Name,
+                ticket.LastName,
+                ticket.Identification,
+                TicketDate = ticket.TicketDate.ToString("dd/MM/yyyy"),
+                ticket.TicketId,
+                ticket.Status,
+                Articulo = ticket.Articulo.ArticleNum,
+                ticket.AgentNumber,
+                Agent = new { ticket.Agente.Name, ticket.Agente.LastName }
+            });
+
+            await JSRuntime.InvokeVoidAsync("GenerarPDF", tickets);
+        }
+    }
+
+
 
 }
+

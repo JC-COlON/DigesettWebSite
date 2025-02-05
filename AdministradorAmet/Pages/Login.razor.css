@@ -150,7 +150,7 @@
 
 .extras label {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 5px;
     font-size: 14px;
 }
@@ -174,6 +174,7 @@
 .extras a {
     color: black;
     font-size: 14px;
+    margin-left:210px
 }
 
 .btn-primary {

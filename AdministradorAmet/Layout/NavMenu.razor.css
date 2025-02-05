@@ -131,3 +131,13 @@
     .submenu-arrow.open {
         transform: rotate(90deg);
     }
+
+.operativo-text {
+    color: #e9e9e7; /* Azul */
+    font-weight: bold;
+}
+
+.financiero-text {
+    color: #e9e9e7; /* Verde */
+    font-weight: bold;
+}
