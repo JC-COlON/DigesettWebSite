@@ -153,7 +153,7 @@
     <script type="text/javascript">
         function Print() {
             var divcontent = document.getElementById("resultadoreporte").innerHTML;
-            var a = window.open('', '', 'height=1300,width=1300');
+            var a = window.open('', 'Reporte', 'height=1300,width=1300');
             a.document.write('<html>');
             a.document.write('<body><br/>');
             a.document.write(divcontent);
@@ -169,7 +169,7 @@
     <script type="text/javascript">
         function PrintMulta() {
             var divcontent = document.getElementById("resultadomulta").innerHTML;
-            var a = window.open('', '', 'height=1300,width=1300');
+            var a = window.open('', 'Reporte', 'height=1300,width=1300');
             a.document.write('<html>');
             a.document.write('<body><br/>');
             a.document.write(divcontent);
@@ -181,12 +181,56 @@
 
     </script>
 
+    <script>
+        window.generatemultaPDF = async (elementId, ticketId) => {
+            const element = document.querySelector(elementId);
+
+            // Ocultar botones antes de generar PDF
+            const buttons = element.querySelectorAll('button');
+            buttons.forEach(btn => btn.style.display = 'none');
+            const span = element.querySelector('span');
+            if (span) {
+                span.style.display = 'none'; // Ocultar el <span>
+            }
+
+            // Crear una nueva instancia de jsPDF
+            const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+
+            // Usar la función 'html' de jsPDF para agregar contenido HTML al PDF
+            pdf.html(element, {
+                callback: function (pdf) {
+                    // Restaurar botones después de generar el PDF
+                    buttons.forEach(btn => btn.style.display = 'block');
+
+                    // Guardar el PDF con el nombre dinámico que incluye el ticketId
+                    pdf.save(`Multa No.-${ticketId}.pdf`);
+
+                    window.location.reload(); 
+                },
+                x: 35,
+                y: 10,
+                width: 140, // Ajustar el ancho
+                windowWidth: 650 // Establecer el tamaño de la ventana para asegurar la conversión correcta
+            });
+        };
+
+
+        
+    </script>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 
     <!-- Asegúrate de cargar primero la librería html2pdf -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Scripts adicionales que ya tienes -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
@@ -194,8 +238,8 @@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="print.js"></script>
     <script src="js/site.js"></script>
-    <script src="jquery/jquery.min.js"></script>
 
+    <script src="jquery/jquery.min.js"></script>
 
 
 
