@@ -339,7 +339,6 @@
       
             bool showDataLabels = false;
 
-          
     private async Task export()
     {
         try
@@ -351,7 +350,11 @@
                 return;
             }
 
-            // Preparar datos para JavaScript
+            // Obtener las fechas de los filtros
+            string fechaInicio = filterModel.FechaInicio?.ToString("dd/MM/yyyy") ?? "Fecha no seleccionada";
+            string fechaFin = filterModel.FechaFin?.ToString("dd/MM/yyyy") ?? "Fecha no seleccionada";
+
+            // Preparar los datos para el PDF
             var ticketsData = filteredTickets.Select(t => new
             {
                 ticketId = t.TicketId,
@@ -361,8 +364,8 @@
                 articulo = new { price = t.Articulo.Price }
             }).ToList();
 
-            // Llamar al generador de PDF
-            await JSRuntime.InvokeVoidAsync("GenerarPDFfinanciero", ticketsData);
+            // Llamar al generador de PDF y pasar las fechas de inicio y fin
+            await JSRuntime.InvokeVoidAsync("GenerarPDFfinanciero", ticketsData, fechaInicio, fechaFin);
         }
         catch (Exception ex)
         {
@@ -370,6 +373,7 @@
             Console.WriteLine($"Error generando PDF: {ex.Message}");
         }
     }
+
 
 
             private async Task Print()

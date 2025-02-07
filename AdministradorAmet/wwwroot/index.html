@@ -152,7 +152,7 @@
 
 
     <script>
-        window.GenerarPDFfinanciero = async (tickets) => {
+        window.GenerarPDFfinanciero = async (tickets, fechaInicio, fechaFin) => {
             console.log("GenerarPDF function called");
 
             var doc = new jsPDF();
@@ -181,7 +181,7 @@
                 const systemTextY = 25;
                 doc.text(contentX, systemTextY, "Sistema de Gestión de Multas de Tránsito");
 
-                // Título "Reporte de Multas" ajustado hacia la derecha
+                // Título "Reporte Financiero" ajustado hacia la derecha
                 const reportTextY = systemTextY + 10;
                 const title = "Reporte Financiero";
                 const titleWidth = doc.getTextDimensions(title).w;
@@ -190,16 +190,24 @@
                 const titleX = contentX + ((doc.internal.pageSize.width - contentX) - titleWidth) / 2 + titleOffsetX;
                 doc.text(titleX, reportTextY, title);
 
-                // Títulos de columnas
-                const lineY = reportTextY + 10; // Definir lineY
-                const startY = lineY + 25;
+                // Agregar las fechas seleccionadas debajo del título
+                const fechasY = reportTextY + 10; // Ajustar la posición vertical de las fechas
+                doc.setFont("times", "normal");
                 doc.setFontSize(12);
+                const fechasX = contentX + 20; // Ajustar este valor para mover las fechas horizontalmente
+                doc.text(fechasX, fechasY, `Del ${fechaInicio} al ${fechaFin}`); // Posicionamiento horizontal de las fechas
+
+                // Títulos de columnas
+                const lineY = fechasY + 10; // Ajustamos lineY para que las fechas no se sobrepongan con las columnas
+                const startY = lineY + 15; // Ajustar este valor para subir la tabla más arriba
+                doc.setFontSize(12);
+                doc.setFont("times", "bold"); // Encabezados en negrita
                 let rowY = startY;
 
                 // Configuración de columnas
                 const columns = {
-                    numMulta: 15,
-                    fecha: 35,
+                    numMulta: 10,
+                    fecha: 40,
                     cedula: 65,
                     estado: 95,
                     pagadas: 135,
