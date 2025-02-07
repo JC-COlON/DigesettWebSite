@@ -147,6 +147,148 @@
             };
         };
 
+    </script>
+
+
+
+    <script>
+        window.GenerarPDFfinanciero = async (tickets) => {
+            console.log("GenerarPDF function called");
+
+            var doc = new jsPDF();
+            console.log("jsPDF instance created");
+
+            // Establecer fuente
+            doc.setFont("times", "bold");
+
+            // IMAGEN
+            var img = new Image();
+            img.src = "logo.png";
+            img.crossOrigin = "";
+            img.onload = function () {
+                console.log("Image loaded");
+
+                // Agregar imagen al lado izquierdo
+                const imgX = 20;
+                const imgY = 10;
+                doc.addImage(this, 'PNG', imgX, imgY, 40, 40);
+
+                // Contenido en el lado derecho del encabezado
+                doc.setFontSize(16);
+                const contentX = 75;
+
+                // Texto "Sistema de Gestión de Multas de Tránsito"
+                const systemTextY = 25;
+                doc.text(contentX, systemTextY, "Sistema de Gestión de Multas de Tránsito");
+
+                // Título "Reporte de Multas" ajustado hacia la derecha
+                const reportTextY = systemTextY + 10;
+                const title = "Reporte Financiero";
+                const titleWidth = doc.getTextDimensions(title).w;
+
+                const titleOffsetX = 23;
+                const titleX = contentX + ((doc.internal.pageSize.width - contentX) - titleWidth) / 2 + titleOffsetX;
+                doc.text(titleX, reportTextY, title);
+
+                // Títulos de columnas
+                const lineY = reportTextY + 10; // Definir lineY
+                const startY = lineY + 25;
+                doc.setFontSize(12);
+                let rowY = startY;
+
+                // Configuración de columnas
+                const columns = {
+                    numMulta: 15,
+                    fecha: 35,
+                    cedula: 65,
+                    estado: 95,
+                    pagadas: 135,
+                    pendientes: 165
+                };
+
+                // Encabezados
+                doc.text(columns.numMulta, rowY, "No. Multa");
+                doc.text(columns.fecha, rowY, "Fecha");
+                doc.text(columns.cedula, rowY, "Cédula");
+                doc.text(columns.estado, rowY, "Estado");
+                doc.text(columns.pagadas, rowY, "Pagadas");
+                doc.text(columns.pendientes, rowY, "Pendientes");
+
+                // Datos de la tabla
+                rowY += 10;
+                doc.setFont("times", "normal");
+
+                const formatter = new Intl.NumberFormat('es-DO', {
+                    style: 'currency',
+                    currency: 'DOP'
+                });
+
+                let totalPagadas = 0;
+                let totalPendientes = 0;
+
+                tickets.forEach((ticket) => {
+                    const status = ticket.status === "Paid" ? "Pagada" :
+                        ticket.status === "pending" ? "Pendiente" :
+                            ticket.status;
+
+                    // Formatear valores
+                    const fecha = new Date(ticket.ticketDate).toLocaleDateString('es-DO');
+                    const montoPagado = status === "Pagada" ? formatter.format(ticket.articulo.price) : "";
+                    const montoPendiente = status === "Pendiente" ? formatter.format(ticket.articulo.price) : "";
+
+                    // Acumular totales
+                    if (status === "Pagada") totalPagadas += ticket.articulo.price;
+                    if (status === "Pendiente") totalPendientes += ticket.articulo.price;
+
+                    // Agregar fila
+                    doc.text(columns.numMulta, rowY, ticket.ticketId.toString());
+                    doc.text(columns.fecha, rowY, fecha);
+                    doc.text(columns.cedula, rowY, ticket.identification);
+                    doc.text(columns.estado, rowY, status);
+                    doc.text(columns.pagadas, rowY, montoPagado);
+                    doc.text(columns.pendientes, rowY, montoPendiente);
+
+                    rowY += 10;
+                });
+
+                // Línea divisora antes de los totales
+                const lineStartX = 15; // Definir lineStartX
+                const lineEndX = 195; // Definir lineEndX
+                rowY += 5; // Espacio antes de la línea divisora
+                doc.setLineWidth(0.5);
+                doc.line(lineStartX, rowY, lineEndX, rowY);
+                rowY += 5; // Espacio después de la línea divisora
+
+                // Totales
+                doc.setFont("times", "bold");
+                doc.text(columns.estado - 10, rowY, "Total:");
+                doc.text(columns.pagadas, rowY, formatter.format(totalPagadas));
+                doc.text(columns.pendientes, rowY, formatter.format(totalPendientes));
+
+                // PIE DE PÁGINA
+                var today = new Date();
+                var dateTime =
+                    "Fecha: " +
+                    today.getDate().toString().padStart(2, '0') + '/' +
+                    (today.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                    today.getFullYear() + ' Hora: ' +
+                    today.getHours().toString().padStart(2, '0') + ':' +
+                    today.getMinutes().toString().padStart(2, '0');
+
+                doc.setFontSize(12);
+                doc.text(20, 290, "Elaborado por: Administrador");
+                doc.text(140, 290, dateTime);
+
+                // Generar el PDF
+                var blob = doc.output('blob');
+                saveAs(blob, 'ReporteMultas.pdf');
+                console.log("PDF saved");
+            };
+
+            img.onerror = function () {
+                console.error("Failed to load image");
+            };
+        };
 
     </script>
 
@@ -161,7 +303,6 @@
             a.document.close();
             a.print();
         }
-
 
     </script>
 
@@ -205,7 +346,7 @@
                     // Guardar el PDF con el nombre dinámico que incluye el ticketId
                     pdf.save(`Multa No.-${ticketId}.pdf`);
 
-                    window.location.reload(); 
+                    window.location.reload();
                 },
                 x: 35,
                 y: 10,
@@ -215,18 +356,18 @@
         };
 
 
-        
+
     </script>
 
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <!-- Asegúrate de cargar primero la librería html2pdf -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 
     <!-- Scripts adicionales que ya tienes -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>

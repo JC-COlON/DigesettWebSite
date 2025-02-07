@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <StaticWebAssetsEnabled>true</StaticWebAssetsEnabled>
     <NuGetAuditMode>direct</NuGetAuditMode>
+      <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,521 @@
 ﻿@page "/ReportesFinancieros"
-<h3>Reportes Financieros</h3>
+@using Microsoft.AspNetCore.Http
+@using Radzen
+@using System.Globalization
+@using AdministradorAmet.Models
+@using System.Text.Json.Serialization
+@using System.IO
+@inject IHttpContextAccessor HttpContextAccessor
+@using AdministradorAmet.Models
+@using System.Text.Json
+@using iTextSharp.text
+@using iTextSharp.text.pdf
+@using Newtonsoft.Json;
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+<div class="header-container">
+    <h1 class="title">Reportes Financiero</h1>
+</div>
+<hr class="divider" />
+<div style="display:flex; gap:20px" >
+<!-- Fecha Inicio -->
+<div class="form-group slideup-placeholder date-picker-container">
+    <RadzenDatePicker @bind-Value="filterModel.FechaInicio" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+    <label class="@(IsFechaInicioSet ? "active" : "")">Fecha Inicio</label>
+</div>
+
+<!-- Fecha Fin -->
+<div class="form-group slideup-placeholder date-picker-container">
+    <RadzenDatePicker @bind-Value="filterModel.FechaFin" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+    <label class="@(IsFechaFinSet ? "active" : "")">Fecha Fin</label>
+</div>
+<div class="form-group">
+    <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
+</div>
+</div>
+
+
+@if (!mostrarResultados)
+{
+    <div class="containerdebajo">
+        <img src="imagenes/ametlogo.png" class="logo @(mostrarResultados ? "reducido" : "")" />
+        <h3 class="info-text">
+            Para generar el reporte, elige opciones con los filtros y luego haz clic en el botón "Generar"
+        </h3>
+    </div>
+}
+ <div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")">
+<div class="contenedor" style="margin-top:45px; gap:20px" >
+   
+    <div class="containerizquierdo">
+        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+            <RadzenCard>
+                <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+                </RadzenStack>
+            </RadzenCard>
+
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <RadzenChart>
+                        <RadzenStackedColumnSeries Data="@barChartData" CategoryProperty="Category" Title="Multas" ValueProperty="Value">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                        </RadzenStackedColumnSeries>
+                        <RadzenValueAxis Min="0">
+                            <RadzenGridLines Visible="true" />
+                            <RadzenAxisTitle Text="Monto en RD$" />
+                        </RadzenValueAxis>
+                    </RadzenChart>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </div>
+
+    <div class="containerderecho" >
+        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+            <RadzenCard Style="width: 100%;">
+                <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+                </RadzenStack>
+            </RadzenCard>
+
+            <RadzenStack Style="width: 100%; max-width: 600px;">
+                <RadzenChart>
+                    <RadzenDonutSeries Data="@donutChartData" CategoryProperty="Category" ValueProperty="Value" TotalAngle="360" StartAngle="360">
+                        <ChildContent>
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                        </ChildContent>
+                        <TitleTemplate>
+                            <div class="rz-donut-content">
+                                <div>Multas</div>
+                            </div>
+                        </TitleTemplate>
+                    </RadzenDonutSeries>
+                </RadzenChart>
+            </RadzenStack>
+        </RadzenStack>
+    </div>
+    
+</div>
+
+
+    <div class="containerabajo">
+    <div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")" id="resultadoreporte">
+        @if (filteredTickets != null && filteredTickets.Any())
+        {
+            <div style="margin-bottom: 20px; margin-left:77%">
+                <span style="margin-right: 10px;">Formato a exportar:</span>
+                <button @onclick="export" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer;">PDF</button>
+                <button @onclick="Print" style="background-color: #fc8403; color: white; padding: 5px 10px; border: none; cursor: pointer; margin-left: 10px;">Print</button>
+            </div>
+
+            <table class="table" style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
+                <thead>
+                    <tr>
+                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">No. Multa</th>
+                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">Fecha</th>
+                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">Cédula</th>
+                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">Estado</th>
+                        <th style="font-weight: bold; width: 100px; white-space: nowrap;">Pagadas</th>
+                        <th style="font-weight: bold; width: 100px; white-space: nowrap;">Pendientes</th>
+                        <th style="font-weight: bold; width: 100px; text-align: center; white-space: nowrap;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ticket in filteredTickets)
+                    {
+                        <tr>
+                            <td>@ticket.TicketId</td>
+                            <td>@ticket.TicketDate.ToString("dd/MM/yyyy")</td>
+                            <td>@ticket.Identification</td>
+                            <td>
+                                @if (ticket.Status == "Paid")
+                                {
+                                    <span>Pagada</span>
+                                }
+                                else if (ticket.Status == "pending")
+                                {
+                                    <span>Pendiente</span>
+                                }
+                                else
+                                {
+                                    <span>@ticket.Status</span>
+                                }
+                            </td>
+                            <td>
+                                @if (ticket.Status == "Paid")
+                                {
+                                    @ticket.Articulo.Price.ToString("C", new CultureInfo("es-DO"))
+                                }
+                            </td>
+                            <td>
+                                @if (ticket.Status == "pending")
+                                {
+                                    @ticket.Articulo.Price.ToString("C", new CultureInfo("es-DO"))
+                                }
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="/detallemulta/@ticket.TicketId" title="Ver multa">
+                                    <img src="imagenes/trespuntos.png" class="lupa" alt="Ver detalles" style="width: 20px; height: 20px; cursor: pointer;" />
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" style="font-weight: bold; text-align: right;">Total:</td>
+                        <td style="font-weight: bold;">
+                            @filteredTickets.Where(t => t.Status == "Paid").Sum(t => t.Articulo.Price).ToString("C", new CultureInfo("es-DO"))
+                        </td>
+                        <td style="font-weight: bold;">
+                            @filteredTickets.Where(t => t.Status == "pending").Sum(t => t.Articulo.Price).ToString("C", new CultureInfo("es-DO"))
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        }
+        else
+        {
+            <div class="no-results-message" style="margin-top: 20px; text-align: center; font-size: 16px; color: #ff0000;">
+                <p>No se encontraron resultados.</p>
+            </div>
+        }
+    </div>
+</div>
+    
+</div>
 
 @code {
+    
+        private FilterModel filterModel = new FilterModel();
+        private bool IsFechaInicioSet => filterModel.FechaInicio.HasValue;
+        private bool IsFechaFinSet => filterModel.FechaFin.HasValue;
+        private bool mostrarResultados = false;
+        private IEnumerable<Ticket> tickets;
+        private IEnumerable<Ticket> filteredTickets;
 
+
+    private async Task OnFilter()
+    {
+        mostrarResultados = false; // Inicialmente, no mostrar los resultados
+
+        // Comenzamos la URL vacía
+        var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
+
+        // Creamos una lista para agregar los parámetros de la consulta
+        var queryParams = new List<string>();
+
+        if (filterModel.FechaInicio.HasValue)
+            queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:dd-MM-yyyy}");
+
+        if (filterModel.FechaFin.HasValue)
+            queryParams.Add($"FechaFin={filterModel.FechaFin.Value:dd-MM-yyyy}");
+
+        // Si hay parámetros, los agregamos a la URL
+        if (queryParams.Any())
+        {
+            url += string.Join("&", queryParams);
+        }
+
+        try
+        {
+            var response = await Http.GetStringAsync(url);
+            var data = JsonConvert.DeserializeObject<List<Ticket>>(response);
+
+            if (data == null || !data.Any())
+            {
+                filteredTickets = new List<Ticket>(); // No hay resultados
+                mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+            }
+            else
+            {
+                filteredTickets = data;
+                mostrarResultados = true; // Mostrar los resultados si existen
+            }
+
+            // Cargar datos para los gráficos
+            await LoadBarChartData();
+            await LoadDonutChartData();
+
+            StateHasChanged(); // Forzar la actualización de la UI
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            filteredTickets = new List<Ticket>(); // No hay resultados
+            mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            mostrarResultados = false; // En caso de error, ocultar los resultados y manejar el error
+            StateHasChanged();
+        }
+    }
+
+        private void OnFilterr()
+        {
+            Console.WriteLine("Filtros aplicados:");
+
+            Console.WriteLine($"Fecha Inicio: {filterModel.FechaInicio}");
+            Console.WriteLine($"Fecha Fin: {filterModel.FechaFin}");
+
+        }
+
+
+        private void OnDateChange(DateTime? value)
+        {
+            StateHasChanged(); // Forzar la actualización de la UI
+        }
+
+
+
+        public class FilterModel
+        {
+
+            public DateTime? FechaInicio { get; set; }
+            public DateTime? FechaFin { get; set; }
+
+        }
+
+        public class Infraccion
+        {
+            public string Text { get; set; }
+            public int? Value { get; set; }
+        }
+
+        public class Estado
+        {
+            public string Text { get; set; }
+            public string? Value { get; set; }
+        }
+
+
+        public class Tickett
+        {
+            public int TicketId { get; set; }
+  
+
+            public DateTime TicketDate { get; set; }
+            public Article Articulo { get; set; }  // Asegúrate de tener la propiedad Articulo aquí
+
+            public string Status { get; set; }
+        }
+
+
+
+
+        public class Article
+        {
+            public string ArticleNum { get; set; }
+            public string Description { get; set; }
+            public decimal Price { get; set; }
+        }
+
+
+
+        public class ApiResponse
+        {
+            [JsonPropertyName("$values")]
+            public List<Ticket> Tickets { get; set; }
+        }
+
+
+
+
+      
+            bool showDataLabels = false;
+
+          
+    private async Task export()
+    {
+        try
+        {
+            // Verificar que hay tickets filtrados
+            if (filteredTickets == null || !filteredTickets.Any())
+            {
+                // Mostrar mensaje de error o notificación
+                return;
+            }
+
+            // Preparar datos para JavaScript
+            var ticketsData = filteredTickets.Select(t => new
+            {
+                ticketId = t.TicketId,
+                ticketDate = t.TicketDate,
+                identification = t.Identification,
+                status = t.Status,
+                articulo = new { price = t.Articulo.Price }
+            }).ToList();
+
+            // Llamar al generador de PDF
+            await JSRuntime.InvokeVoidAsync("GenerarPDFfinanciero", ticketsData);
+        }
+        catch (Exception ex)
+        {
+            // Manejar errores
+            Console.WriteLine($"Error generando PDF: {ex.Message}");
+        }
+    }
+
+
+            private async Task Print()
+            {
+                await JSRuntime.InvokeVoidAsync("Print");
+
+            }
+
+
+        
+
+
+
+    
+
+
+
+    bool showDataLabelss = false;
+
+    
+
+    private List<DataItem> barChartData = new List<DataItem>();
+
+
+    // Modificar el método LoadBarChartData para usar los métodos de la clase MultasPreciosResponse
+    private async Task LoadBarChartData()
+    {
+        var url = $"https://localhost:7277/api/Ticket/report/multas/precios?startDate={filterModel.FechaInicio.Value:dd/MM/yyyy}&endDate={filterModel.FechaFin.Value:dd/MM/yyyy}";
+        var response = await Http.GetStringAsync(url);
+
+        // Procesar la cadena para eliminar caracteres inesperados
+        response = response.Replace("\"$id\":", "\"__id__\":");  // Si fuera necesario
+
+        var data = JsonConvert.DeserializeObject<MultasPreciosResponse>(response);
+
+        if (data != null)
+        {
+            barChartData = new List<DataItem>
+        {
+            new DataItem { Category = "Pagadas", Value = data.GetTotalPaidAmount() },
+            new DataItem { Category = "Pendientes", Value = data.GetTotalPendingAmount() }
+        };
+        }
+    }
+
+    public class MultasPreciosResponse
+    {
+        [JsonPropertyName("totalPaidAmount")]
+        public string TotalPaidAmount { get; set; }
+
+        [JsonPropertyName("totalPendingAmount")]
+        public string TotalPendingAmount { get; set; }
+
+        // Método para parsear los valores de moneda
+        public decimal GetTotalPaidAmount()
+        {
+            return ParseCurrency(TotalPaidAmount);
+        }
+
+        public decimal GetTotalPendingAmount()
+        {
+            return ParseCurrency(TotalPendingAmount);
+        }
+
+        private decimal ParseCurrency(string currency)
+        {
+            if (string.IsNullOrWhiteSpace(currency))
+                return 0;
+
+            // Eliminar el prefijo RD$ y las comas
+            var cleanValue = currency.Replace("RD$", "").Replace(",", "").Trim();
+
+            // Intentar convertir a decimal
+            if (decimal.TryParse(cleanValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
+            {
+                return result;
+            }
+            return 0;
+        }
+    }
+
+    public class DataItem
+    {
+        public string Category { get; set; }
+        public decimal Value { get; set; }
+    }
+
+    private List<DataItem> donutChartData = new List<DataItem>();
+
+    private async Task LoadDonutChartData()
+    {
+        var url = $"https://localhost:7277/api/Ticket/pendientes/pagas?startDate={filterModel.FechaInicio.Value:dd/MM/yyyy}&endDate={filterModel.FechaFin.Value:dd/MM/yyyy}";
+        var response = await Http.GetStringAsync(url);
+
+        // Procesar la cadena para eliminar caracteres inesperados (si es necesario)
+        response = response.Replace("\"$id\":", "\"__id__\":");
+
+        var data = JsonConvert.DeserializeObject<MultasCantidadResponse>(response);
+
+        if (data != null)
+        {
+            donutChartData = new List<DataItem>
+        {
+            new DataItem { Category = "Pagadas", Value = data.GetPagadas() },
+            new DataItem { Category = "Pendientes", Value = data.GetPendientes() }
+        };
+        }
+    }
+
+    public class MultasCantidadResponse
+    {
+        [JsonPropertyName("pagadas")]
+        public string Pagadas { get; set; }
+
+        [JsonPropertyName("pendientes")]
+        public string Pendientes { get; set; }
+
+        // Método para parsear los valores de moneda
+        public int GetPagadas()
+        {
+            return ParseCurrency(Pagadas);
+        }
+
+        public int GetPendientes()
+        {
+            return ParseCurrency(Pendientes);
+        }
+
+        private int ParseCurrency(string currency)
+        {
+            if (string.IsNullOrWhiteSpace(currency))
+                return 0;
+
+            // Eliminar el prefijo RD$ y las comas
+            var cleanValue = currency.Replace("RD$", "").Replace(",", "").Trim();
+
+            // Intentar convertir a int (ya que el donut chart usa valores enteros)
+            if (int.TryParse(cleanValue, NumberStyles.Any, CultureInfo.InvariantCulture, out int result))
+            {
+                return result;
+            }
+            return 0;
+        }
+    }
+
+
+
+    
 }
