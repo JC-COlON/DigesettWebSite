@@ -8,6 +8,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @using AdministradorAmet.Models
 @using System.Text.Json
+@using System.Net
 @using iTextSharp.text
 @using iTextSharp.text.pdf
 @using Newtonsoft.Json;
@@ -41,6 +42,14 @@
     <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
 </div>
 </div>
+
+@if (mostrarMensaje && !string.IsNullOrEmpty(mensajeNoResultados))
+{
+    <div class="alert alert-warning">
+        @mensajeNoResultados
+    </div>
+}
+
 
 
 @if (!mostrarResultados)
@@ -205,11 +214,16 @@
         private bool mostrarResultados = false;
         private IEnumerable<Ticket> tickets;
         private IEnumerable<Ticket> filteredTickets;
+    
+    private string mensajeNoResultados = string.Empty;
+    private bool mostrarMensaje = false;
 
 
     private async Task OnFilter()
     {
         mostrarResultados = false; // Inicialmente, no mostrar los resultados
+        mostrarMensaje = false; // Inicialmente no mostrar el mensaje
+        mensajeNoResultados = string.Empty; // Limpiar el mensaje de resultados
 
         // Comenzamos la URL vacía
         var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
@@ -218,10 +232,10 @@
         var queryParams = new List<string>();
 
         if (filterModel.FechaInicio.HasValue)
-            queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:dd-MM-yyyy}");
+            queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:dd/MM/yyyy}");
 
         if (filterModel.FechaFin.HasValue)
-            queryParams.Add($"FechaFin={filterModel.FechaFin.Value:dd-MM-yyyy}");
+            queryParams.Add($"FechaFin={filterModel.FechaFin.Value:dd/MM/yyyy}");
 
         // Si hay parámetros, los agregamos a la URL
         if (queryParams.Any())
@@ -231,40 +245,170 @@
 
         try
         {
-            var response = await Http.GetStringAsync(url);
-            var data = JsonConvert.DeserializeObject<List<Ticket>>(response);
-
-            if (data == null || !data.Any())
+            var response = await Http.GetAsync(url); // Cambié a GetAsync para manejar los códigos de estado HTTP
+            if (response.IsSuccessStatusCode)
             {
-                filteredTickets = new List<Ticket>(); // No hay resultados
-                mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+                var data = JsonConvert.DeserializeObject<List<Ticket>>(await response.Content.ReadAsStringAsync());
+                if (data == null || !data.Any())
+                {
+                    filteredTickets = new List<Ticket>(); // No hay resultados
+                    mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+                    mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Establecer el mensaje
+                    mostrarMensaje = true; // Mostrar el mensaje
+
+                    // Actualizar la UI para mostrar el mensaje
+                    StateHasChanged();
+
+                    await Task.Delay(3000); // Esperar 3 segundos
+                    mensajeNoResultados = string.Empty; // Limpiar el mensaje después de 3 segundos
+                    mostrarMensaje = false; // Ocultar el mensaje
+
+                    // Actualizar la UI para ocultar el mensaje
+                    StateHasChanged();
+                }
+                else
+                {
+                    filteredTickets = data;
+                    mostrarResultados = true; // Mostrar los resultados si existen
+                    mensajeNoResultados = string.Empty; // Limpiar el mensaje si hay resultados
+                    mostrarMensaje = false; // Ocultar el mensaje
+
+                    // Actualizar los gráficos con los nuevos datos
+                    await LoadBarChartData(); // Cargar datos para el gráfico de barras
+                    await LoadDonutChartData(); // Cargar datos para el gráfico de dona
+
+                    // Actualizar la UI para reflejar los cambios
+                    StateHasChanged();
+                }
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // El servidor retornó un 404
+                filteredTickets = new List<Ticket>();
+                mostrarResultados = false;
+                mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Establecer el mensaje
+                mostrarMensaje = true;
+                StateHasChanged();
+
+                await Task.Delay(3000);
+                mensajeNoResultados = string.Empty;
+                mostrarMensaje = false;
+                StateHasChanged();
             }
             else
             {
-                filteredTickets = data;
-                mostrarResultados = true; // Mostrar los resultados si existen
+                // Otro tipo de error
+                Console.Error.WriteLine($"Error: {response.StatusCode}");
+                mensajeNoResultados = "Hubo un error al intentar obtener los datos.";
+                mostrarMensaje = true;
+                StateHasChanged();
+
+                await Task.Delay(3000);
+                mensajeNoResultados = string.Empty;
+                mostrarMensaje = false;
+                StateHasChanged();
             }
-
-            // Cargar datos para los gráficos
-            await LoadBarChartData();
-            await LoadDonutChartData();
-
-            StateHasChanged(); // Forzar la actualización de la UI
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-            filteredTickets = new List<Ticket>(); // No hay resultados
-            mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
-            StateHasChanged();
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-            mostrarResultados = false; // En caso de error, ocultar los resultados y manejar el error
+            mensajeNoResultados = "Hubo un error al intentar obtener los datos.";
+            mostrarMensaje = true;
+            StateHasChanged();
+
+            await Task.Delay(3000);
+            mensajeNoResultados = string.Empty;
+            mostrarMensaje = false;
             StateHasChanged();
         }
     }
+   
+    
+    // private async Task OnFilter()
+    // {
+    //     mostrarResultados = false; // Inicialmente, no mostrar los resultados
+    //     mostrarMensaje = false; // Inicialmente no mostrar el mensaje
+    //     mensajeNoResultados = string.Empty; // Limpiar el mensaje de resultados
+
+    //     // Comenzamos la URL vacía
+    //     var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
+
+    //     // Creamos una lista para agregar los parámetros de la consulta
+    //     var queryParams = new List<string>();
+
+    //     if (filterModel.FechaInicio.HasValue)
+    //         queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:dd/MM/yyyy}");
+
+    //     if (filterModel.FechaFin.HasValue)
+    //         queryParams.Add($"FechaFin={filterModel.FechaFin.Value:dd/MM/yyyy}");
+
+    //     // Si hay parámetros, los agregamos a la URL
+    //     if (queryParams.Any())
+    //     {
+    //         url += string.Join("&", queryParams);
+    //     }
+
+    //     try
+    //     {
+    //         var response = await Http.GetStringAsync(url);
+    //         var data = JsonConvert.DeserializeObject<List<Ticket>>(response);
+
+    //         if (data == null || !data.Any())
+    //         {
+    //             filteredTickets = new List<Ticket>(); // No hay resultados
+    //             mostrarResultados = false; // No mostrar resultados
+    //             mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Mensaje de "No hay resultados"
+    //             mostrarMensaje = true; // Mostrar el mensaje de advertencia
+
+    //             // Esperar 3 segundos antes de ocultar el mensaje
+    //             await Task.Delay(3000); // Retraso de 3 segundos
+    //             mostrarMensaje = false; // Ocultar el mensaje después del retraso
+    //         }
+    //         else
+    //         {
+    //             filteredTickets = data;
+    //             mostrarResultados = true; // Mostrar los resultados si existen
+    //         }
+
+    //         // Cargar datos para los gráficos
+    //         await LoadBarChartData();
+    //         await LoadDonutChartData();
+
+    //         StateHasChanged(); // Forzar la actualización de la UI
+    //     }
+    //     catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+    //     {
+    //         // Manejo de error 404
+    //         Console.Error.WriteLine($"Error: {ex.Message}");
+    //         filteredTickets = new List<Ticket>(); // No hay resultados
+    //         mostrarResultados = false; // No mostrar resultados
+    //         mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Mensaje de error 404
+    //         mostrarMensaje = true; // Mostrar el mensaje de advertencia
+
+    //         // Esperar 3 segundos antes de ocultar el mensaje
+    //         await Task.Delay(3000); // Retraso de 3 segundos
+    //         mostrarMensaje = false; // Ocultar el mensaje después del retraso
+
+    //         StateHasChanged();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // Manejo de errores generales
+    //         Console.Error.WriteLine($"Error: {ex.Message}");
+    //         filteredTickets = new List<Ticket>(); // No hay resultados
+    //         mostrarResultados = false; // Ocultar los resultados
+    //         mensajeNoResultados = "Hubo un error al realizar la búsqueda, por favor intente más tarde."; // Mensaje de error general
+    //         mostrarMensaje = true; // Mostrar el mensaje de error
+
+    //         // Esperar 3 segundos antes de ocultar el mensaje
+    //         await Task.Delay(3000); // Retraso de 3 segundos
+    //         mostrarMensaje = false; // Ocultar el mensaje después del retraso
+
+    //         StateHasChanged();
+    //     }
+    // }
+
+
 
         private void OnFilterr()
         {

@@ -7,6 +7,7 @@
 @using System.IO
 @inject IHttpContextAccessor HttpContextAccessor
 @using AdministradorAmet.Models
+@using System.Net
 @using iTextSharp.text
 @using iTextSharp.text.pdf
 
@@ -102,8 +103,20 @@
         <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
     </div>
     </div>
+
+ 
+    @if (mostrarMensaje && !string.IsNullOrEmpty(mensajeNoResultados))
+    {
+        <div class="alert alert-warning">
+            @mensajeNoResultados
+        </div>
+    }
+
+
     @if (!mostrarResultados)
     {
+        
+
         <div class="containerdebajo">
             <img src="imagenes/ametlogo.png" class="logo @(mostrarResultados ? "reducido" : "")" />
             <h3 class="info-text">
@@ -118,11 +131,12 @@
     <div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")" id="resultadoreporte">
         @if (filteredTickets != null && filteredTickets.Any())
         {
-            <div style="margin-bottom: 20px; margin-left:77%">
+            <div style="margin-bottom: 20px; margin-left:77%" class="no-print">
                 <span style="margin-right: 10px;">Formato a exportar:</span>
-                <button @onclick="export" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer;">PDF</button>
-                <button @onclick="Print" style="background-color: #fc8403; color: white; padding: 5px 10px; border: none; cursor: pointer; margin-left: 10px;">Print</button>
+                <button @onclick="export" class="export-button" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer;">PDF</button>
+                <button @onclick="Print" class="print-button" style="background-color: #fc8403; color: white; padding: 5px 10px; border: none; cursor: pointer; margin-left: 10px;">Print</button>
             </div>
+
 
             <table class="table" style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
                 <thead>
@@ -192,6 +206,8 @@
     private bool mostrarResultados = false;
     private IEnumerable<Ticket> tickets;
     private IEnumerable<Ticket> filteredTickets;
+    private string mensajeNoResultados = string.Empty;
+    private bool mostrarMensaje = false;
 
 
     private List<Infraccion> infracciones = new List<Infraccion>
@@ -259,6 +275,8 @@
     private async Task OnFilter()
     {
         mostrarResultados = false; // Inicialmente, no mostrar los resultados
+        mostrarMensaje = false; // Asegúrate de ocultar el mensaje al inicio
+        mensajeNoResultados = string.Empty; // Limpiar el mensaje de resultados
 
         // Comenzamos la URL vacía
         var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
@@ -283,10 +301,10 @@
         }
 
         if (filterModel.FechaInicio.HasValue)
-            queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:yyyy-MM-dd}");
+            queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:dd/MM/yyyy}");
 
         if (filterModel.FechaFin.HasValue)
-            queryParams.Add($"FechaFin={filterModel.FechaFin.Value:yyyy-MM-dd}");
+            queryParams.Add($"FechaFin={filterModel.FechaFin.Value:dd/MM/yyyy}");
 
         if (filterModel.Infraccion.HasValue)
             queryParams.Add($"ArticuloInfringidoId={filterModel.Infraccion}");
@@ -318,35 +336,69 @@
 
         try
         {
-            var response = await Http.GetFromJsonAsync<ApiResponse>(url);
+            var response = await Http.GetAsync(url);
 
-            if (response == null || response.Tickets == null || !response.Tickets.Any())
+            // Verificamos el código de estado
+            if (response.IsSuccessStatusCode)
             {
+                var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
+
+                // Si la respuesta tiene resultados
+                if (apiResponse != null && apiResponse.Tickets != null && apiResponse.Tickets.Any())
+                {
+                    filteredTickets = apiResponse.Tickets;
+                    mostrarResultados = true; // Mostrar los resultados si existen
+                }
+                else
+                {
+                    filteredTickets = new List<Ticket>(); // No hay resultados
+                    mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+                    mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Mensaje para "No hay resultados"
+                    mostrarMensaje = true; // Mostrar el mensaje de advertencia
+                }
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Si el servidor devuelve un 404 Not Found
                 filteredTickets = new List<Ticket>(); // No hay resultados
                 mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+                mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Mensaje para "No hay resultados"
+                mostrarMensaje = true; // Mostrar el mensaje de advertencia
             }
             else
             {
-                filteredTickets = response.Tickets;
-                mostrarResultados = true; // Mostrar los resultados si existen
+                // Para otros códigos de estado que no sean 200 (OK) ni 404
+                filteredTickets = new List<Ticket>(); // No hay resultados
+                mostrarResultados = false; // Mostrar mensaje de "Error en la búsqueda"
+                mensajeNoResultados = "Hubo un error en la búsqueda, por favor intente de nuevo."; // Mensaje de error
+                mostrarMensaje = true; // Mostrar el mensaje de error
             }
 
             StateHasChanged(); // Forzar la actualización de la UI
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        catch (HttpRequestException ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Aquí manejamos los errores de red o problemas con la conexión
+            Console.Error.WriteLine($"Error de red: {ex.Message}");
             filteredTickets = new List<Ticket>(); // No hay resultados
-            mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+            mostrarResultados = false; // Mostrar mensaje de error
+            mensajeNoResultados = "Hubo un problema con la conexión. Por favor, intente de nuevo."; // Mensaje de error de conexión
+            mostrarMensaje = true; // Mostrar el mensaje de advertencia
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-            mostrarResultados = false; // En caso de error, ocultar los resultados y manejar el error
+            // Para otros errores generales
+            Console.Error.WriteLine($"Error inesperado: {ex.Message}");
+            filteredTickets = new List<Ticket>(); // No hay resultados
+            mostrarResultados = false; // Mostrar mensaje de error
+            mensajeNoResultados = "Ocurrió un error inesperado."; // Mensaje de error
+            mostrarMensaje = true; // Mostrar el mensaje de advertencia
             StateHasChanged();
         }
     }
+
+
 
 
 

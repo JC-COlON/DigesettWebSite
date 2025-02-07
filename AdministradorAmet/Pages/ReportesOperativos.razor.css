@@ -163,3 +163,31 @@
     margin-left:50px
 }
 
+@media print {
+    /* Ocultar botones y cualquier cosa que no se desee imprimir */
+    .no-print, .print-button, .export-button {
+        display: none !important;
+    }
+
+    /* Estilos adicionales para la tabla, si es necesario */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .no-results-message {
+        font-size: 16px;
+        color: red;
+        text-align: center;
+    }
+}
