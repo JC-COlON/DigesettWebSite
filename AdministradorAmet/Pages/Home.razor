@@ -4,6 +4,7 @@
 @inject HttpClient Http
 @using System.IO
 @using AdministradorAmet.Models
+@using System.Text.Json.Serialization
 @using Tewr.Blazor.FileReader
 @inject IFileReaderService filereader
 @using Radzen
@@ -17,7 +18,94 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
 <div class="ContainerPrincipal">
-    <!-- Contenido del contenedor principal -->
+    <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+        <RadzenCard>
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@smooth" Name="smooth" />
+                    <RadzenLabel Text="Suavizado" Component="smooth" />
+                </RadzenStack>
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels" />
+                    <RadzenLabel Text="Mostrar valores" Component="dataLabels" />
+                </RadzenStack>
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@showMarkers" Name="markers" />
+                    <RadzenLabel Text="Mostrar marcadores" Component="markers" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+   
+
+   
+
+    
+
+
+        <RadzenChart>
+            <RadzenChartTooltipOptions Shared="@sharedTooltip" />
+            <RadzenLineSeries Smooth="@smooth" Data="@multasPorMes"
+                              CategoryProperty="Mes" ValueProperty="Cantidad"
+                              Title="Multas por Mes">
+                <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
+                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            </RadzenLineSeries>
+            <RadzenCategoryAxis Padding="20" />
+            <RadzenValueAxis Max="100" Step="10">
+                <RadzenGridLines Visible="true" />
+                <RadzenAxisTitle Text="Cantidad de Multas" />
+            </RadzenValueAxis>
+        </RadzenChart>
+    </RadzenStack>
+
+   
+</div>
+
+<div class="containersecundario">
+     <RadzenDataGrid  Data="@tickets" TItem="Ticket"
+>
+            <Columns>
+            <RadzenDataGridColumn TItem="Ticket" Title="Nombre Completo" Property="FullName" Width="125px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre Completo</span>
+                    </HeaderTemplate>
+                </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Ticket" Title="Cedula" Property="Identification" Width="80px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Cedula</span>
+                    </HeaderTemplate>
+                </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Ticket" Title="Fecha" Property="TicketDate" Width="100px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Fecha</span>
+                    </HeaderTemplate>
+                </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Ticket" Title="No. Multa" Property="TicketId" Width="60px">
+                <HeaderTemplate>
+                    <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No. Multa</span>
+                </HeaderTemplate>
+            </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Title="Agente No." Property="AgentNumber" Width="75px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Agente No.</span>
+                    </HeaderTemplate>
+                </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Ticket" Width="50px" Title="Acción">
+                <HeaderTemplate>
+                    <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Ver</span>
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenButton Icon="more_vert" Click="@(args => VerDetalles(data.TicketId))" />
+                </Template>
+            </RadzenDataGridColumn>
+
+
+
+            </Columns>
+        </RadzenDataGrid>
 </div>
 
 <div class="ContenedorIzquierdo">
@@ -84,6 +172,7 @@
 </div>
 
 @code {
+    private List<Ticket> tickets;
     private int TotalMultasRegistradas { get; set; }
     private int TotalMultasPagadas { get; set; }
     private int TotalMultasPendientes { get; set; }
@@ -101,7 +190,29 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         await ObtenerMultasResumen(); // Llamar al método para obtener las multas al inicio
+        await CargarUltimasMultas();
+
+        try
+        {
+            var response = await Http.GetFromJsonAsync<ApiResponse>(
+                "https://localhost:7277/api/Ticket/multas/por-mes");
+
+            multasPorMes = response?.Values?
+                .OrderBy(m => DateTime.ParseExact(m.Mes, "MMMM", new CultureInfo("es-ES")))
+                .Select(m => new MultaPorMes
+                    {
+                        Mes = ConvertirMes(m.Mes),
+                        Cantidad = m.Cantidad
+                    })
+                .ToArray() ?? Array.Empty<MultaPorMes>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cargando datos: {ex.Message}");
+        }
     }
 
     private async Task ObtenerMultasResumen()
@@ -147,6 +258,57 @@
         }
     }
 
+    private async Task CargarUltimasMultas()
+    {
+        try
+        {
+            // Obtener todas las multas desde la API
+            var response = await Http.GetStringAsync("https://localhost:7277/api/Ticket/allticket");
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                // Deserializar las multas
+                var todasLasMultas = JsonConvert.DeserializeObject<List<Ticket>>(response);
+
+                if (todasLasMultas != null)
+                {
+                    // Ordenar las multas por la fecha más reciente
+                    tickets = todasLasMultas.OrderByDescending(multa => multa.TicketDate).Take(4).ToList();
+                    Console.WriteLine($"Últimas 4 multas: {tickets?.Count()}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar las últimas multas: {ex.Message}");
+        }
+    }
+
+    private void ShowDetails(int ticketId)
+    {
+        // Aquí puedes implementar la lógica para mostrar los detalles de la multa
+    }
+
+    private string ConvertirMes(string mes)
+    {
+        return mes switch
+        {
+            "enero" => "ENE",
+            "febrero" => "FEB",
+            "marzo" => "MAR",
+            "abril" => "ABR",
+            "mayo" => "MAY",
+            "junio" => "JUN",
+            "julio" => "JUL",
+            "agosto" => "AGO",
+            "septiembre" => "SET",
+            "octubre" => "OCT",
+            "noviembre" => "NOV",
+            "diciembre" => "DIC",
+            _ => mes
+        };
+    }
+
     // Clase para deserializar el JSON
     public class ResumenMultas
     {
@@ -162,5 +324,31 @@
     {
         public string Estado { get; set; }
         public double Monto { get; set; }
+    }
+
+    bool smooth = false;
+    bool sharedTooltip = true;
+    bool showDataLabels = false;
+    bool showMarkers = true;
+
+    MultaPorMes[] multasPorMes = Array.Empty<MultaPorMes>();
+
+    public class ApiResponse
+    {
+        [JsonPropertyName("$values")]
+        public List<MultaPorMes> Values { get; set; }
+    }
+
+    public class MultaPorMes
+    {
+        public string Mes { get; set; }
+        public int Cantidad { get; set; }
+    }
+
+    private void VerDetalles(int ticketId)
+    {
+        // Aquí puedes implementar la lógica para navegar a la página de detalles de la multa
+        // Por ejemplo:
+        NavigationManager.NavigateTo($"/detallemulta/{ticketId}");
     }
 }

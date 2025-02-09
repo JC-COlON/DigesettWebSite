@@ -20,6 +20,7 @@
         public Article Articulo { get; set; }
         public Agent Agente { get; set; }
         public string Status { get; set; }
+        public string FullName => $"{Name} {LastName}";
     }
 
     public class VehicleTypee
