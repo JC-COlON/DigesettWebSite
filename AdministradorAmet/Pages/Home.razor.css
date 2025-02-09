@@ -1,249 +1,110 @@
-﻿/* General */
-.container {
-    font-family: Poppins, Roboto; 
-    padding: 0px;
-    margin-top: 1px;
-    text-align: left;
-    margin-left: 2px;
+﻿/* Contenedor principal que ocupa el 75% */
+.ContainerPrincipal {
+    width: 72%;
+    margin: 20px 0;
+    background-color: white;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    float: left;
+    margin-right: 8px;
 }
 
-/* Header */
-.header {
-    
+/* Contenedor de la columna izquierda que ocupa el 25% restante */
+.ContenedorIzquierdo {
+    width: 25%;
+    margin: 20px 0;
+    float: right;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 0 20px; 
+    flex-direction: column;
 }
-.title {
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    color: black;
-}
-.btn-create {
+
+/* Estilo para el primer contenedor (más grande) */
+.ContainerIzq1 {
+    height: 250px;
+    width: 100%;
+    margin-bottom: 0px;
+    background-color: white;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    background-color: #009C40;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 12px;
-    cursor: pointer;
-    height: 36px;
-    border-radius: 5px;
-    padding: 6px 10px;
-    cursor: pointer;
-
-    transition: background-color 0.3s ease;
-    margin-left: 20px; /* Ajuste el espacio entre el título y el botón */
+    margin-bottom: 10px;
+    position: relative;
 }
-    .btn-create:hover {
-        background-color: #007A30; /* Color más oscuro */
-    }
 
+.SubTextGrafico {
+    font-size: 14px;
+    color: #888;
+    position: absolute;
+    top: 220px;
+    right: 10px;
+}
 
-/* Agents Section */
-.Cuadro-Grande {
-    
-    border: 0.2px solid #DDDDDD;
-    padding: 25px;
-    height: 80vh;
-    width: 100%; /* Ajustado a 100% para que el ancho se adapte al contenedor */
-    max-width: 1200px;
-    min-width: 900px;
-    border-radius: 5px;
+/* Estilo para el segundo contenedor */
+.ContainerIzq2, .ContainerIzq3, .ContainerIzq4 {
+    height: 145px;
+    width: 100%;
     margin-bottom: 10px;
     background-color: white;
+    padding: 15px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    box-shadow: 0px 4px 15px rgba(50, 50, 50, 0.1);
-}
-
-
-/* Título de la sección */
-.section-title {
-    font-size: 10px;
-    margin-bottom: 15px;
-    margin-top: 2px;
-    font-weight: bold;
-    color: black;
-}
-
-/* Top Row */
-.top-row {
-    display: flex;
-    gap: 50px; 
-    margin-bottom: 27px;
-    justify-content: flex-start; 
-    flex-wrap: wrap; 
-}
-
-
-/* Cuadros de AGENTES */
-.agent-box {
-    
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    border-radius: 5px;
-    border: none;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    width: 220px;
-    height: 75px;
-    background-color: white;
-}
-.number {
-    font-size: 14px;
-    margin-bottom: 6px;
-    margin-top: 6px;
-    font-family: 'Poppins', sans-serif;
-}
-.orange {
-    color: #FD8402;
-}
-.text1 {
-    font-size: 10px;
-    text-align: center;
-}
-.green-box1 {
-   
-    right: 80px; /* Establece una distancia de 80px desde el borde derecho del contenedor */
-    bottom: 10px; /* Si quieres que se quede en la parte inferior */
-    background-color: #FD8402;
-    width: 155px;
-    height: 75px;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 12px;
-    color: white;
-    border-radius: 8px;
-}
-
-.green-box1 .fecha1 {
-    font-size: 20px;
-    text-align: center;
-}
-    .green-box1 .text {
-        font-size: 20px;
-        text-align: center;
-        color: white;
-    }
-
-/* Main Table */
-.main-table {
-    overflow-x: auto;
-    overflow-y: auto;
-    width: 80%; 
-    /*height: 420px;*/
-    height:53vh;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
-    padding: 6px;
-    background-color: white;
     position: relative;
-    max-width: 100%; /* Ocupa todo el ancho disponible sin exceder el contenedor */
-    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
 }
-/* Cuadro principal (contenedor de la tabla y los cuadros verdes) */
-.wrapper {
+
+.ContentWrapper {
     display: flex;
-    justify-content: space-between; /* Alinea la tabla y los cuadros verdes */
-    gap: 20px;
+    align-items: center;
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto; /* Centra el contenido */
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: none;
-    box-shadow: none;
+    justify-content: flex-start;
 }
 
-/* Estilo para el checkbox seleccionado */
-.highlighted {
-    background-color: #FD8402;
-}
-input[type="checkbox"] {
-    cursor: pointer;
-}
-th, td {
-    border: none;
-    padding: 4px;
-    font-size: 10px;
-    text-align: center;
-    background-color: white;
-    height: 38px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    
-}
-th {
-
-    font-weight: bold;
-    font-size: 12px;
-    color: black;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1);
-}
-td {
-    cursor: pointer;
-    padding: 2px;
-    font-size: 10px;
-    color: #989898;
-    background-color: white;
-    text-align: center;
+.IconImage {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
 }
 
-
-/* VERDES */
-.side-boxes {
+.TextWrapper {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom:20px;
-    width: 200px; /* Asegura el tamaño fijo de los cuadros verdes */
-    position: relative; /* Ya no es necesario usar 'absolute' */
-    top: 0; /* Eliminar top para un posicionamiento dinámico */
+    align-items: flex-end;
+    width: 100%;
 }
 
-/* Cuadros individuales verdes */
-.green-box {
-    
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    padding: 12px;
-    background-color: #009C40;
-    color: white;
-    width: 155px;
-    height: 75px;
-    border-radius: 8px;
-    
-   
-
+.CountNumber {
+    font-size: 40px;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    align-self: center;
 }
-.second-box-title {
+
+.SubText, .SubTexttotal {
     font-size: 14px;
-    margin-top: 10px;
+    color: #888;
+    margin: 0;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    text-align: right;
 }
-.text {
-    margin-top: 4px;
-    font-size: 15px;
-    text-align: center;
-}
-.fecha {
-    font-size: 9px;
-    text-align: center;
-    color: white;
-}
-.second-box-button {
-    padding: 20px;
+
+.SelectStyled {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+    margin-bottom: 0;
 }

@@ -147,14 +147,14 @@
 }
 /* Añadir borde rojo al contenedor */
 .border-red {
-    border: 2px solid red; /* Borde rojo de 2px */
+  /* Borde rojo de 2px */
     padding: 25px;
     box-sizing: border-box;
 }
 
 
 .border-green {
-    border: 2px solid green; /* Borde rojo de 2px */
+ /* Borde rojo de 2px */
     padding: 25px;
     box-sizing: border-box;
 }

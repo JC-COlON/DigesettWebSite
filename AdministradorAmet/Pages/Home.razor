@@ -2,158 +2,165 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
-@using System.IO;
+@using System.IO
 @using AdministradorAmet.Models
 @using Tewr.Blazor.FileReader
 @inject IFileReaderService filereader
 @using Radzen
 @using MudBlazor
 @using Newtonsoft.Json
-
+@using System.Globalization
 
 <PageTitle>Home</PageTitle>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
-<!-- Contenedor principal -->
-<div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px;">
+<div class="ContainerPrincipal">
+    <!-- Contenido del contenedor principal -->
+</div>
+
+<div class="ContenedorIzquierdo">
 
 
+    <div class="ContainerIzq1">
+        <!-- Selector de rango -->
+        <select @onchange="HandleChange" class="SelectStyled">
+            <option value="dia">Día</option>
+            <option value="semana">Semana</option>
+            <option value="mes">Mes</option>
+            <option value="ano">Año</option>
+            <option value="total" selected>Total</option>
+        </select>
+        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" style="padding-top: 0;">
+            <!-- Elimina el padding superior aquí -->
+            <RadzenChart Style="height: 275px; width: 275px">
+                <RadzenPieSeries Data="@multasData" Title="Multas" CategoryProperty="Estado" ValueProperty="Monto">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenPieSeries>
+            </RadzenChart>
+        </RadzenStack>
 
-    @*   <input type="file" @ref="elementReference" @onchange="async () => await OpenFileAsync()" />
-    <ul>
-        <li>File Name: @fileName  </li>
-        <li>File Size: @size  </li>
-        <li>File Type: @type  </li>
-    </ul>
 
-    <br />
-
-
-    <button class="btn btn-block btn-success" @onclick="async ()=> await UploadFileAsync()"> Upload File </button>
-
-    @if (!string.IsNullOrWhiteSpace(message))
-    {
-        <div class="alert alert pri">
-            Upload SuccesFully
-        </div>
-    }
-    @if (imagePath != null)
-    {
-        <img style="width:150px" src="@imagePath" />
-    } *@
-
-    <!-- Sección de Inputs y Botón -->
-    <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="10px" class="rz-p-4">
-        <RadzenDatePicker @bind-Value="startDate" Placeholder="Fecha Inicio" Style="width: 175px; font-family: 'Poppins', sans-serif;" DateFormat="dd/MM/yyyy" />
-        <RadzenDatePicker @bind-Value="endDate" Placeholder="Fecha Fin" Style="width: 175px; font-family: 'Poppins', sans-serif;" DateFormat="dd/MM/yyyy" />
-        <RadzenButton Text="Consultar" Click="OnConsultarClick" Style="background-color: #009C40; color: white; border: 3px solid #009C40; width:175px; font-family: 'Poppins', sans-serif;" />
-    </RadzenStack>
-
-    <!-- Sección de Tarjetas con los totales -->
-    <RadzenStack Orientation="Radzen.Orientation.Vertical" AlignItems="Radzen.AlignItems.Start" Gap="20px" class="rz-p-4" style="margin-top: 20px;">
-
-        <!-- Total de Multas -->
-        <RadzenCard Style="width: 300px; border:3px solid black; font-family: 'Poppins', sans-serif;">
-            <h4>Total de Multas</h4>
-            <p>@totalTickets</p>
-        </RadzenCard>
-
-        <!-- Total de Multas Pendientes -->
-        <RadzenCard Style="width: 300px; border:3px solid #fc8403; font-family: 'Poppins', sans-serif;">
-            <h4>Total de Multas Pendientes</h4>
-            <p>@totalPendingAmount</p>
-        </RadzenCard>
-
-        <!-- Total de Multas Pagas -->
-        <RadzenCard Style="width: 300px; border:3px solid #009C40; font-family: 'Poppins', sans-serif;">
-            <h4>Total de Multas Pagas</h4>
-            <p>@totalPaidAmount</p>
-        </RadzenCard>
-
-    </RadzenStack>
-
-    <!-- Gráfico de Barras -->
-    <div>
-        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+        <p class="SubTextGrafico">Ingresos por multas</p>
     </div>
-    <MudText Typo="Typo.h6">Selected portion of the chart: @Index</MudText>
+
+
+
+
+    <div class="ContainerIzq2">
+        <!-- Contenido de multas registradas con número -->
+        <div class="ContentWrapper">
+            <img src="imagenes/multatotal.png" alt="Toral multas" class="IconImage">
+            <div>
+                <h1 class="CountNumber">@TotalMultasRegistradas</h1>
+                <p class="SubTexttotal">Total de Multas Registradas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ContainerIzq3">
+        <!-- Contenido de multas pagadas con imagen -->
+        <div class="ContentWrapper">
+            <img src="imagenes/pagadas.png" alt="Multas Pagadas" class="IconImage">
+            <div>
+                <h1 class="CountNumber">@TotalMultasPagadas</h1>
+                <p class="SubText">Multas Pagadas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ContainerIzq4">
+        <!-- Contenido de multas pendientes con imagen -->
+        <div class="ContentWrapper">
+            <img src="imagenes/pendiente.png" alt="Multas Pendientes" class="IconImage">
+            <div>
+                <h1 class="CountNumber">@TotalMultasPendientes</h1>
+                <p class="SubText">Multas Pendientes</p>
+            </div>
+        </div>
+    </div>
 
 </div>
 
-
 @code {
-    DateTime? startDate { get; set; }
-    DateTime? endDate { get; set; }
+    private int TotalMultasRegistradas { get; set; }
+    private int TotalMultasPagadas { get; set; }
+    private int TotalMultasPendientes { get; set; }
+    private string selectedRango = "total"; // Valor por defecto establecido a "total"
 
-    int totalTickets { get; set; }
-    string totalPaidAmount { get; set; }
-    string totalPendingAmount { get; set; }
+    // Datos para el gráfico de pastel
+    private List<DataItem> multasData = new List<DataItem>();
 
-    private int Index = -1; // default value cannot be 0 -> first selectedindex is 0.
-    public List<ChartSeries> Series = new List<ChartSeries>();
-    public string[] XAxisLabels = { };
-
-    async Task OnConsultarClick()
+    // Método para manejar el cambio de selección del rango
+    private async Task HandleChange(ChangeEventArgs e)
     {
-        if (startDate.HasValue && endDate.HasValue)
+        selectedRango = e.Value.ToString();
+        await ObtenerMultasResumen();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerMultasResumen(); // Llamar al método para obtener las multas al inicio
+    }
+
+    private async Task ObtenerMultasResumen()
+    {
+        try
         {
-            string startDateStr = startDate.Value.ToString("dd/MM/yyyy");
-            string endDateStr = endDate.Value.ToString("dd/MM/yyyy");
+            // Hacer la solicitud a la API con el rango seleccionado
+            var response = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/multas/resumen?rango={selectedRango}");
 
-            // Realizar la solicitud HTTP
-            var response = await Http.GetAsync($"https://localhost:7277/api/Ticket/MultasPorFechaYTopArticulos?startDate={startDateStr}&endDate={endDateStr}");
-            if (response.IsSuccessStatusCode)
+            // Deserializar el JSON obtenido
+            var resumenMultas = JsonConvert.DeserializeObject<ResumenMultas>(response);
+
+            // Asignar los valores a las variables correspondientes
+            TotalMultasRegistradas = resumenMultas.total;
+            TotalMultasPagadas = resumenMultas.pagadas;
+            TotalMultasPendientes = resumenMultas.pendientes;
+
+            // Actualizar datos del gráfico de pastel
+            multasData = new List<DataItem>
             {
-                var jsonString = await response.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<MultasResponse>(jsonString);
-
-                if (data != null)
-                {
-                    totalTickets = data.MultasResumen.TotalTickets;
-                    totalPaidAmount = data.MultasResumen.TotalPaidAmount;
-                    totalPendingAmount = data.MultasResumen.TotalPendingAmount;
-
-                    Series = new List<ChartSeries>
-                    {
-                        new ChartSeries { Name = "Cantidad de Multas", Data = data.TopArticulos.Select(a => (double)a.CantidadMultas).ToArray() }
-                    };
-                    XAxisLabels = data.TopArticulos.Select(a => a.ArticleNum).ToArray();
+                new DataItem {
+                    Estado = "Pagadas",
+                    Monto = double.Parse(resumenMultas.totalPaidAmount
+                        .Replace("RD$", "")
+                        .Replace(",", "")
+                        .Trim(),
+                        CultureInfo.InvariantCulture)
+                },
+                new DataItem {
+                    Estado = "Pendientes",
+                    Monto = double.Parse(resumenMultas.totalPendingAmount
+                        .Replace("RD$", "")
+                        .Replace(",", "")
+                        .Trim(),
+                        CultureInfo.InvariantCulture)
                 }
-            }
+            };
+        }
+        catch (Exception ex)
+        {
+            // Manejo de errores, por si la API no responde o ocurre algún problema
+            Console.WriteLine($"Error al obtener los datos: {ex.Message}");
         }
     }
 
-
-
-    public class MultasResponse
+    // Clase para deserializar el JSON
+    public class ResumenMultas
     {
-        public MultasResumenResponse MultasResumen { get; set; }
-        public List<TopArticuloResponse> TopArticulos { get; set; }
+        public int total { get; set; }
+        public int pagadas { get; set; }
+        public int pendientes { get; set; }
+        public string totalPaidAmount { get; set; }
+        public string totalPendingAmount { get; set; }
     }
 
-    public class MultasResumenResponse
+    // Clase para los datos del gráfico de pastel
+    public class DataItem
     {
-        public int TotalTickets { get; set; }
-        public string TotalPaidAmount { get; set; }
-        public string TotalPendingAmount { get; set; }
+        public string Estado { get; set; }
+        public double Monto { get; set; }
     }
-
-    public class TopArticuloResponse
-    {
-        public string ArticleNum { get; set; }
-        public int CantidadMultas { get; set; }
-    }
-
-
-
-
 }
-
-
-
-
-
-
-
