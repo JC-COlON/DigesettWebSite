@@ -23,13 +23,12 @@
     margin-right: 8px;
 }
 /* Contenedor de la columna izquierda que ocupa el 25% restante */
-.ContenedorIzquierdo {
+.ContenedorDerecho {
     width: 25%;
     margin: 20px 0;
     float: right;
     display: flex;
     flex-direction: column;
-    
 }
 
 /* Estilo para el primer contenedor (más grande) */
@@ -47,6 +46,14 @@
     align-items: center;
     margin-bottom: 10px;
     position: relative;
+}
+
+.containertitulo {
+    font-size: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+
 }
 
 .SubTextGrafico {

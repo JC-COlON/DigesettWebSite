@@ -17,8 +17,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
+
+
 <div class="ContainerPrincipal">
-    <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <h3 class="containertitulo">Multas por Mes</h3>
+    <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" >
         <RadzenCard>
             <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="FlexWrap.Wrap">
                 <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
@@ -58,34 +61,34 @@
         </RadzenChart>
     </RadzenStack>
 
-   
-</div>
 
-<div class="containersecundario">
-     <RadzenDataGrid  Data="@tickets" TItem="Ticket"
->
+
+    
+        <h3 class="containertitulo" style="margin-bottom:30px;">Multas Recientes</h3>
+
+        <RadzenDataGrid Data="@tickets" TItem="Ticket">
             <Columns>
-            <RadzenDataGridColumn TItem="Ticket" Title="Nombre Completo" Property="FullName" Width="125px">
+                <RadzenDataGridColumn TItem="Ticket" Title="Nombre Completo" Property="FullName" Width="125px">
                     <HeaderTemplate>
                         <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre Completo</span>
                     </HeaderTemplate>
                 </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Ticket" Title="Cedula" Property="Identification" Width="80px">
+                <RadzenDataGridColumn TItem="Ticket" Title="Cedula" Property="Identification" Width="80px">
                     <HeaderTemplate>
                         <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Cedula</span>
                     </HeaderTemplate>
                 </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Ticket" Title="Fecha" Property="TicketDate" Width="100px">
+                <RadzenDataGridColumn TItem="Ticket" Title="Fecha" Property="TicketDate" Width="100px">
                     <HeaderTemplate>
                         <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Fecha</span>
                     </HeaderTemplate>
                 </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Ticket" Title="No. Multa" Property="TicketId" Width="60px">
-                <HeaderTemplate>
-                    <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No. Multa</span>
-                </HeaderTemplate>
-            </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Ticket" Title="No. Multa" Property="TicketId" Width="60px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No. Multa</span>
+                    </HeaderTemplate>
+                </RadzenDataGridColumn>
 
                 <RadzenDataGridColumn TItem="Ticket" Title="Agente No." Property="AgentNumber" Width="75px">
                     <HeaderTemplate>
@@ -93,22 +96,27 @@
                     </HeaderTemplate>
                 </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Ticket" Width="50px" Title="Acción">
-                <HeaderTemplate>
-                    <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Ver</span>
-                </HeaderTemplate>
-                <Template Context="data">
-                    <RadzenButton Icon="more_vert" Click="@(args => VerDetalles(data.TicketId))" />
-                </Template>
-            </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="Ticket" Width="50px" Title="Acción">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Ver</span>
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenButton Icon="more_vert" Click="@(args => VerDetalles(data.TicketId))" />
+                    </Template>
+                </RadzenDataGridColumn>
 
 
 
             </Columns>
         </RadzenDataGrid>
+    
+
+   
 </div>
 
-<div class="ContenedorIzquierdo">
+
+
+<div class="ContenedorDerecho">
 
 
     <div class="ContainerIzq1">
@@ -177,6 +185,7 @@
     private int TotalMultasPagadas { get; set; }
     private int TotalMultasPendientes { get; set; }
     private string selectedRango = "total"; // Valor por defecto establecido a "total"
+    private HashSet<int> nuevasMultas = new HashSet<int>();
 
     // Datos para el gráfico de pastel
     private List<DataItem> multasData = new List<DataItem>();
@@ -274,6 +283,7 @@
                 {
                     // Ordenar las multas por la fecha más reciente
                     tickets = todasLasMultas.OrderByDescending(multa => multa.TicketDate).Take(4).ToList();
+                    nuevasMultas = new HashSet<int>(tickets.Select(m => m.TicketId)); // Marcar todas las nuevas multas
                     Console.WriteLine($"Últimas 4 multas: {tickets?.Count()}");
                 }
             }
@@ -284,9 +294,15 @@
         }
     }
 
-    private void ShowDetails(int ticketId)
+    private bool EsNuevaMulta(int ticketId)
     {
-        // Aquí puedes implementar la lógica para mostrar los detalles de la multa
+        return nuevasMultas.Contains(ticketId);
+    }
+
+    private void VerDetalles(int ticketId)
+    {
+        nuevasMultas.Remove(ticketId); // Marcar la multa como vista
+        NavigationManager.NavigateTo($"/detallemulta/{ticketId}");
     }
 
     private string ConvertirMes(string mes)
@@ -343,12 +359,5 @@
     {
         public string Mes { get; set; }
         public int Cantidad { get; set; }
-    }
-
-    private void VerDetalles(int ticketId)
-    {
-        // Aquí puedes implementar la lógica para navegar a la página de detalles de la multa
-        // Por ejemplo:
-        NavigationManager.NavigateTo($"/detallemulta/{ticketId}");
     }
 }
