@@ -94,7 +94,7 @@
                 <option value="" selected disabled>Seleccionar</option>
                 <option value="1">Masculino</option>
                 <option value="2">Femenino</option>
-                <option value="3">Otros</option>
+                
             </select>
             @if (!string.IsNullOrEmpty(genderError))
             {
@@ -298,7 +298,7 @@
                 {
                     "Masculino" => 1,
                     "Femenino" => 2,
-                    "Otros" => 3,
+                    
                     _ => null
                 };
 
@@ -396,6 +396,7 @@
         }
     }
 
+
     private async Task ActualizarUsuario()
     {
         bool isValid = true;
@@ -407,21 +408,72 @@
             nameError = "El nombre es obligatorio.";
             isValid = false;
         }
+        else
+        {
+            nameError = null;
+        }
+
         if (string.IsNullOrWhiteSpace(lastname))
         {
             lastnameError = "El apellido es obligatorio.";
             isValid = false;
         }
+        else
+        {
+            lastnameError = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(Cedula))
+        {
+            cedulaError = "La cédula es obligatoria.";
+            isValid = false;
+        }
+        else if (Cedula.Contains('-'))
+        {
+            cedulaError = "Cédula incorrecta. Debe estar sin '-'.";
+            isValid = false;
+        }
+        else if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
+        {
+            cedulaError = "Cédula inválida. Debe tener 11 números.";
+            isValid = false;
+        }
+        else
+        {
+            cedulaError = null;
+        }
+
         if (string.IsNullOrWhiteSpace(phone))
         {
-            phoneError = "El número de teléfono es obligatorio.";
+            phoneError = "El teléfono es obligatorio.";
+            isValid = false;
+        }
+        else if (phone.Contains('-'))
+        {
+            phoneError = "Número de teléfono incorrecto. Debe estar sin '-'.";
             isValid = false;
         }
         else if (phone.Length != 10 || !phone.All(char.IsDigit))
         {
-            phoneError = "El número de teléfono inválido.";
+            phoneError = "Número de teléfono inválido. Debe tener 10 números.";
             isValid = false;
         }
+        else
+        {
+            phoneError = null;
+        }
+
+
+        if (birthdate.HasValue && (DateTime.Now.Year - birthdate.Value.Year) < 18)
+        {
+            birthdateError = "El usuario debe ser mayor de 18 años.";
+            isValid = false;
+        }
+        else
+        {
+            birthdateError = null;
+        }
+
         if (string.IsNullOrWhiteSpace(email))
         {
             emailError = "El correo electrónico es obligatorio.";
@@ -429,37 +481,49 @@
         }
         else if (!Regex.IsMatch(email, emailPattern))
         {
-            emailError = "El correo electrónico no tiene un formato válido. Ejemplo: usuario@dominio.com";
+            emailError = "El correo electrónico no tiene un formato válido.";
             isValid = false;
+        }
+        else
+        {
+            emailError = null;
+        }
+
+        if (!genderId.HasValue)
+        {
+            genderError = "El sexo es obligatorio.";
+            isValid = false;
+        }
+        else
+        {
+            genderError = null;
         }
 
         if (!isValid) return;
 
-        // Crear el objeto usuario sin la contraseña
-        var usuario = new User
+        // Crear el objeto DTO para la actualización
+        var usuarioDto = new UserUpdateDto
             {
                 Cedula = Cedula,
                 Name = name.Trim(),
                 LastName = lastname.Trim(),
-                email = string.IsNullOrWhiteSpace(email) ? null : email.Trim(),
+                Email = string.IsNullOrWhiteSpace(email) ? null : email.Trim(),
                 Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim(),
-                profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg.Trim(),
-                Gender = genderId.HasValue ? genderId.ToString() : null,
-                bloodType = bloodTypeId.HasValue ? bloodTypeId.ToString() : null,
-                CivilStatus = civilStatusId.HasValue ? civilStatusId.ToString() : null,
-                workLocation = workLocationId.HasValue ? workLocationId.ToString() : null,
-                Password = null, // No se enviará la contraseña
-                height = height.HasValue ? (double?)height.Value : null, // Conversión explícita de decimal? a double?
-                birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null,
+                ProfileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg.Trim(),
+                GenderId = genderId.HasValue ? genderId.Value : (int?)null, // Asegúrate de usar GenderId
+                BloodTypeId = bloodTypeId.HasValue ? bloodTypeId.Value : (int?)null, // Asegúrate de usar BloodTypeId
+                CivilStatusId = civilStatusId.HasValue ? civilStatusId.Value : (int?)null, // Asegúrate de usar CivilStatusId
+                WorkLocationId = workLocationId.HasValue ? workLocationId.Value : (int?)null, // Asegúrate de usar WorkLocationId
+                Height = height,
+                Birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null,
                 NoAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente.Trim()
             };
 
-
-        Console.WriteLine($"Usuario a enviar: {JsonConvert.SerializeObject(usuario)}");
+        Console.WriteLine($"Usuario a enviar: {JsonConvert.SerializeObject(usuarioDto)}");
 
         try
         {
-            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateAgent-Admin/{Cedula}", usuario);
+            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateAgent-Admin/{Cedula}", usuarioDto);
 
             if (response.IsSuccessStatusCode)
             {
@@ -509,7 +573,6 @@
             await MostrarAlerta(false);
         }
     }
-
     private async Task Cancelar()
     {
         await JSRuntime.InvokeVoidAsync("window.history.back");
@@ -555,6 +618,24 @@
         errorVisible = false;
 
         StateHasChanged(); // Vuelve a actualizar la UI
+    }
+
+
+    public class UserUpdateDto
+    {
+        public string Cedula { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? ProfileImg { get; set; }
+        public int? GenderId { get; set; } // Cambiado a int
+        public int? BloodTypeId { get; set; } // Cambiado a int
+        public int? WorkLocationId { get; set; } // Cambiado a int
+        public int? CivilStatusId { get; set; } // Cambiado a int
+        public decimal? Height { get; set; }
+        public string? Birthdate { get; set; }
+        public string? NoAgente { get; set; }
     }
 }
 
