@@ -129,9 +129,9 @@
             <option value="total" selected>Total</option>
         </select>
         <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" style="padding-top: 0;">
-            <!-- Elimina el padding superior aquí -->
             <RadzenChart Style="height: 275px; width: 275px">
-                <RadzenPieSeries Data="@multasData" Title="Multas" CategoryProperty="Estado" ValueProperty="Monto">
+                <RadzenPieSeries Data="@multasData" Title="Multas" CategoryProperty="Estado" ValueProperty="Monto"
+                                 Fills="@(new[] { "#009C40", "#fc8403" })">
                     <RadzenSeriesDataLabels Visible="true" />
                 </RadzenPieSeries>
             </RadzenChart>

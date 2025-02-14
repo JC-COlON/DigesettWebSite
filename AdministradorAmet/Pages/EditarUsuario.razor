@@ -19,6 +19,19 @@
 
     <hr class="divider" />
 
+
+
+    <div class="central-section">
+        <div class="image-section">
+            <div class="profile-image-container">
+                <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" disable />
+            </div>
+            @* <div class="image-input">
+                <InputFile OnChange="ImagenPerfilSeleccionada" />
+            </div> *@
+        </div>
+    </div>
+
     @if (alertaVisible)
     {
         <RadzenAlert Title="Éxito" AlertStyle="AlertStyle.Success" Visible="true" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info">
@@ -32,19 +45,6 @@
             No se pudo Actualizar el usuario.
         </RadzenAlert>
     }
-
-    <div class="central-section">
-        <div class="image-section">
-            <div class="profile-image-container">
-                <img src="imagenes/usuario.png" alt="Imagen de perfil" class="profile-image" id="previewImagenPerfil" disable />
-            </div>
-            <div class="image-input">
-                <InputFile OnChange="ImagenPerfilSeleccionada" />
-            </div>
-        </div>
-    </div>
-
-
     <hr class="divider" />
     <!-- Información Personal -->
 
@@ -439,23 +439,27 @@
         var usuario = new User
             {
                 Cedula = Cedula,
-                Name = name,
-                LastName = lastname,
-                email = email,
-                Phone = phone,
-                profileImg = profileImg,
-                Gender = genderId?.ToString(),
-                bloodType = bloodTypeId?.ToString(),
-                CivilStatus = civilStatusId?.ToString(),
-                workLocation = workLocationId?.ToString(),
-                Password = null // No se enviará la contraseña
+                Name = name.Trim(),
+                LastName = lastname.Trim(),
+                email = string.IsNullOrWhiteSpace(email) ? null : email.Trim(),
+                Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim(),
+                profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg.Trim(),
+                Gender = genderId.HasValue ? genderId.ToString() : null,
+                bloodType = bloodTypeId.HasValue ? bloodTypeId.ToString() : null,
+                CivilStatus = civilStatusId.HasValue ? civilStatusId.ToString() : null,
+                workLocation = workLocationId.HasValue ? workLocationId.ToString() : null,
+                Password = null, // No se enviará la contraseña
+                height = height.HasValue ? (double?)height.Value : null, // Conversión explícita de decimal? a double?
+                birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null,
+                NoAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente.Trim()
             };
+
 
         Console.WriteLine($"Usuario a enviar: {JsonConvert.SerializeObject(usuario)}");
 
         try
         {
-            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateCiudadano/{Cedula}", usuario);
+            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateAgent-Admin/{Cedula}", usuario);
 
             if (response.IsSuccessStatusCode)
             {
@@ -505,8 +509,6 @@
             await MostrarAlerta(false);
         }
     }
-
-
 
     private async Task Cancelar()
     {

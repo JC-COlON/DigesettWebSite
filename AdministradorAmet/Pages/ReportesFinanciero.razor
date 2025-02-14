@@ -63,57 +63,59 @@
 }
  <div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")">
 <div class="contenedor" style="margin-top:45px; gap:20px" >
-   
-    <div class="containerizquierdo">
-        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
-            <RadzenCard>
-                <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
-                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
-                </RadzenStack>
-            </RadzenCard>
 
-            <RadzenRow>
-                <RadzenColumn Size="12">
-                    <RadzenChart>
-                        <RadzenStackedColumnSeries Data="@barChartData" CategoryProperty="Category" Title="Multas" ValueProperty="Value">
-                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                        </RadzenStackedColumnSeries>
-                        <RadzenValueAxis Min="0">
-                            <RadzenGridLines Visible="true" />
-                            <RadzenAxisTitle Text="Monto en RD$" />
-                        </RadzenValueAxis>
-                    </RadzenChart>
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenStack>
-    </div>
+        <div class="containerizquierdo">
+            <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+                <RadzenCard>
+                    <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                        <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                        <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+                    </RadzenStack>
+                </RadzenCard>
 
-    <div class="containerderecho" >
-        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
-            <RadzenCard Style="width: 100%;">
-                <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
-                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
-                </RadzenStack>
-            </RadzenCard>
-
-            <RadzenStack Style="width: 100%; max-width: 600px;">
-                <RadzenChart>
-                    <RadzenDonutSeries Data="@donutChartData" CategoryProperty="Category" ValueProperty="Value" TotalAngle="360" StartAngle="360">
-                        <ChildContent>
-                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                        </ChildContent>
-                        <TitleTemplate>
-                            <div class="rz-donut-content">
-                                <div>Multas</div>
-                            </div>
-                        </TitleTemplate>
-                    </RadzenDonutSeries>
-                </RadzenChart>
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenChart>
+                            <RadzenStackedColumnSeries Data="@barChartData" CategoryProperty="Category" Title="Multas" ValueProperty="Value"
+                                                       Fills="@(new[] { "#009C40", "#fc8403" })">
+                                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                            </RadzenStackedColumnSeries>
+                            <RadzenValueAxis Min="0">
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle Text="Monto en RD$" />
+                            </RadzenValueAxis>
+                        </RadzenChart>
+                    </RadzenColumn>
+                </RadzenRow>
             </RadzenStack>
-        </RadzenStack>
-    </div>
+        </div>
+
+        <div class="containerderecho">
+            <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+                <RadzenCard Style="width: 100%;">
+                    <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                        <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                        <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+                    </RadzenStack>
+                </RadzenCard>
+
+                <RadzenStack Style="width: 100%; max-width: 600px;">
+                    <RadzenChart>
+                        <RadzenDonutSeries Data="@donutChartData" CategoryProperty="Category" ValueProperty="Value" TotalAngle="360" StartAngle="360"
+                                           Fills="@(new[] { "#009C40", "#fc8403" })">
+                            <ChildContent>
+                                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                            </ChildContent>
+                            <TitleTemplate>
+                                <div class="rz-donut-content">
+                                    <div>Multas</div>
+                                </div>
+                            </TitleTemplate>
+                        </RadzenDonutSeries>
+                    </RadzenChart>
+                </RadzenStack>
+            </RadzenStack>
+        </div>
     
 </div>
 
@@ -219,11 +221,28 @@
     private bool mostrarMensaje = false;
 
 
+
     private async Task OnFilter()
     {
         mostrarResultados = false; // Inicialmente, no mostrar los resultados
         mostrarMensaje = false; // Inicialmente no mostrar el mensaje
         mensajeNoResultados = string.Empty; // Limpiar el mensaje de resultados
+
+        // Verificar si no se ha proporcionado ninguna fecha
+        if (!filterModel.FechaInicio.HasValue && !filterModel.FechaFin.HasValue)
+        {
+            // Mostrar mensaje de advertencia si no se ingresan fechas
+            mensajeNoResultados = "Por favor, ingrese al menos una fecha (Inicio o Fin).";
+            mostrarMensaje = true;
+            StateHasChanged();
+            return; // Salir del método si no se ha ingresado ninguna fecha
+        }
+
+        // Si solo se proporciona FechaFin, asignar la misma fecha a FechaInicio
+        if (filterModel.FechaFin.HasValue && !filterModel.FechaInicio.HasValue)
+        {
+            filterModel.FechaInicio = filterModel.FechaFin;
+        }
 
         // Comenzamos la URL vacía
         var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
@@ -231,13 +250,25 @@
         // Creamos una lista para agregar los parámetros de la consulta
         var queryParams = new List<string>();
 
+        // Si no se proporciona FechaFin y solo se tiene FechaInicio, establecer FechaFin igual a FechaInicio
         if (filterModel.FechaInicio.HasValue)
+        {
+            // Si FechaFin no tiene valor, la igualamos a FechaInicio
+            if (!filterModel.FechaFin.HasValue)
+            {
+                filterModel.FechaFin = filterModel.FechaInicio;
+            }
+            // Añadimos FechaInicio al filtro
             queryParams.Add($"FechaInicio={filterModel.FechaInicio.Value:dd/MM/yyyy}");
+        }
 
+        // Si FechaFin tiene valor, la añadimos también
         if (filterModel.FechaFin.HasValue)
+        {
             queryParams.Add($"FechaFin={filterModel.FechaFin.Value:dd/MM/yyyy}");
+        }
 
-        // Si hay parámetros, los agregamos a la URL
+        // Si hay parámetros de fecha, los agregamos a la URL
         if (queryParams.Any())
         {
             url += string.Join("&", queryParams);
@@ -322,7 +353,8 @@
             StateHasChanged();
         }
     }
-   
+
+
     
     // private async Task OnFilter()
     // {

@@ -272,6 +272,8 @@
          new TipoVehiculo { Text = "Otros", Value = "5" }
     };
 
+
+
     private async Task OnFilter()
     {
         mostrarResultados = false; // Inicialmente, no mostrar los resultados
@@ -334,6 +336,8 @@
             url += string.Join("&", queryParams);
         }
 
+        Console.WriteLine("URL generada: " + url);
+
         try
         {
             var response = await Http.GetAsync(url);
@@ -343,11 +347,22 @@
             {
                 var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
 
-                // Si la respuesta tiene resultados
-                if (apiResponse != null && apiResponse.Tickets != null && apiResponse.Tickets.Any())
+                if (apiResponse != null)
                 {
-                    filteredTickets = apiResponse.Tickets;
-                    mostrarResultados = true; // Mostrar los resultados si existen
+                    if (apiResponse.Tickets != null && apiResponse.Tickets.Any())
+                    {
+                        // Si la respuesta contiene una lista de tickets
+                        filteredTickets = apiResponse.Tickets;
+                        mostrarResultados = true; // Mostrar los resultados si existen
+                    }
+                    else
+                    {
+                        // Si la lista está vacía
+                        filteredTickets = new List<Ticket>(); // No hay resultados
+                        mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
+                        mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Mensaje para "No hay resultados"
+                        mostrarMensaje = true; // Mostrar el mensaje de advertencia
+                    }
                 }
                 else
                 {
@@ -359,7 +374,6 @@
             }
             else if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                // Si el servidor devuelve un 404 Not Found
                 filteredTickets = new List<Ticket>(); // No hay resultados
                 mostrarResultados = false; // Mostrar mensaje de "No hay resultados"
                 mensajeNoResultados = "No se encontraron multas que coincidan con los filtros."; // Mensaje para "No hay resultados"
@@ -367,7 +381,6 @@
             }
             else
             {
-                // Para otros códigos de estado que no sean 200 (OK) ni 404
                 filteredTickets = new List<Ticket>(); // No hay resultados
                 mostrarResultados = false; // Mostrar mensaje de "Error en la búsqueda"
                 mensajeNoResultados = "Hubo un error en la búsqueda, por favor intente de nuevo."; // Mensaje de error
@@ -397,9 +410,6 @@
             StateHasChanged();
         }
     }
-
-
-
 
 
     private void OnFilterr()
@@ -506,6 +516,7 @@
         [JsonPropertyName("$values")]
         public List<Ticket> Tickets { get; set; }
     }
+
 
 
 

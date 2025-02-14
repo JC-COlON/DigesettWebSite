@@ -30,9 +30,9 @@
         </div>
 
         <!-- Entrada para subir imagen -->
-        <div class="image-input">
+        @* <div class="image-input">
             <InputFile OnChange="ImagenPerfilSeleccionada" disabled="@IsDisabled("profileImg")" />
-        </div>
+        </div> *@
     </div>
 
 
@@ -365,6 +365,11 @@
             cedulaError = "La cédula es obligatoria.";
             isValid = false;
         }
+        else if (Cedula.Contains('-'))
+        {
+            cedulaError = "Cédula incorrecta. Debe estar sin '-'.";
+            isValid = false;
+        }
         else if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
         {
             cedulaError = "Cédula inválida. Debe tener 11 números.";
@@ -378,6 +383,11 @@
         if (string.IsNullOrWhiteSpace(phone))
         {
             phoneError = "El teléfono es obligatorio.";
+            isValid = false;
+        }
+        else if (phone.Contains('-'))
+        {
+            phoneError = "Número de teléfono incorrecto. Debe estar sin '-'.";
             isValid = false;
         }
         else if (phone.Length != 10 || !phone.All(char.IsDigit))
@@ -424,6 +434,7 @@
         {
             emailError = null;
         }
+
         if (!genderId.HasValue)
         {
             genderError = "El sexo es obligatorio.";
@@ -433,6 +444,7 @@
         {
             genderError = null;
         }
+
         if (!isValid)
         {
             return;
@@ -444,25 +456,26 @@
             name = name,
             lastname = lastname,
             password = string.IsNullOrWhiteSpace(password) ? null : password,
-            rolId = rolId, // Aquí agregamos el rolId
+            rolId = rolId,
             email = string.IsNullOrWhiteSpace(email) ? null : email,
             phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
-            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg, // Enviar solo el nombre del archivo de la imagen
+            profileImg = string.IsNullOrWhiteSpace(profileImg) ? null : profileImg,
             nacionalityId = (int?)null,
-            birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null, // Formato de fecha esperado en la API
-            genderId = genderId, // Debería ser un valor numérico (1, 2, 3)
-            bloodTypeId = bloodTypeId, // Debería ser un valor numérico (1-8)
-            height = height.HasValue ? height.Value : (decimal?)null, // Si está vacío, enviar null
-            workLocationId = workLocationId, // Este también debería ser un valor numérico
-            civilStatusId = civilStatusId, // Lo mismo para el estado civil
-            noAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente, // Si es un campo vacío, enviarlo como null
-            statusId = 1 // Este siempre será 1 según lo especificado
+            birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null,
+            genderId = genderId,
+            bloodTypeId = bloodTypeId,
+            height = height.HasValue ? height.Value : (decimal?)null,
+            workLocationId = workLocationId,
+            civilStatusId = civilStatusId,
+            noAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente,
+            statusId = 1
         };
 
         try
         {
             var response = await Http.PostAsJsonAsync(ApiUrl, usuario);
-            Console.WriteLine(response); // Agrega esto para ver la respuesta del servidor
+            Console.WriteLine(response);
+
             if (response.IsSuccessStatusCode)
             {
                 await MostrarAlerta(true);
