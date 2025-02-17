@@ -221,7 +221,6 @@
     private bool mostrarMensaje = false;
 
 
-
     private async Task OnFilter()
     {
         mostrarResultados = false; // Inicialmente, no mostrar los resultados
@@ -244,13 +243,13 @@
             filterModel.FechaInicio = filterModel.FechaFin;
         }
 
-        // Comenzamos la URL vacía
-        var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?";
+        // Comenzamos la URL con el filtro Hidden=0
+        var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?Hidden=0";
 
         // Creamos una lista para agregar los parámetros de la consulta
         var queryParams = new List<string>();
 
-        // Si no se proporciona FechaFin y solo se tiene FechaInicio, establecer FechaFin igual a FechaInicio
+        // Si solo se proporciona FechaInicio, añadirla al filtro
         if (filterModel.FechaInicio.HasValue)
         {
             // Si FechaFin no tiene valor, la igualamos a FechaInicio
@@ -271,12 +270,12 @@
         // Si hay parámetros de fecha, los agregamos a la URL
         if (queryParams.Any())
         {
-            url += string.Join("&", queryParams);
+            url += "&" + string.Join("&", queryParams); // Agregar "&" entre los parámetros
         }
 
         try
         {
-            var response = await Http.GetAsync(url); // Cambié a GetAsync para manejar los códigos de estado HTTP
+            var response = await Http.GetAsync(url); // Realizar la solicitud GET con la URL generada
             if (response.IsSuccessStatusCode)
             {
                 var data = JsonConvert.DeserializeObject<List<Ticket>>(await response.Content.ReadAsStringAsync());
