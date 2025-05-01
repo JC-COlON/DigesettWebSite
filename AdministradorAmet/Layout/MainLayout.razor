@@ -97,7 +97,8 @@
     private async Task CerrarSesion()
     {
         // Eliminar el token del localStorage
-        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+        await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "authToken");
+
 
         // Redirigir al usuario a la página de inicio de sesión
         NavigationManager.NavigateTo("/");
@@ -105,7 +106,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "authToken");
         if (string.IsNullOrEmpty(token))
         {
             NavigationManager.NavigateTo("/");
@@ -139,7 +140,7 @@
 
     private async Task<string> ObtenerCedulaDelToken()
     {
-        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "authToken");
         if (string.IsNullOrEmpty(token)) return null;
 
         try

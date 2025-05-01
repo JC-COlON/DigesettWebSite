@@ -103,7 +103,7 @@
             };
 
             // Eliminar token previo si existe
-            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+            await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "authToken");
 
             // Enviar la solicitud POST a la API
             var response = await Http.PostAsJsonAsync("https://localhost:7277/api/UserAccess/Login", requestBody);
@@ -119,7 +119,8 @@
 
                     if (claims.TryGetValue("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", out var role) && role == "1")
                     {
-                        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", tokenResponse.Token);
+                        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "authToken", tokenResponse.Token);
+
                         NavigationManager.NavigateTo("Home");
                     }
                     else
