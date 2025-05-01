@@ -37,141 +37,109 @@
 
     <script>
         window.GenerarPDF = async (tickets) => {
-            console.log("GenerarPDF function called");
-
-            // Obtener el token desde localStorage usando la clave correcta 'authToken'
             const token = localStorage.getItem('authToken');
-            console.log("Token recuperado:", token);  // Verifica si el token existe
-
-            // Función para obtener el nombre desde el token
             const getUsernameFromToken = (token) => {
                 try {
                     const base64Url = token.split('.')[1];
                     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                     const payload = JSON.parse(atob(base64));
-
-                    console.log('Token decodificado correctamente:', payload);  // Verifica la decodificación
-
                     return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || 'Administrador';
-                } catch (error) {
-                    console.error('Error decodificando el token:', error);  // Error en la decodificación
-                    return 'Administrador'; // Valor por defecto si hay error
+                } catch {
+                    return 'Administrador';
                 }
             };
-
-            // Usar el token recuperado para obtener el nombre
             const username = token ? getUsernameFromToken(token) : 'Administrador';
-            console.log("Usuario obtenido:", username);  // Verifica el nombre del usuario
-
-            var doc = new jsPDF();
-            console.log("jsPDF instance created");
-
-            // Establecer fuente
-            doc.setFont("times", "bold");
-
-            // IMAGEN
-            var img = new Image();
+            const doc = new jsPDF();
+            const img = new Image();
             img.src = "logo.png";
             img.crossOrigin = "";
-            img.onload = function () {
-                console.log("Image loaded");
 
-                // Agregar imagen al lado izquierdo
-                const imgX = 20;
-                const imgY = 10;
-                doc.addImage(this, 'PNG', imgX, imgY, 40, 40);
+            img.onload = () => {
+                const pageHeight = doc.internal.pageSize.height;
+                const marginTop = 20;
+                const footerHeight = 20;
+                const rowHeight = 10;
+                const usableHeight = pageHeight - marginTop - footerHeight;
 
-                // Contenido en el lado derecho del encabezado
-                doc.setFontSize(16);
-                const contentX = 75;
+                const drawHeader = () => {
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(16);
+                    doc.addImage(img, 'PNG', 20, 10, 40, 40);
+                    doc.text(75, 25, "Sistema de Gestión de Multas de Tránsito");
+                    const title = "Reporte de Multas";
+                    const titleWidth = doc.getTextDimensions(title).w;
+                    doc.text(75 + ((doc.internal.pageSize.width - 75 - titleWidth) / 2) + 23, 35, title);
+                    doc.line(60, 40, doc.internal.pageSize.width - 20, 40);
+                    doc.setFontSize(12);
+                    doc.setFont("times", "bold");
+                    doc.text(20, 55, "Nombre Completo");
+                    doc.text(60, 55, "Cédula");
+                    doc.text(90, 55, "Fecha");
+                    doc.text(115, 55, "Multa");
+                    doc.text(135, 55, "Estado");
+                    doc.text(155, 55, "Infracción");
+                    doc.text(180, 55, "N° Agente");
+                    return 65; // start row data below headers
+                };
 
-                // Texto "Sistema de Gestión de Multas de Tránsito"
-                const systemTextY = 25;
-                doc.text(contentX, systemTextY, "Sistema de Gestión de Multas de Tránsito");
+                const drawFooter = () => {
+                    const today = new Date();
+                    const dateTime =
+                        `Fecha: ${today.getDate().toString().padStart(2, '0')}/` +
+                        `${(today.getMonth() + 1).toString().padStart(2, '0')}/` +
+                        `${today.getFullYear()} Hora: ` +
+                        `${today.getHours().toString().padStart(2, '0')}:` +
+                        `${today.getMinutes().toString().padStart(2, '0')}`;
 
-                // Título "Reporte de Multas" ajustado hacia la derecha
-                const reportTextY = systemTextY + 10;
-                const title = "Reporte de Multas";
-                const titleWidth = doc.getTextDimensions(title).w;
+                    doc.setFontSize(12);
+                    doc.setFont("times", "normal");
+                    doc.text(20, pageHeight - 10, `Elaborado por: ${username}`);
+                    doc.text(140, pageHeight - 10, dateTime);
+                };
 
-                const titleOffsetX = 23;
-                const titleX = contentX + ((doc.internal.pageSize.width - contentX) - titleWidth) / 2 + titleOffsetX;
-                doc.text(titleX, reportTextY, title);
-
-                // Línea divisora debajo del encabezado
-                const lineStartX = 60;
-                const lineEndX = doc.internal.pageSize.width - 20;
-                const lineY = reportTextY + 5;
-                doc.setLineWidth(0.5); // Grosor de la línea para la primera línea divisoria
-                doc.line(lineStartX, lineY, lineEndX, lineY);
-
-                // Títulos de columnas
-                const startY = lineY + 25;
-                doc.setFontSize(12);
-                let rowY = startY;
-
-                //// Agregar la columna de numeración (vacía en el encabezado)
-                //doc.text(10, rowY, "N°");
-
-                // Títulos de las otras columnas
-                doc.text(20, rowY, "Nombre Completo");
-                doc.text(60, rowY, "Cédula");
-                doc.text(90, rowY, "Fecha");
-                doc.text(115, rowY, "Multa");
-                doc.text(135, rowY, "Estado");
-                doc.text(155, rowY, "Infracción");
-                doc.text(180, rowY, "N° Agente");
-
-                // Datos de la tabla
-                rowY += 10;
-                doc.setFont("times", "normal"); // Quitar negrita para los datos
+                let rowY = drawHeader();
+                doc.setFont("times", "normal");
 
                 tickets.forEach((ticket, index) => {
-                    const status = ticket.status === "Paid" ? "Pagada" : ticket.status === "pending" ? "Pendiente" : ticket.status;
+                    // Check if we need a new page *before* drawing the next row
+                    if (rowY + rowHeight > pageHeight - footerHeight) {
+                        drawFooter(); // draw footer on current page
+                        doc.addPage();
+                        rowY = drawHeader();
+                        doc.setFont("times", "normal");
+                    }
 
-                    //// Agregar número de fila
-                    //const numColumnX = 10;
-                    //doc.text(numColumnX, rowY, (index + 1).toString()); // Contador de fila: "1", "2", "3", ...
+                    const status = ticket.Status === "Paid" ? "Pagada" :
+                        ticket.Status === "pending" ? "Pendiente" :
+                            ticket.Status;
 
-                    // Resto de las columnas
-                    doc.text(20, rowY, `${ticket.name} ${ticket.lastName}`);
-                    doc.text(60, rowY, ticket.identification);
-                    doc.text(90, rowY, ticket.ticketDate);
-                    doc.text(120, rowY, ticket.ticketId.toString());
+                    doc.text(20, rowY, `${ticket.Name} ${ticket.LastName}`);
+                    doc.text(60, rowY, ticket.Identification);
+                    doc.text(90, rowY, ticket.TicketDate);
+                    doc.text(120, rowY, ticket.TicketId.toString());
                     doc.text(135, rowY, status);
-                    doc.text(155, rowY, ticket.articulo);
-                    doc.text(185, rowY, ticket.agentNumber.toString());
-
-                    rowY += 10;
+                    doc.text(155, rowY, ticket.Articulo);
+                    doc.text(185, rowY, ticket.AgentNumber.toString());
+                    rowY += rowHeight;
                 });
 
-                // PIE DE PÁGINA
-                var today = new Date();
-                var dateTime =
-                    "Fecha: " +
-                    today.getDate().toString().padStart(2, '0') + '/' +
-                    (today.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                    today.getFullYear() + ' Hora: ' +
-                    today.getHours().toString().padStart(2, '0') + ':' +
-                    today.getMinutes().toString().padStart(2, '0');
-
-                doc.setFontSize(12);
-                doc.text(20, 290, `Elaborado por: ${username}`);
-                doc.text(140, 290, dateTime);
-
-                // Generar el PDF como Blob y usar FileSaver para descargar
-                var blob = doc.output('blob');
+                drawFooter(); // footer on last page
+                const blob = doc.output('blob');
                 saveAs(blob, 'Reporte.pdf');
-                console.log("PDF saved");
             };
 
-            img.onerror = function () {
-                console.error("Failed to load image");
+            img.onerror = () => {
+                console.error("Error cargando el logo.");
             };
         };
 
 
+
+
     </script>
+
+
+
 
 
 

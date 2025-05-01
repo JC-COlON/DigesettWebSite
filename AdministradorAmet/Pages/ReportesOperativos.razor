@@ -128,74 +128,118 @@
 
 </div>
 <div class="container">
-    <div class="data-grid-container @(mostrarResultados ? "data-grid-visible" : "data-grid-hidden")" id="resultadoreporte">
-        @if (filteredTickets != null && filteredTickets.Any())
-        {
-            <div style="margin-bottom: 20px; margin-left:77%" class="no-print">
-                <span style="margin-right: 10px;">Formato a exportar:</span>
-                <button @onclick="export" class="export-button" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer;">PDF</button>
-                <button @onclick="Print" class="print-button" style="background-color: #fc8403; color: white; padding: 5px 10px; border: none; cursor: pointer; margin-left: 10px;">Print</button>
-            </div>
+    @if (filteredTickets != null && filteredTickets.Any())
+    {
+        <div style="margin-bottom: 20px; margin-left:77%" class="no-print">
+            <span style="margin-left: 40px;">Formato a exportar:</span>
+            <button @onclick="export" class="export-button" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">PDF</button>
+        </div>
 
+        <RadzenDataGrid  Data="@filteredTickets" TItem="Ticket" ShowPagingSummary="true" AllowPaging="true" PageSize="10" AllowFiltering="true" AllowSorting="true" Style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
+            <Columns>
+                <RadzenDataGridColumn TItem="Ticket" Property="Name" Title="Nombre Completo" Width="250px" >
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre Completo</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium"> @ticket.Name @ticket.LastName</span>
+                    </Template>
+                </RadzenDataGridColumn>
 
-            <table class="table" style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
-                <thead>
-                    <tr>
-                        <th style="font-weight: bold; width: 220px; white-space: nowrap;">Nombre Completo</th>
-                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">Cédula</th>
-                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">Fecha</th>
-                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">No. Multa</th>
-                        <th style="font-weight: bold; width: 120px; white-space: nowrap;">Estado</th>
-                        <th style="font-weight: bold; width: 220px; white-space: nowrap;">Infracción (Artículo)</th>
-                        <th style="font-weight: bold; width: 150px; white-space: nowrap;">Número de Agente</th>
-                        <th style="font-weight: bold; width: 200px; white-space: nowrap;">Agente</th>
-                        <th style="font-weight: bold; width: 100px; text-align: center; white-space: nowrap;">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var ticket in filteredTickets)
-                    {
-                        <tr>
-                            <td>@ticket.Name @ticket.LastName</td>
-                            <td>@ticket.Identification</td>
-                            <td>@ticket.TicketDate.ToString("dd/MM/yyyy")</td>
-                            <td>@ticket.TicketId</td>
-                            <td>
-                                @if (ticket.Status == "Paid")
-                                {
-                                    <span>Pagada</span>
-                                }
-                                else if (ticket.Status == "pending")
-                                {
-                                    <span>Pendiente</span>
-                                }
-                                else
-                                {
-                                    <span>@ticket.Status</span>
-                                }
-                            </td>
-                            <td>@ticket.Articulo.ArticleNum</td>
-                            <td>@ticket.AgentNumber</td>
-                            <td>@ticket.Agente.Name @ticket.Agente.LastName</td>
-                            <td style="text-align: center;">
-                                <a href="/detallemulta/@ticket.TicketId" title="Ver multa">
-                                    <img src="imagenes/trespuntos.png" class="lupa" alt="Ver detalles" style="width: 20px; height: 20px; cursor: pointer;" />
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="no-results-message" style="margin-top: 20px; text-align: center; font-size: 16px; color: #ff0000;">
-                <p>No se encontraron resultados.</p>
-            </div>
-        }
-    </div>
+                <RadzenDataGridColumn TItem="Ticket" Property="Identification" Title="Cédula" Width="200px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Cédula</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium">  @ticket.Identification</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Property="TicketDate" Title="Fecha" Width="160px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Fecha</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium"> @ticket.FormattedTicketDate</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Property="TicketId" Title="No. Multa" Width="200px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No.Multa</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium"> @ticket.TicketId</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Property="Status" Title="Estado" Width="180px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Estado</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium">
+                            @if (ticket.Status == "Paid")
+                            {
+                                <span>Pagada</span>
+                            }
+                            else if (ticket.Status == "pending")
+                            {
+                                <span>Pendiente</span>
+                            }
+                            else
+                            {
+                                <span>@ticket.Status</span>
+                            }
+                        </span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Property="Articulo.ArticleNum" Title="Infracción (Artículo)" Width="260px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Infracción(Artículo)</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium"> @ticket.Articulo.ArticleNum</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Property="AgentNumber" Title="Número de Agente" Width="190px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No.Agente</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium"> @ticket.AgentNumber</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Property="Agente.Name" Title="Agente" Width="200px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Agente</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <span style="font-family: 'Roboto', sans-serif;font-size: medium">     @ticket.Agente.Name @ticket.Agente.LastName</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="Ticket" Title="Acción" Width="160px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Acción</span>
+                    </HeaderTemplate>
+                    <Template Context="ticket">
+                        <a href="/detallemulta/@ticket.TicketId" title="Ver multa">
+                            <img src="imagenes/trespuntos.png" class="lupa" alt="Ver detalles" style="width: 20px; height: 20px; cursor: pointer;" />
+                        </a>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+    else
+    {
+       
+    }
 </div>
-
 
 
 

@@ -19,38 +19,54 @@
 
 
 
+
 <div class="ContainerPrincipal">
-    <h3 class="containertitulo">Multas por Mes</h3>
-    <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" >
-        <RadzenCard>
+
+    <h3 class="containertitulo" style="margin-bottom: 16px; margin-top: 32px;">Multas por Zona</h3>
+    <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+        <RadzenCard Style="background-color: #f0f8ff; color: #333; border: 1px solid #007bff;">
             <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="FlexWrap.Wrap">
                 <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
-                    <RadzenCheckBox @bind-Value="@smooth" Name="smooth" />
-                    <RadzenLabel Text="Suavizado" Component="smooth" />
+                    <RadzenCheckBox @bind-Value="@smooth" Name="smooth" Style="accent-color: #007bff;" />
+                    <RadzenLabel Text="Suavizado" Component="smooth" Style="color: #007bff;" />
                 </RadzenStack>
                 <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
-                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels" />
-                    <RadzenLabel Text="Mostrar valores" Component="dataLabels" />
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels" Style="accent-color: #007bff;" />
+                    <RadzenLabel Text="Mostrar valores" Component="dataLabels" Style="color: #007bff;" />
                 </RadzenStack>
                 <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="0.5rem">
-                    <RadzenCheckBox @bind-Value="@showMarkers" Name="markers" />
-                    <RadzenLabel Text="Mostrar marcadores" Component="markers" />
+                    <RadzenCheckBox @bind-Value="@showMarkers" Name="markers" Style="accent-color: #007bff;" />
+                    <RadzenLabel Text="Mostrar marcadores" Component="markers" Style="color: #007bff;" />
                 </RadzenStack>
             </RadzenStack>
         </RadzenCard>
-   
 
-   
+        <RadzenChart>
+            <RadzenStackedColumnSeries Data="@barChartData"
+                                       CategoryProperty="Category"
+                                       Title="Multas por Zona"
+                                       ValueProperty="Value"
+                                       Fills="@(new[] { "#009C40" })">
+                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            </RadzenStackedColumnSeries>
+            <RadzenValueAxis Min="0" Max="100" Step="10">
+                <RadzenGridLines Visible="true" />
+                <RadzenAxisTitle Text="Cantidad de Multas" />
+            </RadzenValueAxis>
+        </RadzenChart>
 
-    
-
+        <!-- Título de la segunda gráfica correctamente alineado -->
+        <h3 class="containertitulo" style="margin-bottom: 16px; margin-top: 32px;">Multas por Mes</h3>
 
         <RadzenChart>
             <RadzenChartTooltipOptions Shared="@sharedTooltip" />
-            <RadzenLineSeries Smooth="@smooth" Data="@multasPorMes"
-                              CategoryProperty="Mes" ValueProperty="Cantidad"
-                              Title="Multas por Mes">
-                <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
+            <RadzenLineSeries Smooth="@smooth"
+                              Data="@multasPorMes"
+                              CategoryProperty="Mes"
+                              ValueProperty="Cantidad"
+                              Title="Multas por Mes"
+                              Stroke="#009C40">
+                <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Diamond" />
                 <RadzenSeriesDataLabels Visible="@showDataLabels" />
             </RadzenLineSeries>
             <RadzenCategoryAxis Padding="20" />
@@ -132,7 +148,7 @@
             <RadzenChart Style="height: 275px; width: 275px">
                 <RadzenPieSeries Data="@multasData" Title="Multas" CategoryProperty="Estado" ValueProperty="Monto"
                                  Fills="@(new[] { "#009C40", "#fc8403" })">
-                    <RadzenSeriesDataLabels Visible="true" />
+                    <RadzenSeriesDataLabels Visible="false" />
                 </RadzenPieSeries>
             </RadzenChart>
         </RadzenStack>
@@ -203,6 +219,7 @@
 
         await ObtenerMultasResumen(); // Llamar al método para obtener las multas al inicio
         await CargarUltimasMultas();
+        await LoadBarChartData();
 
         try
         {
@@ -360,4 +377,74 @@
         public string Mes { get; set; }
         public int Cantidad { get; set; }
     }
+
+
+    public class TicketResponse
+    {
+        [JsonProperty("$values")]
+        public List<Ticket> Tickets { get; set; }
+    }
+
+    public class Ticket
+    {
+        public int TicketId { get; set; }
+        public string Zone { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+        public string Identification { get; set; }
+        public VehicleType VehicleType { get; set; }
+        public string LicensePlate { get; set; }
+        public string Brand { get; set; }
+        public string Model { get; set; }
+        public string IncidentLocation { get; set; }
+        public string Observations { get; set; }
+        public string AgentNumber { get; set; }
+        public DateTime TicketDate { get; set; }
+        public Article Articulo { get; set; }
+        public Agent Agente { get; set; }
+        public string Status { get; set; }
+        public string FullName => $"{Name} {LastName}";
+    }
+    public class DataItemm
+    {
+        public string Category { get; set; }
+        public int Value { get; set; }
+    }
+
+
+
+    private List<DataItemm> barChartData = new();
+
+
+    private async Task LoadBarChartData()
+    {
+        var url = "https://localhost:7277/api/Ticket/allTicket";
+        var response = await Http.GetStringAsync(url);
+
+        // Reparar formato JSON si es necesario
+        response = response.Replace("\"$id\":", "\"__id__\":");
+
+        var data = JsonConvert.DeserializeObject<TicketResponse>(response);
+
+        if (data?.Tickets != null)
+        {
+            // Agrupar por zona y contar
+            var groupedByZone = data.Tickets
+                .Where(t => !string.IsNullOrEmpty(t.Zone))
+                .GroupBy(t => t.Zone)
+                .Select(g => new DataItemm
+                    {
+                        Category = g.Key,
+                        Value = g.Count()
+                    })
+                .ToList();
+
+            barChartData = groupedByZone;
+        }
+    }
+
+
 }
+

@@ -20,8 +20,20 @@
         public Article Articulo { get; set; }
         public Agent Agente { get; set; }
         public string Status { get; set; }
+
+        // Nombre completo del titular
         public string FullName => $"{Name} {LastName}";
+
+        // Propiedad calculada para formatear la fecha TicketDate
+        public string FormattedTicketDate
+        {
+            get
+            {
+                return TicketDate.ToString("dd/MM/yyyy");
+            }
+        }
     }
+
 
     public class VehicleTypee
     {

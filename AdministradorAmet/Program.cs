@@ -11,6 +11,9 @@ using QuestPDF;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mzg0MjIyMEAzMjM5MmUzMDJlMzAzYjMyMzkzYmFDaFE5NkZCZkoraHpObm04endqcFhMS2pHMnUvckE1M3ErbDE5Um9WYlU9");
+
 builder.Services.AddScoped<UserService>();
 builder.Services.AddRadzenComponents();
 builder.RootComponents.Add<App>("#app");
@@ -28,6 +31,10 @@ builder.Services.AddScoped<TicketService>();
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredModal();
 builder.Services.AddFileReaderService();
+
+//builder.Services.AddScoped<ExportService>();
+
+
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
