@@ -44,6 +44,26 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual */
 }
 
+.containerArriba {
+    width: 90%;
+    display: flex; /* Usa Flexbox */
+    flex-wrap: wrap; /* Permite que los elementos salten de línea si no caben */
+    gap: 20px; /* Espacio entre inputs */
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Alinea los elementos verticalmente */
+    margin-left: 50px
+}
+
+.containerAbajo {
+    width: 90%;
+    display: flex; /* Usa Flexbox */
+    flex-wrap: wrap; /* Permite que los elementos salten de línea si no caben */
+    gap: 20px; /* Espacio entre inputs */
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Alinea los elementos verticalmente */
+    margin-left: 50px
+}
+
 .header {
     display: flex;
     justify-content: space-between;
