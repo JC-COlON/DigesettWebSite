@@ -8,6 +8,7 @@ using Blazored.Modal;
 using Tewr.Blazor.FileReader;
 using Microsoft.AspNetCore.Http; // Asegúrate de agregar esta línea
 using QuestPDF;
+using Syncfusion.Blazor;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -33,6 +34,10 @@ builder.Services.AddBlazoredModal();
 builder.Services.AddFileReaderService();
 
 //builder.Services.AddScoped<ExportService>();
+
+builder.Services.AddSyncfusionBlazor();
+
+
 
 
 

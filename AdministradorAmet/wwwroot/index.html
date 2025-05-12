@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <!-- Syncfusion Blazor Theme -->
+    <link href="_content/Syncfusion.Blazor.Themes/bootstrap5.css" rel="stylesheet" />
+
     <link href="AdministradorAmet.styles.css" rel="stylesheet" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
@@ -16,7 +19,11 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="_content/Blazored.Modal/blazored-modal.css" />
 
-    
+
+
+
+
+
 </head>
 
 <body>
@@ -34,10 +41,9 @@
         <a class="dismiss">🗙</a>
     </div>
 
-
     <script>
         window.GenerarPDF = async (tickets) => {
-            const token = localStorage.getItem('authToken');
+            const token = sessionStorage.getItem('authToken');
             const getUsernameFromToken = (token) => {
                 try {
                     const base64Url = token.split('.')[1];
@@ -55,21 +61,30 @@
             img.crossOrigin = "";
 
             img.onload = () => {
-                const pageHeight = doc.internal.pageSize.height;
                 const marginTop = 20;
                 const footerHeight = 20;
-                const rowHeight = 10;
-                const usableHeight = pageHeight - marginTop - footerHeight;
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                let currentPage = 1;
+
+                // Set row styling and calculate dynamic row height
+                const rowFontSize = 10;
+                doc.setFontSize(rowFontSize);
+                const textDimensions = doc.getTextDimensions('Test');
+                const rowHeight = textDimensions.h * 1.5; // 1.5 line height
 
                 const drawHeader = () => {
                     doc.setFont("times", "bold");
                     doc.setFontSize(16);
                     doc.addImage(img, 'PNG', 20, 10, 40, 40);
                     doc.text(75, 25, "Sistema de Gestión de Multas de Tránsito");
+
                     const title = "Reporte de Multas";
                     const titleWidth = doc.getTextDimensions(title).w;
-                    doc.text(75 + ((doc.internal.pageSize.width - 75 - titleWidth) / 2) + 23, 35, title);
-                    doc.line(60, 40, doc.internal.pageSize.width - 20, 40);
+                    doc.text(75 + ((pageWidth - 75 - titleWidth) / 2) + 23, 35, title);
+
+                    doc.line(60, 40, pageWidth - 20, 40);
+
                     doc.setFontSize(12);
                     doc.setFont("times", "bold");
                     doc.text(20, 55, "Nombre Completo");
@@ -79,40 +94,45 @@
                     doc.text(135, 55, "Estado");
                     doc.text(155, 55, "Infracción");
                     doc.text(180, 55, "N° Agente");
-                    return 65; // start row data below headers
+
+                    return 65; // Starting Y position for rows
                 };
 
                 const drawFooter = () => {
                     const today = new Date();
-                    const dateTime =
-                        `Fecha: ${today.getDate().toString().padStart(2, '0')}/` +
+                    const dateTime = `Fecha: ${today.getDate().toString().padStart(2, '0')}/` +
                         `${(today.getMonth() + 1).toString().padStart(2, '0')}/` +
                         `${today.getFullYear()} Hora: ` +
                         `${today.getHours().toString().padStart(2, '0')}:` +
                         `${today.getMinutes().toString().padStart(2, '0')}`;
 
-                    doc.setFontSize(12);
+                    doc.setFontSize(10);
                     doc.setFont("times", "normal");
                     doc.text(20, pageHeight - 10, `Elaborado por: ${username}`);
-                    doc.text(140, pageHeight - 10, dateTime);
+                    doc.text(pageWidth - 20, pageHeight - 10, `Página ${currentPage}`, { align: "right" });
+                    doc.text(pageWidth - 60, pageHeight - 10, dateTime);
                 };
 
                 let rowY = drawHeader();
                 doc.setFont("times", "normal");
+                doc.setFontSize(rowFontSize); // Set initial row font size
 
                 tickets.forEach((ticket, index) => {
-                    // Check if we need a new page *before* drawing the next row
+                    // Check if we need a new page (including footer space)
                     if (rowY + rowHeight > pageHeight - footerHeight) {
-                        drawFooter(); // draw footer on current page
+                        drawFooter();
                         doc.addPage();
+                        currentPage++;
                         rowY = drawHeader();
                         doc.setFont("times", "normal");
+                        doc.setFontSize(rowFontSize); // Reset font size after new page
                     }
 
                     const status = ticket.Status === "Paid" ? "Pagada" :
                         ticket.Status === "pending" ? "Pendiente" :
                             ticket.Status;
 
+                    // Draw row content
                     doc.text(20, rowY, `${ticket.Name} ${ticket.LastName}`);
                     doc.text(60, rowY, ticket.Identification);
                     doc.text(90, rowY, ticket.TicketDate);
@@ -120,10 +140,12 @@
                     doc.text(135, rowY, status);
                     doc.text(155, rowY, ticket.Articulo);
                     doc.text(185, rowY, ticket.AgentNumber.toString());
+
                     rowY += rowHeight;
                 });
 
-                drawFooter(); // footer on last page
+                drawFooter(); // Final page footer
+
                 const blob = doc.output('blob');
                 saveAs(blob, 'Reporte.pdf');
             };
@@ -132,12 +154,7 @@
                 console.error("Error cargando el logo.");
             };
         };
-
-
-
-
     </script>
-
 
 
 
@@ -314,9 +331,6 @@
             };
         };
 
-
-
-
     </script>
 
     <script type="text/javascript">
@@ -386,21 +400,18 @@
     </script>
 
 
-
-
+    <script src="_content/Syncfusion.Blazor.Core/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
+    <script src="_content/Syncfusion.Blazor.Grids/scripts/pdfexport.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <!-- Asegúrate de cargar primero la librería html2pdf -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
-
-
     <!-- Scripts adicionales que ya tienes -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>

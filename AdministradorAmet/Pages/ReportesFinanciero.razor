@@ -124,7 +124,7 @@
         @if (filteredTickets != null && filteredTickets.Any())
         {
             <div style="margin-bottom: 20px; margin-left:77%">
-                <span style="margin-right: 10px;">Formato a exportar:</span>
+                <span style="margin-left: 60px;" >Formato a exportar:</span>
                 <button @onclick="export" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">PDF</button>
             </div>
 
@@ -191,14 +191,16 @@
                             <span style="font-family: 'Roboto', sans-serif;font-size: medium">
                             @if (ticket.Status == "Paid")
                             {
-                                @ticket.Articulo.Price.ToString("C", new CultureInfo("es-DO"))
+                                    @ticket.Articulo.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))
+
                             }
                             </span>
                         </Template>
                         <FooterTemplate>
                              <span style="font-family: 'Roboto', sans-serif;font-size: medium">
                             <b>
-                                @filteredTickets.Where(t => t.Status == "Paid").Sum(t => t.Articulo.Price).ToString("C", new CultureInfo("es-DO"))
+                                    @filteredTickets.Where(t => t.Status == "Paid").Sum(t => t.Articulo.Price).ToString("C", new CultureInfo("en-US"))
+
                             </b>
                             </span>
                         </FooterTemplate>
@@ -212,14 +214,15 @@
                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">
                             @if (ticket.Status == "pending")
                             {
-                                @ticket.Articulo.Price.ToString("C", new CultureInfo("es-DO"))
+                                    @ticket.Articulo.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))
                             }
                             </span>
                         </Template>
                         <FooterTemplate>
                             <span style="font-family: 'Roboto', sans-serif;font-size: medium">
                             <b>
-                                @filteredTickets.Where(t => t.Status == "pending").Sum(t => t.Articulo.Price).ToString("C", new CultureInfo("es-DO"))
+                                    @filteredTickets.Where(t => t.Status == "Paid").Sum(t => t.Articulo.Price).ToString("C", new CultureInfo("en-US"))
+
                             </b>
                             </span>
                         </FooterTemplate>

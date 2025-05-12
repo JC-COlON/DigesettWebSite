@@ -1,16 +1,17 @@
 ﻿@page "/ReportesOperativos"
 @using Microsoft.AspNetCore.Http
 @using Radzen
+@using Syncfusion.Pdf
+@using Syncfusion.Pdf.Grid
+@using Syncfusion.Pdf.Graphics
+@using Syncfusion.Drawing
+@using System.IO
 
 @using AdministradorAmet.Models
 @using System.Text.Json.Serialization
-@using System.IO
 @inject IHttpContextAccessor HttpContextAccessor
 @using AdministradorAmet.Models
 @using System.Net
-@using iTextSharp.text
-@using iTextSharp.text.pdf
-
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
@@ -30,81 +31,81 @@
 
 <div >
     <div class="containerArriba">
-    <!-- Cédula -->
-    <div class="form-group slideup-placeholder" >
-        <RadzenTextBox @bind-Value="filterModel.Cedula" Placeholder=" " Style="width:150px; font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.Cedula) ? "" : "active")">Cédula</label>
-    </div>
+        <!-- Cédula -->
+        <div class="form-group slideup-placeholder" >
+            <RadzenTextBox @bind-Value="filterModel.Cedula" Placeholder=" " Style="width:150px; font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Cedula) ? "" : "active")">Cédula</label>
+        </div>
 
-     <!-- No. Multa -->
-    <div class="form-group slideup-placeholder" >
-        <RadzenTextBox @bind-Value="filterModel.NoMulta" Placeholder=" " Style="width:150px ;font-weight:bold; " />
-        <label class="@(string.IsNullOrEmpty(filterModel.NoMulta) ? "" : "active")">No. Multa</label>
-    </div>
+        <!-- No. Multa -->
+        <div class="form-group slideup-placeholder" >
+            <RadzenTextBox @bind-Value="filterModel.NoMulta" Placeholder=" " Style="width:150px ;font-weight:bold; " />
+            <label class="@(string.IsNullOrEmpty(filterModel.NoMulta) ? "" : "active")">No. Multa</label>
+        </div>
 
-    <!-- Fecha Inicio -->
-    <div class="form-group slideup-placeholder date-picker-container">
-        <RadzenDatePicker @bind-Value="filterModel.FechaInicio" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
-        <label class="@(IsFechaInicioSet ? "active" : "")">Fecha Inicio</label>
-    </div>
+        <!-- Fecha Inicio -->
+        <div class="form-group slideup-placeholder date-picker-container">
+            <RadzenDatePicker @bind-Value="filterModel.FechaInicio" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+            <label class="@(IsFechaInicioSet ? "active" : "")">Fecha Inicio</label>
+        </div>
 
-    <!-- Fecha Fin -->
-    <div class="form-group slideup-placeholder date-picker-container">
-        <RadzenDatePicker @bind-Value="filterModel.FechaFin" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
-        <label class="@(IsFechaFinSet ? "active" : "")">Fecha Fin</label>
-    </div>
+        <!-- Fecha Fin -->
+        <div class="form-group slideup-placeholder date-picker-container">
+            <RadzenDatePicker @bind-Value="filterModel.FechaFin" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+            <label class="@(IsFechaFinSet ? "active" : "")">Fecha Fin</label>
+        </div>
 
 
-    <!-- Infracción -->
-    <div class="form-group slideup-placeholder">
-        <RadzenDropDown @bind-Value="filterModel.Infraccion" Data=@infracciones TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px; font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.Infraccion?.ToString()) ? "" : "active")">Infracción</label>
-    </div>
+        <!-- Infracción -->
+        <div class="form-group slideup-placeholder">
+            <RadzenDropDown @bind-Value="filterModel.Infraccion" Data=@infracciones TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px; font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Infraccion?.ToString()) ? "" : "active")">Infracción</label>
+        </div>
 
-    <!-- No. Agente -->
-    <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.NoAgente" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.NoAgente) ? "" : "active")">No. Agente</label>
-    </div>
+        <!-- No. Agente -->
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.NoAgente" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.NoAgente) ? "" : "active")">No. Agente</label>
+        </div>
     </div>
 
 
     <div class="containerAbajo">
-    <div class="form-group slideup-placeholder">
-        <RadzenDropDown @bind-Value="filterModel.TipoDeVehiculo" Data=@tipoVehiculos TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:180px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.TipoDeVehiculo) ? "" : "active")">Tipo de Vehiculo</label>
+        <div class="form-group slideup-placeholder">
+            <RadzenDropDown @bind-Value="filterModel.TipoDeVehiculo" Data=@tipoVehiculos TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:180px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.TipoDeVehiculo) ? "" : "active")">Tipo de Vehiculo</label>
+        </div>
+
+
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.Zona" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
+        </div>
+
+
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.Placavehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Placavehiculo) ? "" : "active")">Placa</label>
+        </div>
+
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.MarcaVehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.MarcaVehiculo) ? "" : "active")">Marca</label>
+        </div>
+
+        <!-- Estado -->
+        <div class="form-group slideup-placeholder">
+            <RadzenDropDown @bind-Value="filterModel.Estado" Data=@estados TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Estado) ? "" : "active")">Estado</label>
+        </div>
+
+        <!-- Botón Generar -->
+        <div class="form-group">
+            <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
+        </div>
     </div>
 
 
-    <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.Zona" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
-    </div>
-
-
-    <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.Placavehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.Placavehiculo) ? "" : "active")">Placa</label>
-    </div>
-
-    <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.MarcaVehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.MarcaVehiculo) ? "" : "active")">Marca</label>
-    </div>
-
-    <!-- Estado -->
-    <div class="form-group slideup-placeholder">
-        <RadzenDropDown @bind-Value="filterModel.Estado" Data=@estados TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.Estado) ? "" : "active")">Estado</label>
-    </div>
-
-    <!-- Botón Generar -->
-    <div class="form-group">
-        <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
-    </div>
-    </div>
-
- 
     @if (mostrarMensaje && !string.IsNullOrEmpty(mensajeNoResultados))
     {
         <div class="alert alert-warning">
@@ -115,7 +116,7 @@
 
     @if (!mostrarResultados)
     {
-        
+
 
         <div class="containerdebajo">
             <img src="imagenes/ametlogo.png" class="logo @(mostrarResultados ? "reducido" : "")" />
@@ -131,11 +132,13 @@
     @if (filteredTickets != null && filteredTickets.Any())
     {
         <div style="margin-bottom: 20px; margin-left:77%" class="no-print">
-            <span style="margin-left: 40px;">Formato a exportar:</span>
+            <span style="margin-left: 60px;">Formato a exportar:</span>
             <button @onclick="export" class="export-button" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">PDF</button>
         </div>
 
-        <RadzenDataGrid  Data="@filteredTickets" TItem="Ticket" ShowPagingSummary="true" AllowPaging="true" PageSize="10" AllowFiltering="true" AllowSorting="true" Style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
+        <RadzenDataGrid  Data="@filteredTickets" TItem="Ticket" ShowPagingSummary="true" AllowPaging="true" 
+            PageSize="10" AllowFiltering="true" AllowSorting="true"
+            Style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;" >
             <Columns>
                 <RadzenDataGridColumn TItem="Ticket" Property="Name" Title="Nombre Completo" Width="250px" >
                     <HeaderTemplate>
@@ -237,13 +240,14 @@
     }
     else
     {
-       
+
     }
 </div>
 
 
 
 @code {
+    private List<string> toolbarItems = new List<string>() { "PdfExport" };
     private FilterModel filterModel = new FilterModel();
     private bool IsFechaInicioSet => filterModel.FechaInicio.HasValue;
     private bool IsFechaFinSet => filterModel.FechaFin.HasValue;
@@ -560,9 +564,12 @@
         }
 
 
-    }
+
+
+    
 
 
 
 }
 
+}
