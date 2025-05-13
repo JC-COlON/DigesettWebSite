@@ -258,6 +258,21 @@
     private bool mostrarMensaje = false;
 
 
+    [SupplyParameterFromQuery]
+    public string Estado { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Estado))
+        {
+            filterModel.Estado = Estado.ToLower();
+        }
+
+        await OnFilter(); // <-- Llama OnFilter siempre, con o sin filtros
+    }
+
+
+
     private List<Infraccion> infracciones = new List<Infraccion>
     {
         new Infraccion { Text = "-- Limpiar selección --", Value = null },
@@ -303,11 +318,11 @@
         new Infraccion { Text = "ART 106", Value = 40 }
     };
 
-    private List<Estado> estados = new List<Estado>
+    private List<EstadoItem> estados = new List<EstadoItem>
     {
-        new Estado { Text = "-- Limpiar selección --", Value = null },
-        new Estado { Text = "Pendiente", Value = "pending" },
-        new Estado { Text = "Pagada", Value = "paid" }
+        new EstadoItem { Text = "-- Limpiar selección --", Value = null },
+        new EstadoItem { Text = "Pendiente", Value = "pending" },
+        new EstadoItem { Text = "Pagada", Value = "paid" }
     };
 
     private List<TipoVehiculo> tipoVehiculos = new List<TipoVehiculo>
@@ -470,7 +485,7 @@
         public int? Value { get; set; }
     }
 
-    public class Estado
+    public class EstadoItem
     {
         public string Text { get; set; }
         public string? Value { get; set; }

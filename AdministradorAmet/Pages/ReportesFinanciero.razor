@@ -80,10 +80,7 @@
     </div>
 
 
-    <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.Placavehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.Placavehiculo) ? "" : "active")">Placa</label>
-    </div>
+  
 
     <div class="form-group slideup-placeholder">
         <RadzenTextBox @bind-Value="filterModel.MarcaVehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
@@ -128,7 +125,7 @@
                 <RadzenCard>
                     <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
                         <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                        <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+                        <RadzenLabel Text="Mostrar Datos" Component="dataLabels" />
                     </RadzenStack>
                 </RadzenCard>
 
@@ -436,8 +433,7 @@
         if (!string.IsNullOrEmpty(filterModel.TipoDeVehiculo))
             queryParams.Add($"TipoVehiculoId={filterModel.TipoDeVehiculo}");
 
-        if (!string.IsNullOrEmpty(filterModel.Placavehiculo))
-            queryParams.Add($"PlacaVehiculo={filterModel.Placavehiculo}");
+
 
         if (!string.IsNullOrEmpty(filterModel.MarcaVehiculo))
             queryParams.Add($"Marca={filterModel.MarcaVehiculo}");

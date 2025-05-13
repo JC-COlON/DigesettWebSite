@@ -161,19 +161,21 @@
 
 
 
-    <div class="ContainerIzq2">
-        <!-- Contenido de multas registradas con número -->
-        <div class="ContentWrapper">
-            <img src="imagenes/multatotal.png" alt="Toral multas" class="IconImage">
-            <div>
-                <h1 class="CountNumber">@TotalMultasRegistradas</h1>
-                <p class="SubTexttotal">Total de Multas Registradas</p>
+    <a href="/ReportesOperativos" style="text-decoration: none; color: inherit;">
+        <div class="ContainerIzq2" style="cursor: pointer;">
+            <!-- Contenido de multas registradas con número -->
+            <div class="ContentWrapper">
+                <img src="imagenes/multatotal.png" alt="Total multas" class="IconImage">
+                <div>
+                    <h1 class="CountNumber">@TotalMultasRegistradas</h1>
+                    <p class="SubTexttotal">Total de Multas Registradas</p>
+                </div>
             </div>
         </div>
-    </div>
+    </a>
 
-    <div class="ContainerIzq3">
-        <!-- Contenido de multas pagadas con imagen -->
+
+    <div class="ContainerIzq3" @onclick="@(() => RedirigirReporte("paid"))" style="cursor:pointer;">
         <div class="ContentWrapper">
             <img src="imagenes/pagadas.png" alt="Multas Pagadas" class="IconImage">
             <div>
@@ -183,8 +185,7 @@
         </div>
     </div>
 
-    <div class="ContainerIzq4">
-        <!-- Contenido de multas pendientes con imagen -->
+    <div class="ContainerIzq4" @onclick="@(() => RedirigirReporte("pending"))" style="cursor:pointer;">
         <div class="ContentWrapper">
             <img src="imagenes/pendiente.png" alt="Multas Pendientes" class="IconImage">
             <div>
@@ -193,6 +194,8 @@
             </div>
         </div>
     </div>
+
+
 
 </div>
 
@@ -445,6 +448,13 @@
             barChartData = groupedByZone;
         }
     }
+
+    private void RedirigirReporte(string estado)
+    {
+        // Redirige a la página de reportes con el parámetro de estado
+        NavigationManager.NavigateTo($"/ReportesOperativos?estado={estado}");
+    }
+
 
 
 }
