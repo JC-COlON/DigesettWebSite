@@ -158,21 +158,16 @@
         <p class="SubTextGrafico">Ingresos por multas</p>
     </div>
 
-
-
-
-    <a href="/ReportesOperativos" style="text-decoration: none; color: inherit;">
-        <div class="ContainerIzq2" style="cursor: pointer;">
-            <!-- Contenido de multas registradas con número -->
-            <div class="ContentWrapper">
-                <img src="imagenes/multatotal.png" alt="Total multas" class="IconImage">
-                <div>
-                    <h1 class="CountNumber">@TotalMultasRegistradas</h1>
-                    <p class="SubTexttotal">Total de Multas Registradas</p>
-                </div>
+    <div class="ContainerIzq2" style="cursor: pointer;" @onclick="() => RedirigirReporte()">
+        <div class="ContentWrapper">
+            <img src="imagenes/multatotal.png" alt="Total multas" class="IconImage">
+            <div>
+                <h1 class="CountNumber">@TotalMultasRegistradas</h1>
+                <p class="SubTexttotal">Total de Multas Registradas</p>
             </div>
         </div>
-    </a>
+    </div>
+
 
 
     <div class="ContainerIzq3" @onclick="@(() => RedirigirReporte("paid"))" style="cursor:pointer;">
@@ -206,6 +201,9 @@
     private int TotalMultasPendientes { get; set; }
     private string selectedRango = "total"; // Valor por defecto establecido a "total"
     private HashSet<int> nuevasMultas = new HashSet<int>();
+    private DateTime? fechaInicio;
+    private DateTime? fechaFin;
+
 
     // Datos para el gráfico de pastel
     private List<DataItem> multasData = new List<DataItem>();
@@ -214,8 +212,36 @@
     private async Task HandleChange(ChangeEventArgs e)
     {
         selectedRango = e.Value.ToString();
+
+        switch (selectedRango)
+        {
+            case "dia":
+                fechaInicio = fechaFin = DateTime.Today;
+                break;
+            case "semana":
+                var today = DateTime.Today;
+                int delta = DayOfWeek.Monday - today.DayOfWeek;
+                fechaInicio = today.AddDays(delta);
+                fechaFin = fechaInicio.Value.AddDays(6);
+                break;
+            case "mes":
+                fechaInicio = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                fechaFin = fechaInicio.Value.AddMonths(1).AddDays(-1);
+                break;
+            case "ano":
+                fechaInicio = new DateTime(DateTime.Today.Year, 1, 1);
+                fechaFin = new DateTime(DateTime.Today.Year, 12, 31);
+                break;
+            case "total":
+            default:
+                fechaInicio = null;
+                fechaFin = null;
+                break;
+        }
+
         await ObtenerMultasResumen();
     }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -449,11 +475,40 @@
         }
     }
 
-    private void RedirigirReporte(string estado)
+    private void RedirigirReporte(string estado = null)
     {
-        // Redirige a la página de reportes con el parámetro de estado
-        NavigationManager.NavigateTo($"/ReportesOperativos?estado={estado}");
+        var inicioStr = fechaInicio?.ToString("yyyy-MM-dd");
+        var finStr = fechaFin?.ToString("yyyy-MM-dd");
+
+        var queryParams = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(estado))
+            queryParams.Add($"estado={estado}");
+
+        if (!string.IsNullOrWhiteSpace(inicioStr))
+            queryParams.Add($"fechainicio={Uri.EscapeDataString(inicioStr)}");
+
+        if (!string.IsNullOrWhiteSpace(finStr))
+            queryParams.Add($"fechafin={Uri.EscapeDataString(finStr)}");
+
+        // 🚨 Si no hay fechas ni estado, quiere decir que es el total general
+        if (string.IsNullOrWhiteSpace(estado) && string.IsNullOrWhiteSpace(inicioStr) && string.IsNullOrWhiteSpace(finStr))
+        {
+            queryParams.Add("auto=true");
+        }
+
+        var url = "/ReportesOperativos";
+
+        if (queryParams.Any())
+            url += "?" + string.Join("&", queryParams);
+
+        NavigationManager.NavigateTo(url);
     }
+
+
+
+
+
 
 
 

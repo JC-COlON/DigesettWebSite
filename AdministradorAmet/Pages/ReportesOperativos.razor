@@ -6,7 +6,7 @@
 @using Syncfusion.Pdf.Graphics
 @using Syncfusion.Drawing
 @using System.IO
-
+@using System.Text.Json;
 @using AdministradorAmet.Models
 @using System.Text.Json.Serialization
 @inject IHttpContextAccessor HttpContextAccessor
@@ -261,15 +261,38 @@
     [SupplyParameterFromQuery]
     public string Estado { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrEmpty(Estado))
-        {
-            filterModel.Estado = Estado.ToLower();
-        }
+    [SupplyParameterFromQuery(Name = "fechainicio")]
+    public string FechaInicioStr { get; set; }
 
-        await OnFilter(); // <-- Llama OnFilter siempre, con o sin filtros
+    [SupplyParameterFromQuery(Name = "fechafin")]
+    public string FechaFinStr { get; set; }
+
+    [SupplyParameterFromQuery(Name = "auto")]
+    public string Auto { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        filterModel = new FilterModel();
+
+        if (!string.IsNullOrWhiteSpace(Estado))
+            filterModel.Estado = Estado.ToLower();
+
+        if (DateTime.TryParse(FechaInicioStr, out var fechaInicio))
+            filterModel.FechaInicio = fechaInicio;
+
+        if (DateTime.TryParse(FechaFinStr, out var fechaFin))
+            filterModel.FechaFin = fechaFin;
+
+        // ✅ Solo ejecutar el filtro si viene con ?auto=true o si hay al menos un filtro
+        if (Auto == "true" || !string.IsNullOrWhiteSpace(Estado) || FechaInicioStr != null || FechaFinStr != null)
+        {
+            await OnFilter();
+        }
     }
+
+
+
 
 
 
@@ -416,6 +439,32 @@
                     mensajeNoResultados = "No se encontraron multas que coincidan con los filtros.";
                     mostrarMensaje = true;
                 }
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // 404: no es un error, solo indica que no hay datos
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                try
+                {
+                    using var jsonDoc = JsonDocument.Parse(responseContent);
+                    if (jsonDoc.RootElement.TryGetProperty("mensaje", out JsonElement mensajeElement))
+                    {
+                        mensajeNoResultados = mensajeElement.GetString();
+                    }
+                    else
+                    {
+                        mensajeNoResultados = "No se encontraron resultados.";
+                    }
+                }
+                catch
+                {
+                    mensajeNoResultados = "No se encontraron resultados.";
+                }
+
+                filteredTickets = new List<Ticket>();
+                mostrarResultados = false;
+                mostrarMensaje = true;
             }
             else
             {
