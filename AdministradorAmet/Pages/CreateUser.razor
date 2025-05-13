@@ -4,6 +4,10 @@
 @inject IJSRuntime JSRuntime
 @inject Radzen.DialogService DialogService
 @using System.Text.RegularExpressions;
+@using Newtonsoft.Json
+@using System.Text.Json
+@using SystemTextJson = System.Text.Json
+
 
 
 <PageTitle>Administrador Digesett - Crear Usuario</PageTitle>
@@ -73,6 +77,25 @@
 
 
         <!-- Campos de entrada -->
+
+
+        <div class="input-group">
+            <label for="inputCedula">Cédula</label>
+            <input id="inputCedula"
+                   type="text"
+                   class="form-input"
+                   maxlength="11"
+                   @bind="Cedula"
+                   @onblur="ValidarCedulaEnAPI"
+                   disabled="@IsDisabled("Cedula")" />
+            @if (!string.IsNullOrEmpty(cedulaError))
+            {
+                <span class="error-message">@cedulaError</span>
+            }
+        </div>
+
+
+
         <div class="input-group">
             <label for="inputNombre">Nombre</label>
             <input id="inputNombre" type="text" class="form-input" @bind="name" disabled="@IsDisabled("name")" />
@@ -91,14 +114,6 @@
             }
         </div>
 
-        <div class="input-group">
-            <label for="inputCedula">Cédula</label>
-            <input id="inputCedula" type="text" class="form-input" maxlength="11" @bind="Cedula" disabled="@IsDisabled("Cedula")" />
-            @if (!string.IsNullOrEmpty(cedulaError))
-            {
-                <span class="error-message">@cedulaError</span>
-            }
-        </div>
 
         <div class="input-group">
             <label for="inputTelefono">Teléfono</label>
@@ -257,6 +272,7 @@
     private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
     bool alertaVisible = false;
     bool errorVisible = false;
+    private bool cedulaEsValida = true;
     private string PasswordFieldType { get; set; } = "password";
     private string PasswordToggleClass { get; set; } = "toggle-hidden";
     private Dictionary<string, bool> DisabledFields = new()
@@ -277,7 +293,16 @@
         { "profileImg", true }
     };
 
-    private bool IsDisabled(string fieldName) => DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName];
+    private bool IsDisabled(string fieldName)
+    {
+        // Si el campo es la cédula, usa solo la lógica original
+        if (fieldName == "Cedula")
+            return DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName];
+
+        // Para los demás campos, también valida que la cédula sea válida
+        return (!cedulaEsValida) || (DisabledFields.ContainsKey(fieldName) && DisabledFields[fieldName]);
+    }
+
 
     private string nameError { get; set; }
     private string lastnameError { get; set; }
@@ -540,7 +565,64 @@
 
         StateHasChanged(); // Vuelve a actualizar la UI
     }
+
+
+    private async Task ValidarCedulaEnAPI(FocusEventArgs e)
+    {
+        cedulaEsValida = false; // Por defecto, deshabilita hasta comprobar
+
+        if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
+        {
+            cedulaError = "Cédula inválida. Debe tener 11 números.";
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            var response = await Http.GetAsync($"https://api.digital.gob.do/v3/cedulas/{Cedula}/validate");
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!string.IsNullOrWhiteSpace(responseContent))
+            {
+                var result = SystemTextJson.JsonSerializer.Deserialize<CedulaValidationResult>(responseContent, new SystemTextJson.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+
+                if (result is not null && result.valid)
+                {
+                    cedulaError = null;
+                    cedulaEsValida = true; // Formulario se puede volver a habilitar
+                }
+                else
+                {
+                    cedulaError = "La cédula no es válida según el registro oficial.";
+                   
+                }
+            }
+            else
+            {
+                cedulaError = "No se pudo validar la cédula.";
+            }
+        }
+        catch (Exception ex)
+        {
+            cedulaError = "Error de conexión al validar la cédula.";
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        StateHasChanged();
+    }
+
+
+    public class CedulaValidationResult
+    {
+        public bool valid { get; set; }
+    }
+
+
 }
+
 
 
 
