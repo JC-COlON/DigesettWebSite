@@ -1,4 +1,5 @@
-﻿@page "/Home"
+﻿@implements IAsyncDisposable
+@page "/Home"
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
@@ -13,6 +14,7 @@
 @using System.Globalization
 @using Syncfusion.Blazor.Grids
 
+
 <PageTitle>Home</PageTitle>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
@@ -24,6 +26,26 @@
 <div class="ContainerPrincipal">
 
     <h3 class="containertitulo" style="margin-bottom: 16px; margin-top: 32px;">Multas por Zona</h3>
+
+
+        <div id="map" style="width: 700px; height: 500px;"></div>
+
+     @*    <RadzenChart>
+            <RadzenStackedColumnSeries Data="@barChartData"
+                                       CategoryProperty="Category"
+                                       Title="Multas por Zona"
+                                       ValueProperty="Value"
+                                       Fills="@(new[] { "#009C40" })">
+                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            </RadzenStackedColumnSeries>
+            <RadzenValueAxis Min="0" Max="100" Step="10">
+                <RadzenGridLines Visible="true" />
+                <RadzenAxisTitle Text="Cantidad de Multas" />
+            </RadzenValueAxis>
+        </RadzenChart> *@
+
+
+
     <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
         <RadzenCard Style="background-color: #f0f8ff; color: #333; border: 1px solid #007bff;">
             <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="FlexWrap.Wrap">
@@ -42,22 +64,11 @@
             </RadzenStack>
         </RadzenCard>
 
-        <RadzenChart>
-            <RadzenStackedColumnSeries Data="@barChartData"
-                                       CategoryProperty="Category"
-                                       Title="Multas por Zona"
-                                       ValueProperty="Value"
-                                       Fills="@(new[] { "#009C40" })">
-                <RadzenSeriesDataLabels Visible="@showDataLabels" />
-            </RadzenStackedColumnSeries>
-            <RadzenValueAxis Min="0" Max="100" Step="10">
-                <RadzenGridLines Visible="true" />
-                <RadzenAxisTitle Text="Cantidad de Multas" />
-            </RadzenValueAxis>
-        </RadzenChart>
-
         <!-- Título de la segunda gráfica correctamente alineado -->
         <h3 class="containertitulo" style="margin-bottom: 16px; margin-top: 32px;">Multas por Mes</h3>
+
+
+      
 
         <RadzenChart>
             <RadzenChartTooltipOptions Shared="@sharedTooltip" />
@@ -79,6 +90,8 @@
     </RadzenStack>
 
 
+
+  
 
     
         <h3 class="containertitulo" style="margin-bottom:30px;">Multas Recientes</h3>
@@ -507,7 +520,25 @@
 
 
 
+    private IJSObjectReference? module;
+    private string? result;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/jquery/leafletmap.js");
+            result = await module.InvokeAsync<string>("load_map");
+        }
 
+    }
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+
+        }
+    }
 
 
 
