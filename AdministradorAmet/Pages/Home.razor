@@ -519,24 +519,26 @@
     }
 
 
-
     private IJSObjectReference? module;
     private string? result;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/jquery/leafletmap.js");
+
+
             result = await module.InvokeAsync<string>("load_map");
         }
-
     }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         if (module is not null)
         {
             await module.DisposeAsync();
-
         }
     }
 

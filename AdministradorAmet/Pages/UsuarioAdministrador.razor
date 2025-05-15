@@ -131,12 +131,14 @@
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Property="Role" Width="70px">
+                    <RadzenDataGridColumn TItem="User" Property="Office" Width="70px">
                         <HeaderTemplate>
-                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Tipo de Usuario</span>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Oficina</span>
                         </HeaderTemplate>
                         <Template Context="usuario">
-                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Role</span>
+                            <span style="font-family: 'Roboto', sans-serif; font-size: medium;">
+                                @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(usuario.office.ToLower())
+                            </span>
                         </Template>
                     </RadzenDataGridColumn>
 

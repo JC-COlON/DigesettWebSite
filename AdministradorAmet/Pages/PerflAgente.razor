@@ -57,7 +57,7 @@
                             <p><strong>Email:</strong> @(string.IsNullOrEmpty(usuario?.email) ? "N/A" : usuario.email)</p>
                             <p><strong>Teléfono:</strong> @(string.IsNullOrEmpty(usuario?.Phone) ? "N/A" : usuario.Phone)</p>
                             <p><strong>Género:</strong> @(string.IsNullOrEmpty(usuario?.Gender) ? "N/A" : usuario.Gender)</p>
-                            <p><strong>Ubicación de Trabajo:</strong> @(string.IsNullOrEmpty(usuario?.workLocation) ? "N/A" : usuario.workLocation)</p>
+                            <p><strong>Ubicación de Trabajo:</strong> @(string.IsNullOrEmpty(usuario?.office) ? "N/A" : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(usuario.office.ToLower()))</p>
                         </div>
                         <div class="column">
                             @{

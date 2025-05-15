@@ -161,40 +161,53 @@
 
         <div class="input-group">
             <label for="inputLugarTrabajo">Lugar de Trabajo</label>
-            <select id="inputLugarTrabajo" class="form-select" @bind="workLocationId">
+            <select id="inputLugarTrabajo" class="form-select" @bind="officeId">
                 <option value="" selected disabled>Seleccionar</option>
-                <option value="1">Azua</option>
-                <option value="2">Bahoruco</option>
-                <option value="3">Barahona</option>
-                <option value="4">Dajabon</option>
-                <option value="5">Distrito Nacional</option>
-                <option value="6">Duarte</option>
-                <option value="7">El Seybo</option>
-                <option value="8">Elias Piña</option>
-                <option value="9">Espaillat</option>
-                <option value="10">Hato Mayor</option>
-                <option value="11">Hermanas Mirabal</option>
-                <option value="12">Independencia</option>
-                <option value="13">La Altagracia</option>
-                <option value="14">La Romana</option>
-                <option value="15">La Vega</option>
-                <option value="16">Maria Trinidad Sanchez</option>
-                <option value="17">Monseñor Nouel</option>
-                <option value="18">Monte Plata</option>
-                <option value="19">Montecristi</option>
-                <option value="20">Pedernales</option>
-                <option value="21">Peravia</option>
-                <option value="22">Puerto Plata</option>
-                <option value="23">Samana</option>
-                <option value="24">San Cristobal</option>
-                <option value="25">San Jose de Ocoa</option>
-                <option value="26">San Juan</option>
-                <option value="27">San Pedro de Macoris</option>
-                <option value="28">Sanchez Ramirez</option>
-                <option value="29">Santiago</option>
-                <option value="30">Santiago Rodriguez</option>
-                <option value="31">Santo Domingo</option>
-                <option value="32">Valverde</option>
+                <!-- Oficinas nuevas -->
+                <option value="33">Digesett Mao</option>
+                <option value="34">Digesett Santiago Rodriguez</option>
+                <option value="35">Digesett Dajabon</option>
+                <option value="36">Digesett Monte Cristi</option>
+                <option value="37">Digesett Loma de Cabrera</option>
+                <option value="38">Digesett Barahona</option>
+                <option value="39">Digesett Neyba</option>
+                <option value="40">Digesett Pedernales</option>
+                <option value="41">Digesett Puerto Plata</option>
+                <option value="42">Digesett Cabarete</option>
+                <option value="43">Digesett Sosua</option>
+                <option value="44">Digesett Santiago de los Caballeros</option>
+                <option value="45">Digesett Constanza</option>
+                <option value="46">Digesett San Jose de las Matas</option>
+                <option value="47">Digesett Navarrete</option>
+                <option value="48">Digesett Jarabacoa</option>
+                <option value="49">Digesett La Vega</option>
+                <option value="50">Digesett Moca</option>
+                <option value="51">Digesett Nagua</option>
+                <option value="52">Digesett San Francisco de Macoris</option>
+                <option value="53">Digesett Samana</option>
+                <option value="54">Digesett Salcedo</option>
+                <option value="55">Digesett Bonao</option>
+                <option value="56">Digesett Cotui</option>
+                <option value="57">Digesett Villa Altagracia</option>
+                <option value="58">Digesett Maimon</option>
+                <option value="59">Digesett Bani</option>
+                <option value="60">Digesett San Cristobal</option>
+                <option value="61">Digesett San José de Ocoa</option>
+                <option value="62">Digesett Santo Domingo Norte</option>
+                <option value="63">Digesett Santo Domingo Oeste</option>
+                <option value="64">Digesett Distrito Nacional</option>
+                <option value="65">Digesett Zona Oriental</option>
+                <option value="66">Digesett Digesett San Pedro de Macoris</option>
+                <option value="67">Digesett Juan Dolio</option>
+                <option value="68">Digesett Hato Mayor</option>
+                <option value="69">Digesett Monte Plata</option>
+                <option value="70">Digesett Yamasa</option>
+                <option value="71">Digesett Bayaguana</option>
+                <option value="72">Digesett Higuey</option>
+                <option value="73">Digesett El Seibo</option>
+                <option value="74">Digesett La Romana</option>
+                <option value="75">Digesett San Juan de la Maguana</option>
+                <option value="76">Digesett Azua</option>
             </select>
         </div>
     </div>
@@ -221,7 +234,7 @@
     private int? genderId { get; set; }
     private int? bloodTypeId { get; set; }
     private int? civilStatusId { get; set; }
-    private int? workLocationId { get; set; }
+    private int? officeId { get; set; }
     private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
     bool alertaVisible = false;
     bool errorVisible = false;
@@ -238,7 +251,7 @@
     private string gender = string.Empty;
     private string bloodType = string.Empty;
     private string civilStatus = string.Empty;
-    private string workLocation = string.Empty;
+    private string office = string.Empty;
 
 
     protected override async Task OnInitializedAsync()
@@ -288,7 +301,11 @@
                 gender = usuario.Gender ?? string.Empty;
                 bloodType = usuario.bloodType ?? string.Empty;
                 civilStatus = usuario.CivilStatus ?? string.Empty;
-                workLocation = usuario.workLocation ?? string.Empty;
+                office = usuario.office ?? string.Empty;
+                var officeNormalized = (usuario.office ?? string.Empty).Trim().ToLowerInvariant();
+
+                Console.WriteLine($"Office recibido del API: '{usuario.office}'");
+
 
                 // Imagen de perfil si existe
                 profileImgPreview = usuario.profileImg ?? string.Empty;
@@ -324,42 +341,55 @@
                     _ => null // En caso de que no sea un valor conocido, se deja como null
                 };
 
-                workLocationId = workLocation switch
+                officeId = officeNormalized switch
                 {
-                    "Azua" => 1,
-                    "Bahoruco" => 2,
-                    "Barahona" => 3,
-                    "Dajabon" => 4,
-                    "Distrito Nacional" => 5,
-                    "Duarte" => 6,
-                    "El Seybo" => 7,
-                    "Elias Piña" => 8,
-                    "Espaillat" => 9,
-                    "Hato Mayor" => 10,
-                    "Hermanas Mirabal" => 11,
-                    "Independencia" => 12,
-                    "La Altagracia" => 13,
-                    "La Romana" => 14,
-                    "La Vega" => 15,
-                    "Maria Trinidad Sanchez" => 16,
-                    "Monseñor Nouel" => 17,
-                    "Monte Plata" => 18,
-                    "Montecristi" => 19,
-                    "Pedernales" => 20,
-                    "Peravia" => 21,
-                    "Puerto Plata" => 22,
-                    "Samana" => 23,
-                    "San Cristobal" => 24,
-                    "San Jose de Ocoa" => 25,
-                    "San Juan" => 26,
-                    "San Pedro de Macoris" => 27,
-                    "Sanchez Ramirez" => 28,
-                    "Santiago" => 29,
-                    "Santiago Rodriguez" => 30,
-                    "Santo Domingo" => 31,
-                    "Valverde" => 32,
+                    "digessett mao" => 33,
+                    "digessett santiago rodriguez" => 34,
+                    "digessett dajabon" => 35,
+                    "digessett monte cristi" => 36,
+                    "digessett loma de cabrera" => 37,
+                    "digessett barahona" => 38,
+                    "digessett neyba" => 39,
+                    "digessett pedernales" => 40,
+                    "digessett puerto plata" => 41,
+                    "digessett cabarete" => 42,
+                    "digessett sosua" => 43,
+                    "digessett santiago de los caballeros" => 44,
+                    "digessett constanza" => 45,
+                    "digessett san jose de las matas" => 46,
+                    "digessett navarrete" => 47,
+                    "digessett jarabacoa" => 48,
+                    "digessett la vega" => 49,
+                    "digessett moca" => 50,
+                    "digessett nagua" => 51,
+                    "digessett san francisco de macoris" => 52,
+                    "digessett samana" => 53,
+                    "digessett salcedo" => 54,
+                    "digessett bonao" => 55,
+                    "digessett cotui" => 56,
+                    "digessett villa altagracia" => 57,
+                    "digessett maimon" => 58,
+                    "digessett bani" => 59,
+                    "digessett san cristobal" => 60,
+                    "digessett san josé de ocoa" => 61,
+                    "digessett santo domingo norte" => 62,
+                    "digessett santo domingo oeste" => 63,
+                    "digessett distrito nacional" => 64,
+                    "digessett oriental" => 65,
+                    "digessett san pedro de macoris" => 66,
+                    "digessett juan dolio" => 67,
+                    "digessett hato mayor" => 68,
+                    "digessett monte plata" => 69,
+                    "digessett yamasa" => 70,
+                    "digessett bayaguana" => 71,
+                    "digessett higuey" => 72,
+                    "digessett el seibo" => 73,
+                    "digessett la romana" => 74,
+                    "digessett san juan de la maguana" => 75,
+                    "digessett azua" => 76,
                     _ => null
                 };
+
 
                 // Actualizar la vista
                 StateHasChanged();
@@ -513,7 +543,7 @@
                 GenderId = genderId.HasValue ? genderId.Value : (int?)null, // Asegúrate de usar GenderId
                 BloodTypeId = bloodTypeId.HasValue ? bloodTypeId.Value : (int?)null, // Asegúrate de usar BloodTypeId
                 CivilStatusId = civilStatusId.HasValue ? civilStatusId.Value : (int?)null, // Asegúrate de usar CivilStatusId
-                WorkLocationId = workLocationId.HasValue ? workLocationId.Value : (int?)null, // Asegúrate de usar WorkLocationId
+                OfficeId = officeId.HasValue ? officeId.Value : (int?)null, // Asegúrate de usar WorkLocationId
                 Height = height,
                 Birthdate = birthdate.HasValue ? birthdate.Value.ToString("yyyy-MM-dd") : null,
                 NoAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente.Trim()
@@ -631,7 +661,7 @@
         public string? ProfileImg { get; set; }
         public int? GenderId { get; set; } // Cambiado a int
         public int? BloodTypeId { get; set; } // Cambiado a int
-        public int? WorkLocationId { get; set; } // Cambiado a int
+        public int? OfficeId { get; set; } // Cambiado a int
         public int? CivilStatusId { get; set; } // Cambiado a int
         public decimal? Height { get; set; }
         public string? Birthdate { get; set; }

@@ -60,6 +60,14 @@
         </RadzenAlert>
     }
 
+    @if (isLoadingCedula)
+    {
+        <div class="spinner">
+            <!-- Aquí el contenido visual de tu spinner -->
+            <span>Validando Cedula...</span>
+        </div>
+    }
+
 
 
    <div class="inputs-grid">
@@ -117,17 +125,21 @@
 
         <div class="input-group">
             <label for="inputTelefono">Teléfono</label>
-            <input id="inputTelefono" type="text" class="form-input" maxlength="10" @bind="phone" disabled="@IsDisabled("phone")" />
+            <input id="inputTelefono" type="text" class="form-input" maxlength="10"
+                   @bind="phone" autocomplete="off" disabled="@IsDisabled("phone")" />
             @if (!string.IsNullOrEmpty(phoneError))
             {
                 <span class="error-message">@phoneError</span>
             }
         </div>
+
         <div class="input-group">
             <label for="inputPassword">Contraseña</label>
             <div class="password-container">
-                <input id="inputPassword" type="@PasswordFieldType" class="form-input" @bind="password" disabled="@IsDisabled("password")" />
-                <button type="button" class="password-toggle @PasswordToggleClass" @onclick="TogglePasswordField" disabled="@IsDisabled("Password")">
+                <input id="inputPassword" type="@PasswordFieldType" class="form-input"
+                       @bind="password" autocomplete="new-password" disabled="@IsDisabled("password")" />
+                <button type="button" class="password-toggle @PasswordToggleClass"
+                        @onclick="TogglePasswordField" disabled="@IsDisabled("Password")">
                     👁
                 </button>
             </div>
@@ -136,8 +148,10 @@
                 <span class="error-message">@passwordError</span>
             }
         </div>
+
+
         <div class="input-group">
-            <label for="inputSexo">Sexo</label>
+            <label for="inputSexo">Genero</label>
             <select id="inputSexo" class="form-select" @bind="genderId" disabled="@IsDisabled("genderId")">
                 <option value="" selected disabled>Seleccionar</option>
                 <option value="1">Masculino</option>
@@ -206,44 +220,38 @@
             </select>
         </div>
 
+
         <div class="input-group">
-            <label for="inputLugarTrabajo">Lugar de Trabajo</label>
-            <select id="inputLugarTrabajo" class="form-select" @bind="workLocationId" disabled="@IsDisabled("workLocationId")">
-                <option value="" selected disabled>Seleccionar</option>
-                <option value="1">Azua</option>
-                <option value="2">Bahoruco</option>
-                <option value="3">Barahona</option>
-                <option value="4">Dajabon</option>
-                <option value="5">Distrito Nacional</option>
-                <option value="6">Duarte</option>
-                <option value="7">El Seybo</option>
-                <option value="8">Elias Piña</option>
-                <option value="9">Espaillat</option>
-                <option value="10">Hato Mayor</option>
-                <option value="11">Hermanas Mirabal</option>
-                <option value="12">Independencia</option>
-                <option value="13">La Altagracia</option>
-                <option value="14">La Romana</option>
-                <option value="15">La Vega</option>
-                <option value="16">Maria Trinidad Sanchez</option>
-                <option value="17">Monseñor Nouel</option>
-                <option value="18">Monte Plata</option>
-                <option value="19">Montecristi</option>
-                <option value="20">Pedernales</option>
-                <option value="21">Peravia</option>
-                <option value="22">Puerto Plata</option>
-                <option value="23">Samana</option>
-                <option value="24">San Cristobal</option>
-                <option value="25">San Jose de Ocoa</option>
-                <option value="26">San Juan</option>
-                <option value="27">San Pedro de Macoris</option>
-                <option value="28">Sanchez Ramirez</option>
-                <option value="29">Santiago</option>
-                <option value="30">Santiago Rodriguez</option>
-                <option value="31">Santo Domingo</option>
-                <option value="32">Valverde</option>
+            <label> Comandancia</label>
+            <select class="form-select" @onchange="FiltrarOficinas" >
+                <option disabled selected value="">Seleccionar </option>
+                @foreach (var cmd in comandancias)
+                {
+                    <option value="@cmd.Id">@cmd.Name</option>
+                }
             </select>
         </div>
+
+
+        @if (filteredOffices.Any())
+        {
+            <div class="input-group mt-3">
+                <label> Digesett</label>
+                <select class="form-select" @bind="officeId" disabled="@IsDisabled("officeId")">
+                    <option disabled selected value="">Seleccionar</option>
+                    @foreach (var office in filteredOffices)
+                    {
+                        <option value="@office.Id">@office.Name</option>
+                    }
+                </select>
+            </div>
+        }
+
+    
+
+
+
+    
     </div>
 
     <div class="buttons">
@@ -268,7 +276,7 @@
     private int? genderId { get; set; }
     private int? bloodTypeId { get; set; }
     private int? civilStatusId { get; set; }
-    private int? workLocationId { get; set; }
+    private int? officeId { get; set; }
     private string profileImg { get; set; } = string.Empty; // Guardará el nombre del archivo
     bool alertaVisible = false;
     bool errorVisible = false;
@@ -289,7 +297,7 @@
         { "genderId", true },
         { "bloodTypeId", true },
         { "civilStatusId", true },
-        { "workLocationId", true },
+        { "officeId", true },
         { "profileImg", true }
     };
 
@@ -312,6 +320,8 @@
     private string birthdateError { get; set; }
     private string emailError { get; set; }
     private string genderError { get; set; }
+    private string? officeError;
+
 
     // Función que cambia la visibilidad de la contraseña
     private void TogglePasswordField()
@@ -462,13 +472,23 @@
 
         if (!genderId.HasValue)
         {
-            genderError = "El sexo es obligatorio.";
+            genderError = "El genero es obligatorio.";
             isValid = false;
         }
         else
         {
             genderError = null;
         }
+        if (!officeId.HasValue)
+        {
+            officeError = "La oficina de digesett es obligatoria.";
+            isValid = false;
+        }
+        else
+        {
+            officeError = null;
+        }
+
 
         if (!isValid)
         {
@@ -490,11 +510,17 @@
             genderId = genderId,
             bloodTypeId = bloodTypeId,
             height = height.HasValue ? height.Value : (decimal?)null,
-            workLocationId = workLocationId,
+            officeId = officeId,
             civilStatusId = civilStatusId,
             noAgente = string.IsNullOrWhiteSpace(noAgente) ? null : noAgente,
             statusId = 1
         };
+
+        // Serializar a JSON
+        var jsonString = System.Text.Json.JsonSerializer.Serialize(usuario);
+
+        // // Mostrar alert con JSON antes de enviar
+        // await JSRuntime.InvokeVoidAsync("alert", $"Datos que se enviarán:\n{jsonString}");
 
         try
         {
@@ -517,7 +543,6 @@
             Console.WriteLine($"Error al crear usuario: {ex}");
         }
     }
-
 
     private void Cancelar()
     {
@@ -566,14 +591,18 @@
         StateHasChanged(); // Vuelve a actualizar la UI
     }
 
+    private bool isLoadingCedula = false;  // Esta propiedad controla el spinner
 
     private async Task ValidarCedulaEnAPI(FocusEventArgs e)
     {
         cedulaEsValida = false; // Por defecto, deshabilita hasta comprobar
+        isLoadingCedula = true; // Mostrar spinner
+        StateHasChanged();
 
         if (Cedula.Length != 11 || !Cedula.All(char.IsDigit))
         {
-            cedulaError = "Cédula inválida. Debe tener 11 números.";
+            cedulaError = "Cédula inválida.";
+            isLoadingCedula = false; // Ocultar spinner
             StateHasChanged();
             return;
         }
@@ -588,7 +617,6 @@
             {
                 var result = SystemTextJson.JsonSerializer.Deserialize<CedulaValidationResult>(responseContent, new SystemTextJson.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-
                 if (result is not null && result.valid)
                 {
                     cedulaError = null;
@@ -597,7 +625,6 @@
                 else
                 {
                     cedulaError = "La cédula no es válida según el registro oficial.";
-                   
                 }
             }
             else
@@ -611,8 +638,10 @@
             Console.WriteLine($"Error: {ex.Message}");
         }
 
+        isLoadingCedula = false; // Ocultar spinner
         StateHasChanged();
     }
+
 
 
     public class CedulaValidationResult
@@ -623,7 +652,143 @@
 
 }
 
+@code {
+    private List<CommandRegion> comandancias = new();
+    private int? selectedCommandId;
+    private int? selectedOfficeId;
+    private List<Office> filteredOffices = new();
 
+    protected override void OnInitialized()
+    {
+        comandancias = new List<CommandRegion>
+    {
+        new() {
+            Id = 1, Name = "Comandancia Regional Noroeste", Offices = new List<Office> {
+                new() { Id = 33, Name = "Digesett Mao", CommandId = 1 },
+                new() { Id = 34, Name = "Digesett Santiago Rodriguez", CommandId = 1 },
+                new() { Id = 35, Name = "Digesett Dajabon", CommandId = 1 },
+                new() { Id = 36, Name = "Digesett Monte Cristi", CommandId = 1 },
+                new() { Id = 37, Name = "Digesett Loma De Cabrera", CommandId = 1 },
+            }
+        },
+        new() {
+            Id = 2, Name = "Comandancia Regional Sur Barahona", Offices = new List<Office> {
+                new() { Id = 38, Name = "Digesett Barahona", CommandId = 2 },
+                new() { Id = 39, Name = "Digesett Neyba", CommandId = 2 },
+                new() { Id = 40, Name = "Digesett Pedernales", CommandId = 2 },
+            }
+        },
+        new() {
+            Id = 3, Name = "Comandancia Regional Puerto Plata", Offices = new List<Office> {
+                new() { Id = 41, Name = "Digesett Puerto Plata", CommandId = 3 },
+                new() { Id = 42, Name = "Digesett Cabarete", CommandId = 3 },
+                new() { Id = 43, Name = "Digesett Sosua", CommandId = 3 },
+            }
+        },
+        new() {
+            Id = 4, Name = "Comandancia Regional Norte", Offices = new List<Office> {
+                new() { Id = 44, Name = "Digesett Santiago De Los Caballeros", CommandId = 4 },
+                new() { Id = 45, Name = "Digesett Constanza", CommandId = 4 },
+                new() { Id = 46, Name = "Digesett San Jose De Las Matas", CommandId = 4 },
+                new() { Id = 47, Name = "Digesett Navarrete", CommandId = 4 },
+                new() { Id = 48, Name = "Digesett Jarabacoa", CommandId = 4 },
+                new() { Id = 49, Name = "Digesett La Vega", CommandId = 4 },
+                new() { Id = 50, Name = "Digesett Moca", CommandId = 4 },
+            }
+        },
+        new() {
+            Id = 5, Name = "Comandancia Regional Nordeste", Offices = new List<Office> {
+                new() { Id = 51, Name = "Digesett Nagua", CommandId = 5 },
+                new() { Id = 52, Name = "Digesett San Francisco De Macoris", CommandId = 5 },
+                new() { Id = 53, Name = "Digesett Samana", CommandId = 5 },
+                new() { Id = 54, Name = "Digesett Salcedo", CommandId = 5 },
+            }
+        },
+        new() {
+            Id = 6, Name = "Comandancia Cibao Sur", Offices = new List<Office> {
+                new() { Id = 55, Name = "Digesett Bonao", CommandId = 6 },
+                new() { Id = 56, Name = "Digesett Cotui", CommandId = 6 },
+                new() { Id = 57, Name = "Digesett Villa Altagracia", CommandId = 6 },
+                new() { Id = 58, Name = "Digesett Maimon", CommandId = 6 },
+            }
+        },
+        new() {
+            Id = 7, Name = "Comandancia Regional Sur Central", Offices = new List<Office> {
+                new() { Id = 59, Name = "Digesett Bani", CommandId = 7 },
+                new() { Id = 60, Name = "Digesett San Cristobal", CommandId = 7 },
+                new() { Id = 61, Name = "Digesett San José De Ocoa", CommandId = 7 },
+            }
+        },
+        new() {
+            Id = 8, Name = "Comandancia Santo Domingo Norte", Offices = new List<Office> {
+                new() { Id = 62, Name = "Digesett Santo Domingo Norte", CommandId = 77 },
+            }
+        },
+        new() {
+            Id = 9, Name = "Comandancia Santo Domingo Oeste", Offices = new List<Office> {
+                new() { Id = 63, Name = "Digesett Santo Domingo Oeste", CommandId = 78 },
+            }
+        },
+        new() {
+            Id = 10, Name = "Comandancia Distrito Nacional", Offices = new List<Office> {
+                new() { Id = 64, Name = "Digesett Distrito Nacional", CommandId = 79 },
+            }
+        },
+        new() {
+            Id = 11, Name = "Comandancia Oriental", Offices = new List<Office> {
+                new() { Id = 65, Name = "Digesett Zona Oriental", CommandId = 80 },
+            }
+        },
+        new() {
+            Id = 12, Name = "Comandancia Regional Sureste", Offices = new List<Office> {
+                new() { Id = 66, Name = "Digesett San Pedro De Macoris", CommandId = 12 },
+                new() { Id = 67, Name = "Digesett Juan Dolio", CommandId = 12 },
+                new() { Id = 68, Name = "Digesett Hato Mayor", CommandId = 12 },
+                new() { Id = 69, Name = "Digesett Monte Plata", CommandId = 12 },
+                new() { Id = 70, Name = "Digesett Yamasa", CommandId = 12 },
+                new() { Id = 71, Name = "Digesett Bayaguana", CommandId = 12 },
+            }
+        },
+        new() {
+            Id = 13, Name = "Comandancia Regional Este", Offices = new List<Office> {
+                new() { Id = 72, Name = "Digesett Higuey", CommandId = 13 },
+                new() { Id = 73, Name = "Digesett El Seibo", CommandId = 13 },
+                new() { Id = 74, Name = "Digesett La Romana", CommandId = 13 },
+            }
+        },
+        new() {
+            Id = 14, Name = "Comandancia Regional Suroeste", Offices = new List<Office> {
+                new() { Id = 75, Name = "Digesett San Juan De La Maguana", CommandId = 14 },
+                new() { Id = 76, Name = "Digesett Azua", CommandId = 14 },
+            }
+        },
+    };
+    }
+
+
+
+    private void FiltrarOficinas(ChangeEventArgs e)
+    {
+        selectedCommandId = int.Parse(e.Value?.ToString() ?? "0");
+        filteredOffices = comandancias.FirstOrDefault(c => c.Id == selectedCommandId)?.Offices ?? new();
+        selectedOfficeId = null;
+
+    }
+
+    public class CommandRegion
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Office> Offices { get; set; } = new();
+    }
+
+    public class Office
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int CommandId { get; set; }
+    }
+}
 
 
 

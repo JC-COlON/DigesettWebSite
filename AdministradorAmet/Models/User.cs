@@ -16,7 +16,7 @@ namespace AdministradorAmet.Models
         public string? nacionality { get; set; }
         public string? Gender { get; set; }
         public string? bloodType { get; set; }
-        public string? workLocation { get; set; }
+        public string? office { get; set; }
         public string? CivilStatus { get; set; }
         public string? Role { get; set; }
         public string? status { get; set; }
