@@ -3,7 +3,8 @@
         center: [18.7357, -70.1627],
         zoom: 8,
         scrollWheelZoom: false,
-        doubleClickZoom: false
+        doubleClickZoom: false,
+        zoomControl: false
     });
 
     const bounds = [
@@ -12,22 +13,27 @@
     ];
     map.setMaxBounds(bounds);
 
-    L.tileLayer('https://api.mapbox.com/styles/v1/jrcolon/cmanh2hcn000z01qpbw5ha93z/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoianJjb2xvbiIsImEiOiJjbWFuZzE0eGEwdmQwMnhvam5ocXNhbjZsIn0.tSPQn8MwpX9PrzpMP3Xv3g', {
+    L.tileLayer('https://api.mapbox.com/styles/v1/jrcolon/cmapu8xqq01cd01s8ensn822v/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoianJjb2xvbiIsImEiOiJjbWFuZzE0eGEwdmQwMnhvam5ocXNhbjZsIn0.tSPQn8MwpX9PrzpMP3Xv3g', {
         tileSize: 512,
         zoomOffset: -1,
-        attribution: 'Map data © OpenStreetMap contributors, Imagery © Mapbox'
-    }).addTo(map);
+        attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 18,
+    }).addTo(map); // ojo, antes tenías mapa, debe ser 'map'
 
     // FUNCIONES DE COLOR Y ESTILO
     function getColor(multas) {
-        return multas > 100 ? '#800026' :
-            multas > 50 ? '#BD0026' :
-                multas > 20 ? '#E31A1C' :
-                    multas > 10 ? '#FC4E2A' :
-                        multas > 1 ? '#FD8D3C' :
+        multas = Number(multas) || 0;
+
+        return multas > 10 ? '#800026' :
+            multas > 8 ? '#BD0026' :
+                multas > 6 ? '#E31A1C' :
+                    multas > 4 ? '#FC4E2A' :
+                        multas > 2 ? '#FD8D3C' :
                             multas > 0 ? '#FEB24C' :
-                                '#FFEDA0';
+                                '#FFEDA0'; // Sin multas
     }
+
+
 
     function style(feature) {
         const multas = feature.properties.multas || 0;
@@ -41,22 +47,18 @@
         };
     }
 
-    // CARGAR GEOJSON DE ZONAS
     const geoResponse = await fetch('/data/geojson.json');
     const geoJson = await geoResponse.json();
 
-    // CARGAR MULTAS POR ZONA DESDE LA API
     const multasResponse = await fetch('https://localhost:7277/api/Ticket/api/zona-multas/resumen');
     const multasPorZona = await multasResponse.json();
 
-    // INYECTAR LA CANTIDAD DE MULTAS EN CADA ZONA DEL GEOJSON
     geoJson.features.forEach(feature => {
         const zonaNombre = feature.properties.name;
         const cantidad = multasPorZona[zonaNombre] || 0;
         feature.properties.multas = cantidad;
     });
 
-    // AGREGAR LAS ZONAS AL MAPA
     L.geoJson(geoJson, {
         style: style,
         onEachFeature: function (feature, layer) {

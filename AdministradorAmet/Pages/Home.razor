@@ -28,7 +28,45 @@
     <h3 class="containertitulo" style="margin-bottom: 16px; margin-top: 32px;">Multas por Zona</h3>
 
 
-        <div id="map" style="width: 700px; height: 500px;"></div>
+    <div class="map-container">
+        <div id="map" style="width: 70%; height: 500px; float: left;"></div>
+
+        <div id="legend" class="containerleyenda" style="width: 30%; float: left; padding-left: 10px;">
+            <h4 class="titulolegenda">Rango de Multas</h4>
+
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #FFEDA0;"></span>
+                <span>0 Multas</span>
+            </div>
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #FEB24C;"></span>
+                <span>1 - 2 Multas</span>
+            </div>
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #FD8D3C;"></span>
+                <span>3 - 4 Multas</span>
+            </div>
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #FC4E2A;"></span>
+                <span>5 - 6 Multas</span>
+            </div>
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #E31A1C;"></span>
+                <span>7 - 8 Multas</span>
+            </div>
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #BD0026;"></span>
+                <span>9 - 10 Multas</span>
+            </div>
+            <div class="legend-item">
+                <span class="color-box" style="background-color: #800026;"></span>
+                <span>Más de 10 Multas</span>
+            </div>
+        </div>
+    </div>
+
+
+
 
      @*    <RadzenChart>
             <RadzenStackedColumnSeries Data="@barChartData"

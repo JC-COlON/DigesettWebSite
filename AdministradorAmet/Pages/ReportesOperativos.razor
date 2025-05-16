@@ -82,6 +82,10 @@
             <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
         </div>
 
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.IncidentLocation" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.IncidentLocation) ? "" : "active")">Lugar del Hecho</label>
+        </div>
 
         <div class="form-group slideup-placeholder">
             <RadzenTextBox @bind-Value="filterModel.Placavehiculo" Placeholder=" " Style="width:150px;font-weight:bold;" />
@@ -401,6 +405,9 @@
         if (!string.IsNullOrEmpty(filterModel.Zona))
             queryParams.Add($"Zona={filterModel.Zona}");
 
+        if (!string.IsNullOrEmpty(filterModel.IncidentLocation))
+            queryParams.Add($"LugarHecho={filterModel.IncidentLocation}");
+
         if (!string.IsNullOrEmpty(filterModel.TipoDeVehiculo))
             queryParams.Add($"TipoVehiculoId={filterModel.TipoDeVehiculo}");
 
@@ -500,6 +507,7 @@
         Console.WriteLine($"No. de Agente: {filterModel.NoAgente}");
         Console.WriteLine($"Estado: {filterModel.Estado}");
         Console.WriteLine($"Zona: {filterModel.Zona}");
+        Console.WriteLine($"Lugar Hecho: {filterModel.IncidentLocation}");
         Console.WriteLine($"Tipo de Vehículo: {filterModel.TipoDeVehiculo}");
         Console.WriteLine($"Placa: {filterModel.Placavehiculo}");
         Console.WriteLine($"Marca: {filterModel.MarcaVehiculo}");
@@ -526,6 +534,7 @@
         public string TipoDeVehiculo { get; set; }
         public string Placavehiculo { get; set; }
         public string MarcaVehiculo { get; set; }
+        public string IncidentLocation { get; set; }
     }
 
     public class Infraccion

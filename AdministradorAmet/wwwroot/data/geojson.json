@@ -3409,8 +3409,8 @@
     {
       "type": "Feature",
       "properties": {
-        "name ": "DISTRITO NACIONAL",
-        "multas": 350
+        "name": "DISTRITO NACIONAL",
+        "multas": 215
       },
       "geometry": {
         "coordinates": [

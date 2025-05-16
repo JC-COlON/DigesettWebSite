@@ -128,3 +128,51 @@
     border-radius: 5px;
     margin-bottom: 0;
 }
+
+
+/* Estilo para el contenedor del mapa y la leyenda */
+.map-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Estilo del contenedor de la leyenda */
+.legend-container {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-left: 20px;
+}
+
+/* Estilo de cada elemento en la leyenda */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Estilo para los cuadros de color en la leyenda */
+.color-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 3px;
+}
+
+.titulolegenda {
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 10px;
+}
+.containerleyenda {
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
