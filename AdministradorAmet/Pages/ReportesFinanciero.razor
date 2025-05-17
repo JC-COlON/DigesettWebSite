@@ -182,9 +182,17 @@
     <div class="containerabajo">
         @if (filteredTickets != null && filteredTickets.Any())
         {
-            <div style="margin-bottom: 20px; margin-left:77%">
-                <span style="margin-left: 60px;">Formato a exportar:</span>
-                <button @onclick="export" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">PDF</button>
+          
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 class="tituloreporte">Reporte Generado</h3>
+
+                <div class="no-print" style="display: flex; align-items: center;">
+                    <span style="margin-right: 10px;">Formato a exportar:</span>
+                    <button  @onclick="export" class="export-button"
+                            style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">
+                        PDF
+                    </button>
+                </div>
             </div>
 
             <RadzenDataGrid Data="@filteredTickets" TItem="Ticket" ShowPagingSummary="true" AllowPaging="true" PageSize="15"
@@ -320,6 +328,7 @@
     private IEnumerable<Ticket> tickets;
     private IEnumerable<Ticket> filteredTickets;
 
+
     private string mensajeNoResultados = string.Empty;
     private bool mostrarMensaje = false;
 
@@ -391,10 +400,9 @@
         mostrarMensaje = false;
         mensajeNoResultados = string.Empty;
 
+        // Si el usuario solo pone fecha fin, asumimos el mismo día para inicio
         if (filterModel.FechaFin.HasValue && !filterModel.FechaInicio.HasValue)
-        {
             filterModel.FechaInicio = filterModel.FechaFin;
-        }
 
         var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?Hidden=0";
         var queryParams = new List<string>();
@@ -439,20 +447,13 @@
         if (!string.IsNullOrEmpty(filterModel.TipoDeVehiculo))
             queryParams.Add($"TipoVehiculoId={filterModel.TipoDeVehiculo}");
 
-
-
         if (!string.IsNullOrEmpty(filterModel.MarcaVehiculo))
             queryParams.Add($"Marca={filterModel.MarcaVehiculo}");
 
-        // Agregar los parámetros a la URL
+        // Construir la URL final
         if (queryParams.Any())
-        {
             url += (url.Contains("?") ? "&" : "?") + string.Join("&", queryParams);
-        }
 
-
-
-        // Imprimir la URL generada en la consola
         Console.WriteLine("URL generada: " + url);
 
         try
@@ -468,24 +469,20 @@
                     mostrarResultados = false;
                     mensajeNoResultados = "No se encontraron multas que coincidan con los filtros.";
                     mostrarMensaje = true;
-                    StateHasChanged();
-
-                    await Task.Delay(3000);
-                    mensajeNoResultados = string.Empty;
-                    mostrarMensaje = false;
-                    StateHasChanged();
                 }
                 else
                 {
-                    filteredTickets = data;
+                    // Ordenar de más reciente a más antigua
+                    filteredTickets = data
+                        .OrderByDescending(t => t.TicketDate) // Cambia 'FechaMulta' por la propiedad correcta
+                        .ToList();
+
                     mostrarResultados = true;
                     mensajeNoResultados = string.Empty;
                     mostrarMensaje = false;
 
                     await LoadBarChartData();
-                    Console.WriteLine(barChartData.Count);
                     await LoadDonutChartData();
-                    StateHasChanged();
                 }
             }
             else if (response.StatusCode == HttpStatusCode.NotFound)
@@ -494,23 +491,11 @@
                 mostrarResultados = false;
                 mensajeNoResultados = "No se encontraron multas que coincidan con los filtros.";
                 mostrarMensaje = true;
-                StateHasChanged();
-
-                await Task.Delay(3000);
-                mensajeNoResultados = string.Empty;
-                mostrarMensaje = false;
-                StateHasChanged();
             }
             else
             {
                 mensajeNoResultados = "Hubo un error al intentar obtener los datos.";
                 mostrarMensaje = true;
-                StateHasChanged();
-
-                await Task.Delay(3000);
-                mensajeNoResultados = string.Empty;
-                mostrarMensaje = false;
-                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -518,14 +503,11 @@
             Console.Error.WriteLine($"Error: {ex.Message}");
             mensajeNoResultados = "Hubo un error al intentar obtener los datos.";
             mostrarMensaje = true;
-            StateHasChanged();
-
-            await Task.Delay(3000);
-            mensajeNoResultados = string.Empty;
-            mostrarMensaje = false;
-            StateHasChanged();
         }
+
+        StateHasChanged();
     }
+
 
 
 

@@ -1,0 +1,688 @@
+﻿@page "/ReportesReviews"
+@using Microsoft.AspNetCore.Http
+@using Radzen
+@using Syncfusion.Pdf
+@using Syncfusion.Pdf.Grid
+@using Syncfusion.Pdf.Graphics
+@using Syncfusion.Drawing
+@using System.IO
+@using System.Text.Json;
+@using AdministradorAmet.Models
+@using System.Text.Json.Serialization
+@inject IHttpContextAccessor HttpContextAccessor
+@using AdministradorAmet.Models
+@using System.Net
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+@inject Radzen.DialogService dialogService
+
+
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
+
+
+<div class="header-container">
+    <h1 class="title">Reportes Sobre Reseñas</h1>
+</div>
+<hr class="divider" />
+
+
+
+<div >
+    <div class="containerArriba">
+        <!-- Cédula -->
+        <div class="form-group slideup-placeholder" >
+            <RadzenTextBox @bind-Value="filterModel.Cedula" Placeholder=" " Style="width:180px; font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Cedula) ? "" : "active")">Cédula Ciudadano</label>
+        </div>
+
+
+        <!-- Fecha Inicio -->
+        <div class="form-group slideup-placeholder date-picker-container">
+            <RadzenDatePicker @bind-Value="filterModel.FechaInicio" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+            <label class="@(IsFechaInicioSet ? "active" : "")">Fecha Inicio</label>
+        </div>
+
+        <!-- Fecha Fin -->
+        <div class="form-group slideup-placeholder date-picker-container">
+            <RadzenDatePicker @bind-Value="filterModel.FechaFin" DateFormat="dd/MM/yyyy" Style="width:150px; font-weight:bold;" Change="OnDateChange" />
+            <label class="@(IsFechaFinSet ? "active" : "")">Fecha Fin</label>
+        </div>
+
+
+        <!-- No. Agente -->
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.NoAgente" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.NoAgente) ? "" : "active")">No. Agente</label>
+        </div>
+    
+
+        <!-- Nombre del Agente -->
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.NombreAgente" Placeholder=" " Style="width:150px; font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.NombreAgente) ? "" : "active")">Nombre Agente</label>
+        </div>
+
+        <!-- Comentario contiene -->
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.ComentarioContiene" Placeholder=" " Style="width:200px; font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.ComentarioContiene) ? "" : "active")">Comentario contiene</label>
+        </div>
+
+        <!-- Rating -->
+        <div class="form-group slideup-placeholder">
+            <RadzenDropDown @bind-Value="filterModel.Rating" Data="@ratingOptions" TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px; font-weight:bold;" />
+            <label class="@(filterModel.Rating == null ? "" : "active")">Rating</label>
+        </div>
+
+
+        <div class="form-group slideup-placeholder">
+            <RadzenTextBox @bind-Value="filterModel.Zona" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
+        </div>
+
+
+
+    
+
+        <!-- Botón Generar -->
+        <div class="form-group">
+            <RadzenButton Text="Generar" Click="OnFilter" Style="width: 140px; height: 40px; background-color: #009C40; color: white; border: 3px solid #009C40;" />
+        </div>
+    </div>
+ 
+
+
+    @if (mostrarMensaje && !string.IsNullOrEmpty(mensajeNoResultados))
+    {
+        <div class="alert alert-warning">
+            @mensajeNoResultados
+        </div>
+    }
+
+
+    @if (!mostrarResultados)
+    {
+
+
+        <div class="containerdebajo">
+            <img src="imagenes/ametlogo.png" class="logo @(mostrarResultados ? "reducido" : "")" />
+            <h3 class="info-text">
+                Para generar el reporte, elige opciones con los filtros y luego haz clic en el botón "Generar"
+            </h3>
+        </div>
+    }
+</div>
+@if (filteredReviews != null && filteredReviews.Any())
+{
+    <div class="contenedor" style="margin-top: 45px; gap: 20px;">
+
+        <!-- 📊 Gráfico de Distribución -->
+        <div class="containerizquierdo">
+            <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+                <!-- Título centrado -->
+                <h3 class="rz-text-align-center" style="margin-top: 10px; font-size: 22px; font-family: 'Poppins', sans-serif; font-weight: bold; color: black;">
+
+                    <RadzenIcon Icon="help_outline"
+                                Style="font-size: 20px; margin-left: 8px; cursor: pointer; color: #fc8403;"
+                                @onclick="MostrarExplicacionBarras" />
+                  
+                    Cantidad de Calificaciones
+                </h3>
+                <RadzenCard>
+                    <RadzenStack Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                        <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                        <RadzenLabel Text="Mostrar Datos" Component="dataLabels" />
+                    </RadzenStack>
+                </RadzenCard>
+
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenChart Style="height: 400px;">
+                            <RadzenStackedColumnSeries Data="@chartData"
+                                                       CategoryProperty="Category"
+                                                       ValueProperty="Value"
+                                                       Title="Distribución de Calificaciones"
+                                                       Fill="#fc8403"
+                                                       Fills="@(new[] { "#fc8403" })">
+                                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                            </RadzenStackedColumnSeries>
+
+
+                            <RadzenCategoryAxis>
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle Text="Estrellas" />
+                            </RadzenCategoryAxis>
+
+                            <RadzenValueAxis Min="0">
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle Text="Cantidad de Personas" />
+                            </RadzenValueAxis>
+                        </RadzenChart>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </div>
+
+        <div class="columna-derecha">
+            <!-- ⭐ Promedio de Calificación -->
+            <div class="containerderecho">
+                <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+                    <RadzenStack>
+                        <h3 class="rz-text-align-center" style="margin-top: 10px; font-size: 22px; font-family: 'Poppins', sans-serif; font-weight: bold; color: black;">
+                            <RadzenIcon Icon="help_outline"
+                                        Style="font-size: 20px; margin-left: 8px; cursor: pointer; color: #fc8403;"
+                                        @onclick="MostrarExplicacionPromedio" />
+                            Promedio de Calificaciones
+                        </h3>
+
+                        <div class="rz-text-align-center custom-rating" style="margin-top: 20px;">
+                            <RadzenRating Value="@promedioRatingInt"
+                                          ReadOnly="true"
+                                          Max="5"
+                                          Style="font-size: 52px; color: gold !important;" />
+                        </div>
+
+                        @if (promedioRatingInt == 0)
+                        {
+                            <p class="rz-text-align-center">Este agente no ha sido calificado</p>
+                        }
+                    </RadzenStack>
+                </RadzenStack>
+            </div>
+
+            <!-- 🔽 Gráfico Donut en contenedor separado -->
+            <div class="containerderechoabajo">
+                <RadzenStack Style="width: 100%; max-width: 600px;">
+                    <RadzenChart>
+                        <RadzenDonutSeries Data="@donutChartData"
+                                           CategoryProperty="Category"
+                                           ValueProperty="Value"
+                                           TotalAngle="360"
+                                           StartAngle="360"
+                                           Fills="@(new[] { "#009C40", "#ffc107", "#dc3545" })">
+                            <ChildContent>
+                                <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                            </ChildContent>
+                            <TitleTemplate>
+                                <div class="rz-donut-content">
+                                    <div>Tipo de Reseñas</div>
+                                </div>
+                            </TitleTemplate>
+                        </RadzenDonutSeries>
+                    </RadzenChart>
+                </RadzenStack>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<div class="container">
+    @if (filteredReviews != null && filteredReviews.Any())
+
+    {
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="tituloreporte">Reporte Generado</h3>
+
+            <div class="no-print" style="display: flex; align-items: center;">
+                <span style="margin-right: 10px;">Formato a exportar:</span>
+                <button class="export-button"
+                        style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">
+                    PDF
+                </button>
+            </div>
+        </div>
+
+
+        <RadzenDataGrid Data="@filteredReviews" TItem="Review" ShowPagingSummary="true"
+                        AllowPaging="true" PageSize="10" AllowFiltering="true" AllowSorting="true"
+                        Style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;">
+            <Columns>
+                <!-- No. de Agente -->
+                <RadzenDataGridColumn TItem="Review" Title="No. Agente" Width="180px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No. Agente</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium">@review.AgentNumber</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <!-- Nombre del Agente -->
+                <RadzenDataGridColumn TItem="Review" Title="Nombre del Agente" Width="250px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre del Agente</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium">@review.AgentName @review.AgentLastName</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <!-- No. Multa -->
+                <RadzenDataGridColumn TItem="Review" Title="No. Multa" Width="180px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">No. Multa</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        <a href="/detallemulta/@review.TicketId" style="font-family: 'Roboto', sans-serif; font-size: medium;" title="Ver multa"># @review.TicketId</a>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <!-- Comentario -->
+                <RadzenDataGridColumn TItem="Review" Title="Comentario" Width="300px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Comentario</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium">@review.Comment</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <!-- Rating -->
+                <RadzenDataGridColumn TItem="Review" Title="Rating" Width="180px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Rating</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        @{
+                            var color = review.Rating switch
+                            {
+                                <= 2 => "#e00000",
+                                <= 4 => "#fc8403",
+                                _ => "#009C40"
+                            };
+                        }
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium;">
+                            @for (int i = 0; i < review.Rating; i++)
+                            {
+                                <span style="color: @color; font-size: 30px;">★</span>
+                            }
+                        </span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <!-- Fecha -->
+                <RadzenDataGridColumn TItem="Review" Title="Fecha" Width="160px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Fecha</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium">@review.CreatedAt.ToString("dd/MM/yyyy")</span>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <!-- Cédula del ciudadano -->
+                <RadzenDataGridColumn TItem="Review" Title="Cédula Ciudadano" Width="250px">
+                    <HeaderTemplate>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Cédula Ciudadano</span>
+                    </HeaderTemplate>
+                    <Template Context="review">
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium">@review.UsuarioCedula</span>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+
+
+
+
+    }
+    else
+    {
+
+    }
+</div>
+
+
+
+@code {
+    private List<string> toolbarItems = new List<string>() { "PdfExport" };
+    private FilterModel filterModel = new FilterModel();
+    private bool IsFechaInicioSet => filterModel.FechaInicio.HasValue;
+    private bool IsFechaFinSet => filterModel.FechaFin.HasValue;
+    private bool mostrarResultados = false;
+    private IEnumerable<Ticket> tickets;
+    private IEnumerable<Ticket> filteredTickets;
+    private string mensajeNoResultados = string.Empty;
+    private bool mostrarMensaje = false;
+    private double promedioRating = 0;
+    private int promedioRatingInt => (int)Math.Round(promedioRating); // Para usar en RadzenRating
+    private Dictionary<int, int> distribucionRating = new(); // Key: estrellas, Value: cantidad
+    private bool showDataLabels = false;
+
+
+
+
+    [SupplyParameterFromQuery]
+    public string Estado { get; set; }
+
+    [SupplyParameterFromQuery(Name = "fechainicio")]
+    public string FechaInicioStr { get; set; }
+
+    [SupplyParameterFromQuery(Name = "fechafin")]
+    public string FechaFinStr { get; set; }
+
+    [SupplyParameterFromQuery(Name = "auto")]
+    public string Auto { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        filterModel = new FilterModel();
+
+
+
+        if (DateTime.TryParse(FechaInicioStr, out var fechaInicio))
+            filterModel.FechaInicio = fechaInicio;
+
+        if (DateTime.TryParse(FechaFinStr, out var fechaFin))
+            filterModel.FechaFin = fechaFin;
+
+        // ✅ Solo ejecutar el filtro si viene con ?auto=true o si hay al menos un filtro
+        if (Auto == "true" || !string.IsNullOrWhiteSpace(Estado) || FechaInicioStr != null || FechaFinStr != null)
+        {
+            await OnFilter();
+        }
+
+
+    }
+
+
+
+
+    private List<EstadoItem> ratingOptions = new()
+{
+    new EstadoItem { Text = "-- Todos --", Value = null },
+    new EstadoItem { Text = "1", Value = "1" },
+    new EstadoItem { Text = "2", Value = "2" },
+    new EstadoItem { Text = "3", Value = "3" },
+    new EstadoItem { Text = "4", Value = "4" },
+    new EstadoItem { Text = "5", Value = "5" },
+};
+
+
+  
+
+
+    private IEnumerable<Review> filteredReviews;
+
+    private async Task OnFilter()
+    {
+        mostrarResultados = false;
+        mostrarMensaje = false;
+        mensajeNoResultados = string.Empty;
+
+        var url = "https://localhost:7277/api/Reviews/FilterReviews?hidden=0";
+        var queryParams = new List<string>();
+
+        if (filterModel.FechaFin.HasValue)
+            queryParams.Add($"fechaFin={filterModel.FechaFin.Value:dd/MM/yyyy}");
+        if (filterModel.FechaInicio.HasValue)
+            queryParams.Add($"fechaInicio={filterModel.FechaInicio.Value:dd/MM/yyyy}");
+        if (!string.IsNullOrEmpty(filterModel.Cedula))
+            queryParams.Add($"cedulaUsuario={filterModel.Cedula}");
+        if (!string.IsNullOrEmpty(filterModel.NoAgente))
+            queryParams.Add($"agentNumber={filterModel.NoAgente}");
+        if (!string.IsNullOrEmpty(filterModel.NombreAgente))
+            queryParams.Add($"agentName={filterModel.NombreAgente}");
+        if (!string.IsNullOrEmpty(filterModel.ComentarioContiene))
+            queryParams.Add($"palabraComentario={filterModel.ComentarioContiene}");
+        if (!string.IsNullOrEmpty(filterModel.Zona))
+            queryParams.Add($"zona={filterModel.Zona}");
+        if (!string.IsNullOrEmpty(filterModel.Rating))
+            queryParams.Add($"rating={filterModel.Rating}");
+
+        if (queryParams.Any())
+            url += "&" + string.Join("&", queryParams);
+
+        Console.WriteLine("URL generada: " + url);
+
+        try
+        {
+            var response = await Http.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                var apiResponse = JsonSerializer.Deserialize<ReviewApiResponse>(json, options);
+
+                if (apiResponse?.Values != null && apiResponse.Values.Any())
+                {
+                    filteredReviews = apiResponse.Values
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToList();
+
+                    // Calcular el promedio de ratings
+                    promedioRating = filteredReviews
+                    .Where(r => r.Rating > 0)
+                    .Average(r => r.Rating);
+
+                    // Calcular la distribución de estrellas (1 a 5)
+                    chartData = Enumerable.Range(1, 5)
+                    .Select(rating => new RatingChartItem
+                            {
+                                Category = rating.ToString(),
+                                Value = filteredReviews.Count(r => r.Rating == rating)
+                            })
+                    .ToList();
+
+                    // ✅ Calcular distribución de sentimiento para gráfico donut
+                    CalcularDistribucionSentimiento(filteredReviews.ToList());
+
+
+                    mostrarResultados = true;
+                }
+
+                else
+                {
+                    filteredReviews = new List<Review>();
+                    promedioRating = 0; // Importante: reiniciar si no hay resultados
+                    mensajeNoResultados = "No se encontraron reseñas con los filtros aplicados.";
+                    mostrarMensaje = true;
+                }
+
+            }
+            else
+            {
+                filteredReviews = new List<Review>();
+                mensajeNoResultados = "Error al obtener los datos.";
+                mostrarMensaje = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error: " + ex.Message);
+            mensajeNoResultados = "Error inesperado.";
+            mostrarMensaje = true;
+        }
+
+        StateHasChanged();
+    }
+
+
+
+    private void OnDateChange(DateTime? value)
+    {
+        StateHasChanged(); // Forzar la actualización de la UI
+    }
+
+
+
+    public class FilterModel
+    {
+        public string Cedula { get; set; }
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
+        public string NoAgente { get; set; }
+        public string NombreAgente { get; set; }
+        public string ApellidoAgente { get; set; }
+        public string ComentarioContiene { get; set; }
+        public string Zona { get; set; }
+        public string Rating { get; set; }
+
+        
+        
+    }
+
+
+
+    public class EstadoItem
+    {
+        public string Text { get; set; }
+        public string? Value { get; set; }
+    }
+
+
+
+    public class ReviewApiResponse
+    {
+        [JsonPropertyName("$values")]
+        public List<Review> Values { get; set; }
+    }
+
+
+   
+
+    public class ApiResponse
+    {
+        [JsonPropertyName("$values")]
+        public List<Ticket> Tickets { get; set; }
+    }
+
+
+
+
+
+
+
+
+    
+    // private async Task export()
+    // {
+    //         var tickets = filteredTickets.Select(ticket => new
+    //         {
+    //             ticket.Name,
+    //             ticket.LastName,
+    //             ticket.Identification,
+    //             TicketDate = ticket.TicketDate.ToString("dd/MM/yyyy"),
+    //             ticket.TicketId,
+    //             ticket.Status,
+    //             Articulo = ticket.Articulo.ArticleNum,
+    //             ticket.AgentNumber,
+    //             Agent = new { ticket.Agente.Name, ticket.Agente.LastName }
+    //         });
+
+    //         await JSRuntime.InvokeVoidAsync("GenerarPDF", tickets);
+    //  }
+
+
+    //     private async Task Print()
+    //     {
+    //         await JSRuntime.InvokeVoidAsync("Print");
+   
+    //     }
+
+
+    public class Review
+    {
+        public int Rating { get; set; }
+        public string Comment { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public int TicketId { get; set; }
+        public string Zona { get; set; }
+        public string AgentNumber { get; set; }
+        public string AgentName { get; set; }
+        public string AgentLastName { get; set; }
+        public string UsuarioCedula { get; set; }
+        public int Hidden { get; set; }
+    }
+
+    public class User
+    {
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string Identification { get; set; }
+    }
+    public class Agent
+    {
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string Id { get; set; }
+    }
+    public class Ticket
+    {
+        public int TicketId { get; set; }
+        public string IncidentLocation { get; set; }
+        public DateTime TicketDate { get; set; }
+        
+
+
+    }
+
+    public class RatingChartItem
+    {
+        public string Category { get; set; } = "";
+        public int Value { get; set; }
+    }
+
+    private List<RatingChartItem> chartData = new();
+
+
+    private void MostrarExplicacionPromedio()
+    {
+        dialogService.Open("¿Qué significa este promedio?", ds => @<div style="padding: 20px;">
+        <p><strong>Promedio de Calificaciones</strong> representa el valor medio de todas las calificaciones (de 1 a 5 estrellas) que los ciudadanos han dado a los agentes en el reporte generado.</p>
+    </div>, new Radzen.DialogOptions() { Width = "500px", Height = "auto" });
+    }
+    
+    private void MostrarExplicacionBarras()
+    {
+        dialogService.Open("¿Qué significa esta cantidad de Calificaciones?", ds => @<div style="padding: 20px;">
+        <p><strong>Cantidad de Calificaciones</strong> representa el número total de veces que los ciudadanos han calificado a los agentes, agrupadas por cantidad de estrellas (de 1 a 5).</p>
+        <p>El gráfico muestra cuántas personas asignaron cada calificación. Por ejemplo, si 10 personas dieron 5 estrellas y 4 dieron 3 estrellas, se mostrará una barra de altura 10 para las 5 estrellas y otra de altura 4 para las 3 estrellas.</p>
+        <p>Esto permite visualizar fácilmente cómo se distribuyen las opiniones de los ciudadanos respecto al desempeño de los agentes.</p>
+    </div>, new Radzen.DialogOptions() { Width = "500px", Height = "auto" });
+    }
+
+
+    public class ReseñaTipoData
+    {
+        public string Category { get; set; }
+        public int Value { get; set; }
+    }
+
+
+    private List<ReseñaTipoData> donutChartData;
+
+
+    private void CalcularDistribucionSentimiento(List<Review> reseñasFiltradas)
+    {
+        int positivas = reseñasFiltradas.Count(r => r.Rating >= 4);
+        int neutrales = reseñasFiltradas.Count(r => r.Rating == 3);
+        int negativas = reseñasFiltradas.Count(r => r.Rating <= 2);
+
+        donutChartData = new List<ReseñaTipoData>
+    {
+        new ReseñaTipoData { Category = "Positivas", Value = positivas },
+        new ReseñaTipoData { Category = "Neutrales", Value = neutrales },
+        new ReseñaTipoData { Category = "Negativas", Value = negativas }
+    };
+    }
+
+
+
+}

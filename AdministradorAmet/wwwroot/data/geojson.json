@@ -1281,7 +1281,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "ZONA ORIENTAL",
+        "name": "SANTO DOMINGO ESTE",
         "multas": 450
       },
       "geometry": {

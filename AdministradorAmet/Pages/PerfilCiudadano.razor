@@ -64,7 +64,7 @@
             </div>
 
             <div class="header-container">
-                <h3 >Multas de este Ciudadano</h3>
+                <h3 class="title2">Multas de este Ciudadano</h3>
             </div>
 
             @if (tickets == null)
@@ -290,7 +290,7 @@ else
     {
         try
         {
-            var response = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/FilterOrGetTicket?Cedula={Cedula}");
+            var response = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/FilterOrGetTicket?Hidden=0&Cedula={Cedula}");
 
             // Verifica si la respuesta es válida antes de deserializarla
             if (!string.IsNullOrEmpty(response))

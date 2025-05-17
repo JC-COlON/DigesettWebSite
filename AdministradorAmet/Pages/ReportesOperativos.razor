@@ -135,15 +135,27 @@
 <div class="container">
     @if (filteredTickets != null && filteredTickets.Any())
     {
-        <div style="margin-bottom: 20px; margin-left:77%" class="no-print">
-            <span style="margin-left: 60px;">Formato a exportar:</span>
-            <button @onclick="export" class="export-button" style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">PDF</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="tituloreporte">Reporte Generado</h3>
+
+            <div class="no-print" style="display: flex; align-items: center;">
+                <span style="margin-right: 10px;">Formato a exportar:</span>
+                <button @onclick="export" class="export-button"
+                        style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">
+                    PDF
+                </button>
+            </div>
         </div>
 
         <RadzenDataGrid  Data="@filteredTickets" TItem="Ticket" ShowPagingSummary="true" AllowPaging="true" 
             PageSize="10" AllowFiltering="true" AllowSorting="true"
             Style="margin-top:50px; width: 100%; border-collapse: collapse; background-color: white;" >
+
+
             <Columns>
+
+
+
                 <RadzenDataGridColumn TItem="Ticket" Property="Name" Title="Nombre Completo" Width="250px" >
                     <HeaderTemplate>
                         <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Nombre Completo</span>
@@ -297,6 +309,14 @@
 
 
 
+    private int currentPageIndex = 0;
+    private int pageSize = 10; // Igual que el PageSize del grid
+
+    private void OnLoadData(LoadDataArgs args)
+    {
+        currentPageIndex = args.Skip / args.Top ?? 0;
+        pageSize = args.Top ?? 10;
+    }
 
 
 
@@ -374,17 +394,13 @@
 
         // Solo agregar los parámetros si tienen valor
         if (!string.IsNullOrEmpty(filterModel.Cedula))
-        {
             queryParams.Add($"Cedula={filterModel.Cedula}");
-        }
 
         if (!string.IsNullOrEmpty(filterModel.NoMulta))
         {
             string ticketIdStr = filterModel.NoMulta.Trim();
             if (int.TryParse(ticketIdStr, out var ticketId))
-            {
                 queryParams.Add($"ticketId={ticketId}");
-            }
         }
 
         if (filterModel.FechaInicio.HasValue)
@@ -419,10 +435,7 @@
 
         // Si hay parámetros adicionales, los agregamos a la URL
         if (queryParams.Any())
-        {
-            // Esto asegura que el primer parámetro se agrega con "?", y los demás con "&"
             url += "&" + string.Join("&", queryParams);
-        }
 
         Console.WriteLine("URL generada: " + url);
 
@@ -436,7 +449,11 @@
 
                 if (apiResponse != null && apiResponse.Tickets != null && apiResponse.Tickets.Any())
                 {
-                    filteredTickets = apiResponse.Tickets;
+                    // Ordenar de más reciente a más antigua por la fecha de la multa
+                    filteredTickets = apiResponse.Tickets
+                                                 .OrderByDescending(t => t.TicketDate) // Cambia 'FechaMulta' si tu modelo usa otro nombre
+                                                 .ToList();
+
                     mostrarResultados = true;
                 }
                 else
@@ -455,14 +472,9 @@
                 try
                 {
                     using var jsonDoc = JsonDocument.Parse(responseContent);
-                    if (jsonDoc.RootElement.TryGetProperty("mensaje", out JsonElement mensajeElement))
-                    {
-                        mensajeNoResultados = mensajeElement.GetString();
-                    }
-                    else
-                    {
-                        mensajeNoResultados = "No se encontraron resultados.";
-                    }
+                    mensajeNoResultados = jsonDoc.RootElement.TryGetProperty("mensaje", out var mensajeElement)
+                        ? mensajeElement.GetString()
+                        : "No se encontraron resultados.";
                 }
                 catch
                 {
@@ -493,6 +505,7 @@
             StateHasChanged();
         }
     }
+
 
 
 
