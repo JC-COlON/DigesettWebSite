@@ -4,9 +4,14 @@
 @inject IJSRuntime JSRuntime
 
 <div class="container" id="resultadomulta">
-    <div style="margin-bottom: 20px; margin-left:82%">
-        <span style="margin-right: 5px;">Formato a exportar:</span>
-        <button @onclick="export" style="background-color: #fc8403; color: white; padding: 5px 10px;  cursor: pointer; border-radius: 5px;">PDF</button>
+    <div style="margin-bottom: 20px; margin-left:85%">
+
+
+        <RadzenButton Text="Exportar PDF"
+                      Icon="file_download"
+                      Click="export"
+                      Style="background-color: #009C40; color: white; padding: 5px 10px; border-radius: 5px;" />
+
       
     </div>
 <div class="header" >

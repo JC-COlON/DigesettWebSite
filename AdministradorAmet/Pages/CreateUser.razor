@@ -223,7 +223,7 @@
 
         <div class="input-group">
             <label> Comandancia</label>
-            <select class="form-select" @onchange="FiltrarOficinas" >
+            <select class="form-select" @onchange="FiltrarOficinas" disabled="@(!ComandanciaHabilitada)">
                 <option disabled selected value="">Seleccionar </option>
                 @foreach (var cmd in comandancias)
                 {
@@ -231,6 +231,7 @@
                 }
             </select>
         </div>
+
 
 
         @if (filteredOffices.Any())
@@ -261,7 +262,7 @@
 </div>
 
 @code {
-    private const string ApiUrl = "https://localhost:7277/api/UserAccess/Create"; // URL de la API
+    private const string ApiUrl = "https://digesett.somee.com/api/UserAccess/Create"; // URL de la API
     private int? rolId { get; set; } // Guardará el tipo de usuario seleccionado (1, 2, 3)
     private string profileImgPreview { get; set; } = string.Empty; // Guardará el dataUrl para la vista previa
     private string name { get; set; } = string.Empty;
@@ -300,6 +301,7 @@
         { "officeId", true },
         { "profileImg", true }
     };
+    private bool ComandanciaHabilitada => rolId == 1 || rolId == 2;
 
     private bool IsDisabled(string fieldName)
     {

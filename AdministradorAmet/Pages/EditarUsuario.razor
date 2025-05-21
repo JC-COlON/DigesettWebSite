@@ -273,7 +273,7 @@
     {
         try
         {
-            string urlCompleta = $"https://localhost:7277/api/User/{cedula}";
+            string urlCompleta = $"https://digesett.somee.com/api/User/{cedula}";
             var usuario = await Http.GetFromJsonAsync<User>(urlCompleta);
 
             if (usuario != null)
@@ -553,7 +553,7 @@
 
         try
         {
-            var response = await Http.PutAsJsonAsync($"https://localhost:7277/api/User/UpdateAgent-Admin/{Cedula}", usuarioDto);
+            var response = await Http.PutAsJsonAsync($"https://digesett.somee.com/api/User/UpdateAgent-Admin/{Cedula}", usuarioDto);
 
             if (response.IsSuccessStatusCode)
             {
@@ -561,7 +561,7 @@
                 Console.WriteLine("Actualización exitosa");
 
                 // Obtener los datos del usuario para determinar el rol
-                var userResponse = await Http.GetAsync($"https://localhost:7277/api/User/{Cedula}");
+                var userResponse = await Http.GetAsync($"https://digesett.somee.com/api/User/{Cedula}");
                 if (userResponse.IsSuccessStatusCode)
                 {
                     var userData = await userResponse.Content.ReadFromJsonAsync<User>();

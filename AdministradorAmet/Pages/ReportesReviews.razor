@@ -80,12 +80,20 @@
         <!-- Rating -->
         <div class="form-group slideup-placeholder">
             <RadzenDropDown @bind-Value="filterModel.Rating" Data="@ratingOptions" TextProperty="Text" ValueProperty="Value" Placeholder=" " Style="width:150px; font-weight:bold;" />
-            <label class="@(filterModel.Rating == null ? "" : "active")">Rating</label>
+            <label class="@(filterModel.Rating == null ? "" : "active")">Calificación</label>
         </div>
 
 
         <div class="form-group slideup-placeholder">
-            <RadzenTextBox @bind-Value="filterModel.Zona" Placeholder=" " Style="width:150px;font-weight:bold;" />
+            <RadzenDropDown @bind-Value="filterModel.Zona"
+                            Data="@zonas"
+                            Placeholder="Zona"
+                            Style="width:200px;font-weight:bold;"
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            AllowClear="true"
+                            Filterable="true"
+                            Class="rz-dropdown"
+                            Name="Zona" />
             <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
         </div>
 
@@ -235,11 +243,19 @@
             <h3 class="tituloreporte">Reporte Generado</h3>
 
             <div class="no-print" style="display: flex; align-items: center;">
-                <span style="margin-right: 10px;">Formato a exportar:</span>
-                <button class="export-button"
-                        style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">
-                    PDF
-                </button>
+
+                <RadzenButton Text="Exportar PDF"
+                              Icon="file_download"
+                              Click="@(async () => await ExportarResenasPDFAsync(filteredReviews.ToList()))"
+                              Style="background-color: white;
+                     color: #009C40;
+                     border: 2px solid #009C40;
+                     padding: 5px 10px;
+                     border-radius: 5px;
+                     font-weight: bold;" />
+
+
+
             </div>
         </div>
 
@@ -281,12 +297,34 @@
                 <!-- Comentario -->
                 <RadzenDataGridColumn TItem="Review" Title="Comentario" Width="300px">
                     <HeaderTemplate>
-                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Comentario</span>
+                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">
+                            Comentario
+                        </span>
                     </HeaderTemplate>
                     <Template Context="review">
-                        <span style="font-family: 'Roboto', sans-serif; font-size: medium">@review.Comment</span>
+                        @{
+                            const int limite = 25;
+                            var comentario = review.Comment ?? "";
+                            var esLargo = comentario.Length > limite;
+                            var textoCorto = esLargo ? comentario.Substring(0, limite) + "..." : comentario;
+                        }
+
+                        <span style="font-family: 'Roboto', sans-serif; font-size: medium;">
+                            @textoCorto
+                            @if (esLargo)
+                            {
+                                <span @onclick="() => VerComentarioCompleto(comentario)"
+                                      style="color: #007bff; cursor: pointer; font-size: small; margin-left: 5px;">
+                                    Ver más...
+                                </span>
+                            }
+                        </span>
                     </Template>
                 </RadzenDataGridColumn>
+
+
+
+
 
                 <!-- Rating -->
                 <RadzenDataGridColumn TItem="Review" Title="Rating" Width="180px">
@@ -399,16 +437,15 @@
 
 
 
-
     private List<EstadoItem> ratingOptions = new()
-{
-    new EstadoItem { Text = "-- Todos --", Value = null },
-    new EstadoItem { Text = "1", Value = "1" },
-    new EstadoItem { Text = "2", Value = "2" },
-    new EstadoItem { Text = "3", Value = "3" },
-    new EstadoItem { Text = "4", Value = "4" },
-    new EstadoItem { Text = "5", Value = "5" },
-};
+    {
+    new EstadoItem { Text = "-- Limpiar --", Value = null },
+    new EstadoItem { Text = "★", Value = "1" },
+    new EstadoItem { Text = "★★", Value = "2" },
+    new EstadoItem { Text = "★★★", Value = "3" },
+    new EstadoItem { Text = "★★★★", Value = "4" },
+    new EstadoItem { Text = "★★★★★", Value = "5" },
+    };
 
 
   
@@ -422,7 +459,7 @@
         mostrarMensaje = false;
         mensajeNoResultados = string.Empty;
 
-        var url = "https://localhost:7277/api/Reviews/FilterReviews?hidden=0";
+        var url = "https://digesett.somee.com/api/Reviews/FilterReviews?hidden=0";
         var queryParams = new List<string>();
 
         if (filterModel.FechaFin.HasValue)
@@ -442,6 +479,7 @@
         if (!string.IsNullOrEmpty(filterModel.Rating))
             queryParams.Add($"rating={filterModel.Rating}");
 
+
         if (queryParams.Any())
             url += "&" + string.Join("&", queryParams);
 
@@ -450,13 +488,14 @@
         try
         {
             var response = await Http.GetAsync(url);
+            var json = await response.Content.ReadAsStringAsync();
+
             if (response.IsSuccessStatusCode)
             {
-                var json = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    };
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
 
                 var apiResponse = JsonSerializer.Deserialize<ReviewApiResponse>(json, options);
 
@@ -466,12 +505,10 @@
                     .OrderByDescending(r => r.CreatedAt)
                     .ToList();
 
-                    // Calcular el promedio de ratings
                     promedioRating = filteredReviews
                     .Where(r => r.Rating > 0)
                     .Average(r => r.Rating);
 
-                    // Calcular la distribución de estrellas (1 a 5)
                     chartData = Enumerable.Range(1, 5)
                     .Select(rating => new RatingChartItem
                             {
@@ -480,21 +517,37 @@
                             })
                     .ToList();
 
-                    // ✅ Calcular distribución de sentimiento para gráfico donut
                     CalcularDistribucionSentimiento(filteredReviews.ToList());
-
-
                     mostrarResultados = true;
                 }
-
                 else
                 {
                     filteredReviews = new List<Review>();
-                    promedioRating = 0; // Importante: reiniciar si no hay resultados
+                    promedioRating = 0;
                     mensajeNoResultados = "No se encontraron reseñas con los filtros aplicados.";
                     mostrarMensaje = true;
                 }
+            }
+            else if ((int)response.StatusCode == 404)
+            {
+                // Manejo específico para 404: mensaje sin reseñas
+                var errorJson = JsonSerializer.Deserialize<ErrorMensaje>(json, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
 
+                if (errorJson?.Mensaje != null && errorJson.Mensaje.Contains("No se encontraron reseñas"))
+                {
+                    filteredReviews = new List<Review>();
+                    promedioRating = 0;
+                    mensajeNoResultados = errorJson.Mensaje;
+                    mostrarMensaje = true;
+                }
+                else
+                {
+                    mensajeNoResultados = "Error 404: recurso no encontrado.";
+                    mostrarMensaje = true;
+                }
             }
             else
             {
@@ -512,6 +565,14 @@
 
         StateHasChanged();
     }
+
+    public class ErrorMensaje
+    {
+        [JsonPropertyName("mensaje")]
+        public string Mensaje { get; set; }
+    }
+
+
 
 
 
@@ -569,32 +630,24 @@
 
 
 
-
     
-    // private async Task export()
-    // {
-    //         var tickets = filteredTickets.Select(ticket => new
-    //         {
-    //             ticket.Name,
-    //             ticket.LastName,
-    //             ticket.Identification,
-    //             TicketDate = ticket.TicketDate.ToString("dd/MM/yyyy"),
-    //             ticket.TicketId,
-    //             ticket.Status,
-    //             Articulo = ticket.Articulo.ArticleNum,
-    //             ticket.AgentNumber,
-    //             Agent = new { ticket.Agente.Name, ticket.Agente.LastName }
-    //         });
+    public async Task ExportarResenasPDFAsync(List<Review> filteredReviews)
+    {
+        // Prepara la lista para enviar a JS, convierte fechas a string y otros datos necesarios
+        var reviewsForJs = filteredReviews.Select(r => new
+        {
+            agentNumber = r.AgentNumber,
+            agentName = r.AgentName,
+            agentLastName = r.AgentLastName,
+            ticketId = r.TicketId,
+            comment = r.Comment ?? "",
+            rating = $"{r.Rating}/5",
+            createdAt = r.CreatedAt.ToString("o"),
+            usuarioCedula = r.UsuarioCedula
+        });
 
-    //         await JSRuntime.InvokeVoidAsync("GenerarPDF", tickets);
-    //  }
-
-
-    //     private async Task Print()
-    //     {
-    //         await JSRuntime.InvokeVoidAsync("Print");
-   
-    //     }
+        await JSRuntime.InvokeVoidAsync("GenerarPDFResenas", reviewsForJs);
+    }
 
 
     public class Review
@@ -683,6 +736,39 @@
     };
     }
 
+
+        void VerComentarioCompleto(string comentario)
+        {
+            dialogService.Open("Comentario completo", ds => @<div style="padding: 20px;">
+            <p style="white-space: pre-wrap; font-size: medium; font-family: 'Roboto', sans-serif;">
+                @comentario
+            </p>
+        </div>, new Radzen.DialogOptions()
+              {
+                  Width = "600px",
+                  Height = "auto",
+                  CloseDialogOnOverlayClick = true
+              });
+        }
+   
+
+
+    private List<string> zonas = new()
+{
+    "Noroeste",
+    "Sur Barahona",
+    "Norte",
+    "Nordeste",
+    "Ciabo Sur",
+    "Sur Central",
+    "Santo Domingo Norte",
+    "Santo Domingo Oeste",
+    "Distrito Nacional",
+    "Oriental",
+    "Sureste",
+    "Este",
+    "Suroeste"
+};
 
 
 }

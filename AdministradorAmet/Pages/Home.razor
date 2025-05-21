@@ -68,19 +68,6 @@
 
 
 
-     @*    <RadzenChart>
-            <RadzenStackedColumnSeries Data="@barChartData"
-                                       CategoryProperty="Category"
-                                       Title="Multas por Zona"
-                                       ValueProperty="Value"
-                                       Fills="@(new[] { "#009C40" })">
-                <RadzenSeriesDataLabels Visible="@showDataLabels" />
-            </RadzenStackedColumnSeries>
-            <RadzenValueAxis Min="0" Max="100" Step="10">
-                <RadzenGridLines Visible="true" />
-                <RadzenAxisTitle Text="Cantidad de Multas" />
-            </RadzenValueAxis>
-        </RadzenChart> *@
 
 
 
@@ -164,14 +151,18 @@
                     </HeaderTemplate>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn TItem="Ticket" Width="50px" Title="Acción">
-                    <HeaderTemplate>
-                        <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Ver</span>
-                    </HeaderTemplate>
-                    <Template Context="data">
-                        <RadzenButton Icon="more_vert" Click="@(args => VerDetalles(data.TicketId))" />
-                    </Template>
-                </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Ticket" Width="50px" Title="Acción">
+                <HeaderTemplate>
+                    <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Ver</span>
+                </HeaderTemplate>
+                <Template Context="data">
+                    <span style="cursor: pointer;" @onclick="() => VerDetalles(data.TicketId)">
+                        <i class="material-icons" title="Ver Detalles" style="font-size: 20px; color: #009C40;">visibility</i>
+                    </span>
+                </Template>
+            </RadzenDataGridColumn>
+
+
 
 
 
@@ -188,7 +179,6 @@
 
 
     <div class="ContainerIzq1">
-        <!-- Selector de rango -->
         <select @onchange="HandleChange" class="SelectStyled">
             <option value="dia">Día</option>
             <option value="semana">Semana</option>
@@ -196,18 +186,36 @@
             <option value="ano">Año</option>
             <option value="total" selected>Total</option>
         </select>
-        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" style="padding-top: 0;">
-            <RadzenChart Style="height: 275px; width: 275px">
-                <RadzenPieSeries Data="@multasData" Title="Multas" CategoryProperty="Estado" ValueProperty="Monto"
-                                 Fills="@(new[] { "#009C40", "#fc8403" })">
-                    <RadzenSeriesDataLabels Visible="false" />
-                </RadzenPieSeries>
-            </RadzenChart>
-        </RadzenStack>
+
+        <div class="ChartAndLegend" style="margin-top: -40px; margin-left: 40px;">
+
+            <SfAccumulationChart Width="390px" Height="390px">
+                <AccumulationChartTooltipSettings Enable="true" />
+                <AccumulationChartLegendSettings Visible="true"
+                                                 Position="Syncfusion.Blazor.Charts.LegendPosition.Right"
+                                                 Width="150px"
+                                                 ToggleVisibility="false" />
+                <AccumulationChartSeriesCollection>
+                    <AccumulationChartSeries DataSource="@PieChartPoints"
+                                             XName="Estado"
+                                             YName="Monto"
+                                             Name="Multas"
+                                             PointColorMapping="Color">
+                        @* 👈 Aquí se asignan los colores *@
+                        <AccumulationDataLabelSettings Name="MontoTexto" Visible="true">
+                            <AccumulationChartDataLabelFont Color="white" FontWeight="Bold" />
+                        </AccumulationDataLabelSettings>
+                    </AccumulationChartSeries>
+                </AccumulationChartSeriesCollection>
+            </SfAccumulationChart>
+
+        </div>
+
 
 
         <p class="SubTextGrafico">Ingresos por multas</p>
     </div>
+
 
     <div class="ContainerIzq2" style="cursor: pointer;" @onclick="() => RedirigirReporte()">
         <div class="ContentWrapper">
@@ -254,6 +262,7 @@
     private HashSet<int> nuevasMultas = new HashSet<int>();
     private DateTime? fechaInicio;
     private DateTime? fechaFin;
+    private string[] graficoColores = new[] { "#009C40", "#fc8403" };
 
 
     // Datos para el gráfico de pastel
@@ -264,17 +273,25 @@
     {
         selectedRango = e.Value.ToString();
 
+        // Llama a JS para actualizar el mapa
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("load_map", selectedRango);
+        }
+
+
         switch (selectedRango)
         {
             case "dia":
                 fechaInicio = fechaFin = DateTime.Today;
                 break;
-            case "semana":
-                var today = DateTime.Today;
-                int delta = DayOfWeek.Monday - today.DayOfWeek;
-                fechaInicio = today.AddDays(delta);
-                fechaFin = fechaInicio.Value.AddDays(6);
-                break;
+         case "semana":
+    var today = DateTime.Today;
+    int delta = -(int)today.DayOfWeek + (today.DayOfWeek == DayOfWeek.Sunday ? -6 : 1);
+    fechaInicio = today.AddDays(delta);
+    fechaFin = fechaInicio.Value.AddDays(6);
+    break;
+
             case "mes":
                 fechaInicio = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
                 fechaFin = fechaInicio.Value.AddMonths(1).AddDays(-1);
@@ -302,10 +319,13 @@
         await CargarUltimasMultas();
         await LoadBarChartData();
 
+    
+
+
         try
         {
             var response = await Http.GetFromJsonAsync<ApiResponse>(
-                "https://localhost:7277/api/Ticket/multas/por-mes");
+                "https://digesett.somee.com/api/Ticket/multas/por-mes");
 
             multasPorMes = response?.Values?
                 .OrderBy(m => DateTime.ParseExact(m.Mes, "MMMM", new CultureInfo("es-ES")))
@@ -327,7 +347,7 @@
         try
         {
             // Hacer la solicitud a la API con el rango seleccionado
-            var response = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/multas/resumen?rango={selectedRango}");
+            var response = await Http.GetStringAsync($"https://digesett.somee.com/api/Ticket/multas/resumen?rango={selectedRango}");
 
             // Deserializar el JSON obtenido
             var resumenMultas = JsonConvert.DeserializeObject<ResumenMultas>(response);
@@ -370,7 +390,7 @@
         try
         {
             // Obtener todas las multas desde la API
-            var response = await Http.GetStringAsync("https://localhost:7277/api/Ticket/allticket");
+            var response = await Http.GetStringAsync("https://digesett.somee.com/api/Ticket/allticket");
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -501,7 +521,7 @@
 
     private async Task LoadBarChartData()
     {
-        var url = "https://localhost:7277/api/Ticket/allTicket";
+        var url = "https://digesett.somee.com/api/Ticket/allTicket";
         var response = await Http.GetStringAsync(url);
 
         // Reparar formato JSON si es necesario
@@ -564,13 +584,13 @@
     {
         if (firstRender)
         {
-
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/jquery/leafletmap.js");
 
-
-            result = await module.InvokeAsync<string>("load_map");
+            // Usar el valor actual de selectedRango para inicializar correctamente el mapa
+            result = await module.InvokeAsync<string>("load_map", selectedRango);
         }
     }
+
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
@@ -580,7 +600,39 @@
         }
     }
 
+    string FormatearMontoNumerico(double monto)
+    {
+        if (monto >= 1_000_000)
+            return (monto / 1_000_000).ToString("0.#") + "M";
+        else if (monto >= 1_000)
+            return (monto / 1_000).ToString("0.#") + "K";
+        else
+            return monto.ToString("0");
+    }
 
+
+
+    public class PieData
+    {
+        public string Estado { get; set; }
+        public double Monto { get; set; }
+        public string MontoTexto { get; set; }
+        public string Color { get; set; }  // 👈 Nuevo campo para color
+    }
+
+
+
+
+
+
+
+    private List<PieData> PieChartPoints => multasData.Select(item => new PieData
+        {
+            Estado = item.Estado,
+            Monto = item.Monto,
+            MontoTexto = FormatearMontoNumerico(item.Monto),
+            Color = item.Estado == "Pagadas" ? "#009C40" : "#fc8403"
+        }).ToList();
 
 
 }

@@ -24,7 +24,7 @@
 }
 /* Contenedor de la columna izquierda que ocupa el 25% restante */
 .ContenedorDerecho {
-    width: 25%;
+    width: 27%;
     margin: 20px 0;
     float: right;
     display: flex;
@@ -33,7 +33,7 @@
 
 /* Estilo para el primer contenedor (más grande) */
 .ContainerIzq1 {
-    height: 250px;
+    height: 290px;
     width: 100%;
     margin-bottom: 0px;
     background-color: white;

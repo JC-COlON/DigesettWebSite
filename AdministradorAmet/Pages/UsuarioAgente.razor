@@ -195,7 +195,7 @@
     {
         try
         {
-            var response = await Http.GetStringAsync("https://localhost:7277/api/User/all");
+            var response = await Http.GetStringAsync("https://digesett.somee.com/api/User/all");
             users = JsonConvert.DeserializeObject<List<User>>(response);
 
             // Filtrar solo los administradores
@@ -222,6 +222,7 @@
                    (user.FullName?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Gender?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Cedula?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
+                     user.office?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.NoAgente?.Contains(value, StringComparison.OrdinalIgnoreCase) == true ||
                     user.Role?.Contains(value, StringComparison.OrdinalIgnoreCase) == true) &&
                    user.Role == "Agente";  // Filtrar solo administradores
@@ -273,7 +274,7 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{cedula}");
+            var response = await Http.DeleteAsync($"https://digesett.somee.com/api/User/{cedula}");
 
             if (response.IsSuccessStatusCode)
             {

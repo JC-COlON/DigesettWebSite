@@ -38,7 +38,7 @@
     {
         try
         {
-            var response = await Http.PostAsJsonAsync("https://localhost:7277/api/User/forgot-password", new { EmailAddress = emailAddress, ClientURL = clientURL });
+            var response = await Http.PostAsJsonAsync("https://digesett.somee.com/api/User/forgot-password", new { EmailAddress = emailAddress, ClientURL = clientURL });
             if (response.IsSuccessStatusCode)
             {
                 await JSRuntime.InvokeVoidAsync("alert", "Correo de recuperación enviado. Por favor, revisa tu bandeja de entrada.");

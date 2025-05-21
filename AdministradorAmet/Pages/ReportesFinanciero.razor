@@ -75,13 +75,32 @@
 
 
     <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.Zona" Placeholder=" " Style="width:150px;font-weight:bold;" />
+        <RadzenDropDown @bind-Value="filterModel.Zona"
+                        Data="@zonas"
+                        Placeholder="Zona"
+                        Style="width:200px;font-weight:bold;"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        AllowClear="true"
+                        Filterable="true"
+                        Class="rz-dropdown"
+                        Change="@OnZonaChanged"
+                        Name="Zona" />
         <label class="@(string.IsNullOrEmpty(filterModel.Zona) ? "" : "active")">Zona</label>
     </div>
 
     <div class="form-group slideup-placeholder">
-        <RadzenTextBox @bind-Value="filterModel.IncidentLocation" Placeholder=" " Style="width:150px;font-weight:bold;" />
-        <label class="@(string.IsNullOrEmpty(filterModel.IncidentLocation) ? "" : "active")">Lugar del Hecho</label>
+        <RadzenDropDown @bind-Value="filterModel.IncidentLocation"
+                        Data="@lugaresFiltrados"
+                        Placeholder="Lugar del Hecho"
+                        Style="width:200px; font-weight:bold;"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        AllowClear="true"
+                        Filterable="true"
+                        Class="rz-dropdown"
+                        Name="LugarDelHecho" />
+        <label class="@(string.IsNullOrEmpty(filterModel.IncidentLocation) ? "" : "active")">
+            Lugar del Hecho
+        </label>
     </div>
   
 
@@ -187,12 +206,21 @@
                 <h3 class="tituloreporte">Reporte Generado</h3>
 
                 <div class="no-print" style="display: flex; align-items: center;">
-                    <span style="margin-right: 10px;">Formato a exportar:</span>
-                    <button  @onclick="export" class="export-button"
-                            style="background-color: #009C40; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 5px;">
-                        PDF
-                    </button>
+
+                    <RadzenButton Text="Exportar PDF"
+                                  Icon="file_download"
+                                  Click="export"
+                                  Style="background-color: white;
+                     color: #009C40;
+                     border: 2px solid #009C40;
+                     padding: 5px 10px;
+                     border-radius: 5px;
+                     font-weight: bold;" />
+
+
+
                 </div>
+                
             </div>
 
             <RadzenDataGrid Data="@filteredTickets" TItem="Ticket" ShowPagingSummary="true" AllowPaging="true" PageSize="15"
@@ -404,7 +432,7 @@
         if (filterModel.FechaFin.HasValue && !filterModel.FechaInicio.HasValue)
             filterModel.FechaInicio = filterModel.FechaFin;
 
-        var url = "https://localhost:7277/api/Ticket/FilterOrGetTicket?Hidden=0";
+        var url = "https://digesett.somee.com/api/Ticket/FilterOrGetTicket?Hidden=0";
         var queryParams = new List<string>();
 
         // Filtros generales
@@ -624,7 +652,6 @@
 
 
 
-
     bool showDataLabels = false;
 
     private async Task export()
@@ -741,7 +768,7 @@
 
     private async Task LoadBarChartData()
     {
-        var baseUrl = "https://localhost:7277/api/Ticket/report/multas/montos";
+        var baseUrl = "https://digesett.somee.com/api/Ticket/report/multas/montos";
         var queryParams = BuildQueryParams();
 
         var url = !string.IsNullOrEmpty(queryParams)
@@ -806,7 +833,7 @@
     private List<DataItem> donutChartData = new List<DataItem>();
     private async Task LoadDonutChartData()
     {
-        var baseUrl = "https://localhost:7277/api/Ticket/FilterGetPendientes-Pagadas";
+        var baseUrl = "https://digesett.somee.com/api/Ticket/FilterGetPendientes-Pagadas";
         var queryParams = BuildQueryParams();
 
         var url = !string.IsNullOrEmpty(queryParams)
@@ -847,6 +874,63 @@
         public int GetPendientes() => Pendientes;
     }
 
+
+
+
+
+    public class ZonaLugar
+    {
+        public string Zona { get; set; } = string.Empty;
+        public List<string> Lugares { get; set; } = new();
+    }
+
+
+    private List<ZonaLugar> zonasLugares = new()
+{
+    new ZonaLugar { Zona = "Noroeste", Lugares = new() { "Mao", "Santiago Rodriguez", "Dajabon", "Monte Cristi", "Loma De Cabrera" }},
+    new ZonaLugar { Zona = "Sur Barahona", Lugares = new() { "Barahona", "Neyba", "Pedernales" }},
+    new ZonaLugar { Zona = "Norte", Lugares = new() { "Santiago De Los Caballeros", "Constanza", "San Jose De Las Matas", "Navarrete", "Jarabacoa", "La Vega", "Moca","Puerto Plata", "Cabarete", "Sosua" }},
+    new ZonaLugar { Zona = "Nordeste", Lugares = new() { "Nagua", "San Francisco De Macoris", "Samana", "Salcedo" }},
+    new ZonaLugar { Zona = "Cibao Sur", Lugares = new() { "Bonao", "Cotui", "Villa Altagracia", "Maimon" }},
+    new ZonaLugar { Zona = "Sur Central", Lugares = new() { "Bani", "San Cristobal", "San José De Ocoa" }},
+    new ZonaLugar { Zona = "Santo Domingo Norte", Lugares = new() { "Santo Domingo Norte" }},
+    new ZonaLugar { Zona = "Santo Domingo Oeste", Lugares = new() { "Santo Domingo Oeste" }},
+    new ZonaLugar { Zona = "Distrito Nacional", Lugares = new() { "Distrito Nacional" }},
+    new ZonaLugar { Zona = "Oriental", Lugares = new() { "Oriental" }},
+    new ZonaLugar { Zona = "Sureste", Lugares = new() { "San Pedro De Macoris", "Juan Dolio", "Hato Mayor", "Monte Plata", "Yamasa", "Bayaguana" }},
+    new ZonaLugar { Zona = "Este", Lugares = new() { "Higuey", "El Seibo", "La Romana" }},
+    new ZonaLugar { Zona = "Suroeste", Lugares = new() { "San Juan De La Maguana", "Azua" }}
+};
+
+    private List<string> zonas;
+    private List<string> lugaresFiltrados;
+
+
+    protected override void OnInitialized()
+    {
+        zonas = zonasLugares.Select(z => z.Zona).ToList();
+        lugaresFiltrados = zonasLugares.SelectMany(z => z.Lugares).ToList();
+    }
+
+
+    private void OnZonaChanged(object value)
+    {
+        var zonaSeleccionada = value?.ToString();
+
+        if (!string.IsNullOrWhiteSpace(zonaSeleccionada))
+        {
+            var zona = zonasLugares.FirstOrDefault(z => z.Zona == zonaSeleccionada);
+            lugaresFiltrados = zona?.Lugares ?? new List<string>();
+        }
+        else
+        {
+            // Mostrar todos si no hay zona seleccionada
+            lugaresFiltrados = zonasLugares.SelectMany(z => z.Lugares).ToList();
+        }
+
+        // También podrías limpiar el valor del lugar seleccionado si deseas:
+        filterModel.IncidentLocation = null;
+    }
 
 
 }

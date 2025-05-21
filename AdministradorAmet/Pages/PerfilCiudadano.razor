@@ -238,10 +238,10 @@ else
             try
             {
                 // Obtener datos del usuario
-                usuario = await Http.GetFromJsonAsync<User>($"https://localhost:7277/api/User/{Cedula}");
+                usuario = await Http.GetFromJsonAsync<User>($"https://digesett.somee.com/api/User/{Cedula}");
 
                 // Obtener las últimas 3 multas pendientes
-                var responseMultasPendientes = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/Pending/{Cedula}");
+                var responseMultasPendientes = await Http.GetStringAsync($"https://digesett.somee.com/api/Ticket/Pending/{Cedula}");
                 var multasPendientesResponse = JsonConvert.DeserializeObject<List<Ticket>>(responseMultasPendientes);
 
                 if (multasPendientesResponse != null && multasPendientesResponse.Count > 0)
@@ -255,7 +255,7 @@ else
                 }
 
                 // Obtener las últimas 3 multas pagas
-                var responseMultasPagas = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/Paid/{Cedula}");
+                var responseMultasPagas = await Http.GetStringAsync($"https://digesett.somee.com/api/Ticket/Paid/{Cedula}");
                 var multasPagasResponse = JsonConvert.DeserializeObject<List<Ticket>>(responseMultasPagas);
 
                 if (multasPagasResponse != null && multasPagasResponse.Count > 0)
@@ -290,7 +290,7 @@ else
     {
         try
         {
-            var response = await Http.GetStringAsync($"https://localhost:7277/api/Ticket/FilterOrGetTicket?Hidden=0&Cedula={Cedula}");
+            var response = await Http.GetStringAsync($"https://digesett.somee.com/api/Ticket/FilterOrGetTicket?Hidden=0&Cedula={Cedula}");
 
             // Verifica si la respuesta es válida antes de deserializarla
             if (!string.IsNullOrEmpty(response))
@@ -390,7 +390,7 @@ else
     {
         try
         {
-            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{cedula}");
+            var response = await Http.DeleteAsync($"https://digesett.somee.com/api/User/{cedula}");
 
             if (response.IsSuccessStatusCode)
             {

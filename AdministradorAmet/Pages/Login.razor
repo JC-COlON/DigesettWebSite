@@ -106,7 +106,7 @@
             await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "authToken");
 
             // Enviar la solicitud POST a la API
-            var response = await Http.PostAsJsonAsync("https://localhost:7277/api/UserAccess/Login", requestBody);
+            var response = await Http.PostAsJsonAsync("https://digesett.somee.com/api/UserAccess/Login", requestBody);
 
             if (response.IsSuccessStatusCode)
             {

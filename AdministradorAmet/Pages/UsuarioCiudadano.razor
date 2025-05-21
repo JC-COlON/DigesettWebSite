@@ -103,26 +103,27 @@
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Property="Gender" Width="65px">
+                    <RadzenDataGridColumn TItem="User" Property="Gender" Width="35px">
                         <HeaderTemplate>
                             <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Sexo</span>
                         </HeaderTemplate>
                         <Template Context="usuario">
-                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Gender</span>
-                        </Template>
-                        <Template Context="usuario">
                             @if (string.IsNullOrWhiteSpace(usuario.Gender))
                             {
-                                <span style="display: block; text-align:justify; width: 100%;font-size:large">-</span>  <!-- Muestra un guion si no hay valor -->
+                                <span style="display: block; text-align:justify; width: 100%;font-size:large">-</span>
                             }
                             else
                             {
-                                <span style="font-family: 'Roboto', sans-serif; font-size: medium;">@usuario.Gender</span>
+                                <span style="font-family: 'Roboto', sans-serif; font-size: medium;">
+                                    @(usuario.Gender.ToLower().StartsWith("m") ? "M" :
+                                        usuario.Gender.ToLower().StartsWith("f") ? "F" : "-")
+                                </span>
                             }
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Property="Phone" Width="70px">
+
+                    <RadzenDataGridColumn TItem="User" Property="Phone" Width="50px">
                         <HeaderTemplate>
                             <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Teléfono</span>
                         </HeaderTemplate>
@@ -131,12 +132,22 @@
                         </Template>
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="User" Property="Role" Width="70px">
+                    <RadzenDataGridColumn TItem="User" Property="Gender" Width="85px">
                         <HeaderTemplate>
-                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Tipo de Usuario</span>
+                            <span style="font-weight: bold; font-size: medium; font-family: 'Poppins', sans-serif;">Correo</span>
                         </HeaderTemplate>
                         <Template Context="usuario">
-                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.Role</span>
+                            <span style="font-family: 'Roboto', sans-serif;font-size: medium">@usuario.email</span>
+                        </Template>
+                        <Template Context="usuario">
+                            @if (string.IsNullOrWhiteSpace(usuario.email))
+                            {
+                                <span style="display: block; text-align:justify; width: 100%;font-size:large">-</span>  <!-- Muestra un guion si no hay valor -->
+                            }
+                            else
+                            {
+                                <span style="font-family: 'Roboto', sans-serif; font-size: medium;">@usuario.email</span>
+                            }
                         </Template>
                     </RadzenDataGridColumn>
 
@@ -192,7 +203,7 @@
     {
         try
         {
-            var response = await Http.GetStringAsync("https://localhost:7277/api/User/all");
+            var response = await Http.GetStringAsync("https://digesett.somee.com/api/User/all");
             users = JsonConvert.DeserializeObject<List<User>>(response);
 
             // Filtrar solo los administradores
@@ -270,7 +281,7 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"https://localhost:7277/api/User/{cedula}");
+            var response = await Http.DeleteAsync($"https://digesett.somee.com/api/User/{cedula}");
 
             if (response.IsSuccessStatusCode)
             {

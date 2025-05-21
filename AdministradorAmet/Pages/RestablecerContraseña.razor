@@ -52,7 +52,7 @@
             return;
         }
 
-        var response = await Http.PostAsJsonAsync("https://localhost:7277/api/User/reset-password", new { Token = token, NewPassword = newPassword });
+        var response = await Http.PostAsJsonAsync("https://digesett.somee.com/api/User/reset-password", new { Token = token, NewPassword = newPassword });
         if (response.IsSuccessStatusCode)
         {
             await JSRuntime.InvokeVoidAsync("alert", "Contraseña restablecida con éxito.");

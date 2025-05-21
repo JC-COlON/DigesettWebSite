@@ -216,7 +216,7 @@
             Console.WriteLine($"NewPassword: {newPassword}");
             Console.WriteLine($"ConfirmPassword: {confirmPassword}");
 
-            var response = await Http.PostAsJsonAsync("https://localhost:7277/api/User/change-password", cambioContrasenaDto);
+            var response = await Http.PostAsJsonAsync("https://digesett.somee.com/api/User/change-password", cambioContrasenaDto);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Cambio de contraseña exitoso.");
